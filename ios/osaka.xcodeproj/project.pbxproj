@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* osakaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* osakaTests.m */; };
+		04C4E5CD249805C3003CCB37 /* SF Pro Icons Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 04C4E5CC249805C3003CCB37 /* SF Pro Icons Regular.ttf */; };
 		04D60575249768C600E0A425 /* AvenirNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04D60572249768C600E0A425 /* AvenirNextLTPro-Regular.otf */; };
 		04D60576249768C600E0A425 /* AvenirNextLTPro-It.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04D60573249768C600E0A425 /* AvenirNextLTPro-It.otf */; };
 		04D60577249768C600E0A425 /* AvenirNextLTPro-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 04D60574249768C600E0A425 /* AvenirNextLTPro-Bold.otf */; };
@@ -48,6 +49,7 @@
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* osakaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = osakaTests.m; sourceTree = "<group>"; };
 		029416373D7B9ECA081963ED /* libPods-osaka.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-osaka.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04C4E5CC249805C3003CCB37 /* SF Pro Icons Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "SF Pro Icons Regular.ttf"; path = "../assets/fonts/SF Pro Icons Regular.ttf"; sourceTree = "<group>"; };
 		04D60572249768C600E0A425 /* AvenirNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "AvenirNextLTPro-Regular.otf"; path = "../assets/fonts/AvenirNextLTPro-Regular.otf"; sourceTree = "<group>"; };
 		04D60573249768C600E0A425 /* AvenirNextLTPro-It.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "AvenirNextLTPro-It.otf"; path = "../assets/fonts/AvenirNextLTPro-It.otf"; sourceTree = "<group>"; };
 		04D60574249768C600E0A425 /* AvenirNextLTPro-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "AvenirNextLTPro-Bold.otf"; path = "../assets/fonts/AvenirNextLTPro-Bold.otf"; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				04C4E5CC249805C3003CCB37 /* SF Pro Icons Regular.ttf */,
 				04D60574249768C600E0A425 /* AvenirNextLTPro-Bold.otf */,
 				04D60573249768C600E0A425 /* AvenirNextLTPro-It.otf */,
 				04D60572249768C600E0A425 /* AvenirNextLTPro-Regular.otf */,
@@ -348,6 +351,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04C4E5CD249805C3003CCB37 /* SF Pro Icons Regular.ttf in Resources */,
 				04D60575249768C600E0A425 /* AvenirNextLTPro-Regular.otf in Resources */,
 				04D60576249768C600E0A425 /* AvenirNextLTPro-It.otf in Resources */,
 				04D60577249768C600E0A425 /* AvenirNextLTPro-Bold.otf in Resources */,

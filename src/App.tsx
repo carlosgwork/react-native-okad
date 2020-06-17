@@ -10,7 +10,7 @@ import {
 
 import { Provider } from 'react-redux'
 import { Loading, Toast } from '@components'
-import Routes from '@routes/main'
+import Routes from '@routes/index'
 import store from '@redux/store'
 import { ThemeContext } from '@global/Context'
 import getThemeStyle from '@utils/styles'

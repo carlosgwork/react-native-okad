@@ -57,7 +57,6 @@ export default function Splash() {
   return (
     <View style={styles.content}>
       <Image source={Logo} style={styles.logo} />
-      <Text style={styles.text}>Welcome</Text>
     </View>
   )
 }

@@ -1,3 +1,3 @@
 export const navigateHome = (navigate: Function) => {
-  navigate('Home')
+  navigate('Main')
 }

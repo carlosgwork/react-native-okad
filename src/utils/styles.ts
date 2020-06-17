@@ -2,25 +2,23 @@ import { Dimensions, Platform } from 'react-native'
 import DeviceInfo from 'react-native-device-info'
 
 const defaultColors = {
-  backgroundPrimary: '#FFFFFF',
+  backgroundWhite: '#FFFFFF',
+  
+  purple: '#5D396E',
+  lightPurple: '#9E5FC2',
+  gray: '#9b9b9b',
+  gray1: '#D8D8D8',
+
   black: '#000000',
   black50: 'rgba(0, 0, 0, .75)',
   
   textBlack: '#000000',
-  themePrimary: '#100D32',
+  textPurple: '#5D396E',
+  textWhite: '#FFF',
 }
 
 function getThemeColors(theme: Theme): AppColors {
   switch (theme) {
-    case 'normal':
-      return {
-        backgroundPrimary: '#FFFFFF',
-        black: '#000000',
-        black50: 'rgba(0, 0, 0, .75)',
-        
-        textBlack: '#000000',
-        themePrimary: '#100D32',
-      }
     case 'normal':
     default:
       return defaultColors
@@ -77,7 +75,7 @@ const textSizes: {
   [16]: {
     fontSize: scale(16),
     letterSpacing: scale(0.5),
-    lineHeight: scale(20)
+    lineHeight: scale(20),
   },
   [18]: {
     fontSize: scale(18),

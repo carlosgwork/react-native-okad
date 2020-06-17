@@ -1,105 +1,65 @@
 import * as React from 'react'
-import { NavigationContainer } from '@react-navigation/native'
-import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Icon } from 'react-native-elements'
 
-import Splash from '@views/Splash'
-
-import Login from '@views/Login'
 
 import Home from '@views/Home'
+import Contacts from '@views/Contacts'
+import Agreements from '@views/Agreements'
+import Catalog from '@views/Catalog'
 
-import { useBackHandler } from '@global/Hooks'
-import { setAction } from '@redux/actions'
 
-// Gets the current screen from navigation state
-const getActiveRouteName = (state: { [key: string]: any }) => {
-  const route = state.routes[state.index]
-  if (route.state) {
-    // Dive into nested navigators
-    return getActiveRouteName(route.state)
-  }
-  return route.name
-}
 
-const SplashStack = createStackNavigator()
-function SplashRoutes() {  
+const MainTab = createBottomTabNavigator()
+import { useStyles, useTheme } from '@global/Hooks'
+export function MainTabRoutes() {
+  const { themeStyle } = useTheme()
+
   return (
-    <SplashStack.Navigator
-      initialRouteName='Splash'
+    <MainTab.Navigator
+      initialRouteName='Contacts'
       headerMode='none'
-    >
-      <SplashStack.Screen
-        name='Splash'
-        component={Splash}
-        options={{
-          gestureEnabled: false
-        }}
-      />
-    </SplashStack.Navigator>
-  )
-}
 
-const AuthStack = createStackNavigator()
-function AuthRoutes() {
-  return (
-    <AuthStack.Navigator
-      initialRouteName='Login'
-      headerMode='none'
-    >
-      <AuthStack.Screen
-        name='Login'
-        component={Login}
-      />
-    </AuthStack.Navigator>
-  )
-}
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
 
-const HomeStack = createStackNavigator()
-function HomeRoutes() {
-  return (
-    <HomeStack.Navigator
-      initialRouteName='Home'
-      headerMode='none'
+          iconName = 'ios-home'
+          if (route.name === 'Home') {
+            // iconName = focused
+            //   ? 'ios-information-circle'
+            //   : 'ios-information-circle-outline'
+          } else if (route.name === 'Settings') {
+          }
+
+          return <Icon
+            name={iconName}
+            type='ionicon'
+            color={color}
+          />
+        },
+      })}
+      tabBarOptions={{
+        activeTintColor: themeStyle.purple,
+        inactiveTintColor: themeStyle.gray,
+      }}
     >
-      <HomeStack.Screen
+      <MainTab.Screen
         name='Home'
         component={Home}
       />
-    </HomeStack.Navigator>
-  )
-}
-
-const Stack = createStackNavigator()
-export default function Routes() {
-  const routeNameRef = React.useRef()
-  useBackHandler()
-  return (
-    <NavigationContainer
-      onStateChange={async (state) => {
-        const previousScreen = routeNameRef.current
-        const currentScreen = getActiveRouteName(state)
-        if (previousScreen !== currentScreen) {
-          setAction('screens', { currentScreen, previousScreen })
-        }
-        routeNameRef.current = currentScreen
-      }}>
-      <Stack.Navigator
-        initialRouteName='Splash'
-        headerMode='none'
-      >
-        <Stack.Screen
-          name='Splash'
-          component={SplashRoutes}
-        />
-        <Stack.Screen
-          name='Auth'
-          component={AuthRoutes}
-        />
-        <Stack.Screen
-          name='Home'
-          component={HomeRoutes}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
+      <MainTab.Screen
+        name='Contacts'
+        component={Contacts}
+      />
+      <MainTab.Screen
+        name='Agreements'
+        component={Agreements}
+      />
+      <MainTab.Screen
+        name='Catalog'
+        component={Catalog}
+      />
+    </MainTab.Navigator>
   )
 }
