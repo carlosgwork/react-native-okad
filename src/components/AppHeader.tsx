@@ -71,8 +71,9 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
   },
   toolbar: {
     flexDirection: 'row',
-    marginHorizontal: 20,
-    height: themeStyle.scale(50),
+    alignItems: 'center',
+    marginHorizontal: themeStyle.scale(20),
+    paddingVertical: themeStyle.scale(5),
     borderBottomWidth: 1,
     borderColor: themeStyle.gray1,
   },

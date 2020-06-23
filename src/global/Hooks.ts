@@ -53,7 +53,7 @@ export const useStyles = (getStyles?: GetStyles = () => ({})): UseStyles => {
   return { styles, theme, themeStyle }
 }
 
-export function useTheme() {
+export function useTheme(): ThemeStyle {
   return React.useContext(ThemeContext)
 }
 
