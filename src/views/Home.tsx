@@ -1,46 +1,44 @@
-import * as React from 'react'
-import { Image, View, Text } from 'react-native'
-import { useSelector } from 'react-redux'
-import { useNavigation } from '@react-navigation/native'
+/* eslint-disable react-hooks/exhaustive-deps */
+import * as React from 'react';
+import {View} from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 
-import { Button } from 'react-native-elements'
+import {Button} from 'react-native-elements';
 
-import { useStyles } from '@global/Hooks'
-
-import { logout } from '@redux/actions'
+import {useStyles} from '@global/Hooks';
+import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import {logout} from '@redux/actions';
 
 export default function Home() {
-  const { navigate, replace } = useNavigation()
-  const { styles } = useStyles(getStyles)
-  const user = useSelector((state: any) => state.user)
-  const [storeReady, setStoreReady] = React.useState(false)
+  const {replace} = useNavigation();
+  const {styles} = useStyles(getStyles);
 
   const onLogout = React.useCallback(() => {
-    logout()
+    logout();
 
-    replace('Auth')
-  }, [])
+    replace('Auth');
+  }, []);
   return (
     <View style={styles.container}>
-      <Button
-        style={{ marginTop: 100, height: 100 }}
-        onPress={onLogout}
-        title={'Logout'}
-      />
+      <Button style={styles.logoutBtn} onPress={onLogout} title={'Logout'} />
     </View>
-  )
+  );
 }
 
-const getStyles = (themeStyle) => ({
+const getStyles = (themeStyle: StyleType) => ({
   container: {
     backgroundColor: themeStyle.white,
-    flex: 1
+    flex: 1,
+  },
+  logoutBtn: {
+    marginTop: 100,
+    height: 100,
   },
   text: {
     ...themeStyle.getTextStyle({
       color: 'textBlack',
       font: 'anBold',
-      size: 16
+      size: 16,
     }),
-  }
-})
+  },
+});

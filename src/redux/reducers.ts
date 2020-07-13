@@ -1,21 +1,21 @@
-import { toast, ToastState } from './reducers/toast'
-import { user, UserState } from './reducers/user'
-import { loading } from './reducers/loading'
-import { contacts, ContactsState, ContactsAction } from './reducers/contacts'
-
+import {toast, ToastState} from './reducers/toast';
+import {user} from './reducers/user';
+import {loading} from './reducers/loading';
+import {contacts, ContactsState} from './reducers/contacts';
+import {UserType} from '../utils/types';
 
 export const reducers = {
   toast,
   user,
   loading,
   contacts,
-}
+};
 
-export type ReducerKeys = $Keys<typeof reducers>
+export type ReducerKeys = keyof typeof reducers;
 
 export type ReduxState = {
-  toast: ToastState,
-  user: UserState,
-  loading: boolean,
-  contacts: ContactsState,
-}
+  toast: ToastState;
+  user: UserType;
+  loading: boolean;
+  contacts: ContactsState;
+};

@@ -1,26 +1,16 @@
-import * as React from 'react'
-import { Image, View, Text } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import * as React from 'react';
+import {View} from 'react-native';
 
-import { useSelector } from 'react-redux'
-import { setAction } from '@redux/actions'
-
-import type { Theme, ThemeStyle as StyleType } from '@utils/style'
-import { useStyles, useTheme } from '@global/Hooks'
-import { navigateHome } from '@utils/functions'
+import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import {useStyles} from '@global/Hooks';
 
 export default function Contacts() {
-  const { themeStyle } = useTheme()
-  const { navigate } = useNavigation()
-  const { styles } = useStyles(getStyles)
+  const {styles} = useStyles(getStyles);
 
-  return (
-    <View style={styles.container}>
-    </View>
-  )
+  return <View style={styles.container} />;
 }
 
-const getStyles = (themeStyle: StyleType<Theme>) => ({
+const getStyles = (themeStyle: StyleType) => ({
   container: {
     flex: 1,
     ...themeStyle.viewCentered,
@@ -29,7 +19,7 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
     ...themeStyle.getTextStyle({
       color: 'textBlack',
       font: 'anBold',
-      size: 18
+      size: 18,
     }),
-  }
-})
+  },
+});

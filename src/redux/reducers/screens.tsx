@@ -1,24 +1,26 @@
-
-type ScreensState = {
-  previousScreen: string,
-  currentScreen: string
-}
+export type ScreensState = {
+  previousScreen: string;
+  currentScreen: string;
+};
 
 export const initialScreens: ScreensState = {
   previousScreen: '',
   currentScreen: 'Splash',
-}
+};
 
-export const screens = (state: ScreensState = initialScreens, action: ScreensAction) => {
-  const { payload = {}, type } = action
+export const screens = (
+  state: ScreensState = initialScreens,
+  action: ScreensAction,
+) => {
+  const {payload = {}, type} = action;
   switch (type) {
     case 'clean_toast':
-      return initialScreens
+      return initialScreens;
     case 'set_toast':
-      return { ...state, ...payload }
+      return {...state, ...payload};
     default:
-      return state
+      return state;
   }
-}
+};
 
-export type ScreensAction = { payload?: $Shape<ScreensState>, type: string }
+export type ScreensAction = {payload?: Partial<ScreensState>; type: string};

@@ -1,30 +1,30 @@
 //@flow
 
-import React, { useEffect, useState } from 'react'
-import { Text, Image, View } from 'react-native'
-import { useSelector } from 'react-redux'
-import { useStyles } from '@global/Hooks'
-import type { Theme, ThemeStyle as StyleType } from '@utils/style'
-import { Logo } from '@assets/assets'
+import React from 'react';
+import {Text, Image, View} from 'react-native';
+import {useSelector} from 'react-redux';
+import {useStyles} from '@global/Hooks';
+import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import {Logo} from '@assets/assets';
 
-type Props = {}
+type Props = {};
 
 export default React.memo<Props>(function Loading() {
-  const { styles } = useStyles(getStyles)
-  const loading = useSelector((state: any) => state.loading)
+  const {styles} = useStyles(getStyles);
+  const loading = useSelector((state: any) => state.loading);
 
   if (!loading) {
-    return null
+    return null;
   }
   return (
     <View style={styles.main}>
       <Image source={Logo} style={styles.logo} />
       <Text style={styles.byline}>Loading...</Text>
     </View>
-  )
-})
+  );
+});
 
-const getStyles = (themeStyle: StyleType<Theme>) => ({
+const getStyles = (themeStyle: StyleType) => ({
   main: {
     position: 'absolute',
     backgroundColor: '#fff',
@@ -35,9 +35,9 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'flex-start',
-    zIndex: 9999999
+    zIndex: 9999999,
   },
   logo: {
     width: themeStyle.window.width * 0.6,
   },
-})
+});

@@ -1,45 +1,41 @@
-//@flow
+import * as React from 'react';
+import {
+  Image,
+  TouchableOpacity,
+  Text,
+  ImageStyle,
+  ViewStyle,
+} from 'react-native';
+import {useTheme} from '@global/Hooks';
 
-import moment from 'moment'
-import * as React from 'react'
-import { Image, TouchableOpacity, Text } from 'react-native'
-import { useTheme } from '@global/Hooks'
-
-import { GoogleLogo } from '@assets/assets'
+import {GoogleLogo} from '@assets/assets';
+import {ThemeStyle} from '@root/utils/styles';
 
 type Props = {
-  provider: string,
-  onPress?: () => any,
-}
+  provider: string;
+  onPress?: () => any;
+};
 
 export default React.memo<Props>(function SocialLoginButton(props: Props) {
-  const { themeStyle } = useTheme()
-  const styles = React.useMemo(() => getStyles(themeStyle), [themeStyle])
-  const { provider, onPress } = props
+  const {themeStyle} = useTheme();
+  const styles = React.useMemo(() => getStyles(themeStyle), [themeStyle]);
+  const {provider, onPress} = props;
 
-  let content = null
+  let content = null;
   if (provider === 'google') {
     content = [
-      <Image
-        source={GoogleLogo}
-        style={styles.iconStyle}
-      />,
-      <Text style={styles.text}>Sign in with Google</Text>
-    ]
+      <Image source={GoogleLogo} style={styles.iconStyle as ImageStyle} />,
+      <Text style={styles.text}>Sign in with Google</Text>,
+    ];
   }
   return (
-    <TouchableOpacity
-      style={[
-        styles.buttonStyle,
-      ]}
-      onPress={onPress}
-    >
-      { content }
+    <TouchableOpacity style={styles.buttonStyle as ViewStyle} onPress={onPress}>
+      {content}
     </TouchableOpacity>
-  )
-})
+  );
+});
 
-function getStyles(themeStyle) {
+function getStyles(themeStyle: ThemeStyle) {
   return {
     buttonStyle: {
       ...themeStyle.viewCentered,
@@ -60,8 +56,8 @@ function getStyles(themeStyle) {
       ...themeStyle.getTextStyle({
         color: 'textBlack',
         font: 'anBold',
-        size: 16
+        size: 16,
       }),
-    }
-  }
+    },
+  };
 }

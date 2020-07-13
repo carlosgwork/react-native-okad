@@ -1,12 +1,11 @@
-
-import React from 'react'
-import { Theme, ThemeStyle } from '@utils/styles'
+import React from 'react';
+import {Theme, ThemeStyle} from '@root/utils/styles';
 
 export type ThemeContextType = {
   // setTheme: Theme => any,
-  setTheme: any,
-  theme: Theme,
-  themeStyle: ThemeStyle<Theme>
-}
+  setTheme: any;
+  theme: Theme;
+  themeStyle: ThemeStyle;
+};
 
-export const ThemeContext = React.createContext<ThemeContextType>({})
+export const ThemeContext = React.createContext<ThemeContextType>({});

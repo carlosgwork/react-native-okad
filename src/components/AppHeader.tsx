@@ -1,37 +1,31 @@
-import * as React from 'react'
-import { Image, View, Text } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import * as React from 'react';
+import {View, Text} from 'react-native';
 
-import { useSelector } from 'react-redux'
-import { setAction } from '@redux/actions'
+import {Header} from 'react-native-elements';
 
-import { Header } from 'react-native-elements'
-
-import type { Theme, ThemeStyle as StyleType } from '@utils/style'
-import { useStyles, useTheme } from '@global/Hooks'
-import { navigateHome } from '@utils/functions'
+import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import {useStyles, useTheme} from '@global/Hooks';
 
 type Props = {
-  leftContent?: React.ReactElement,
-  rightContent?: React.ReactElement,
-  toolbarLeftContent?: React.ReactElement,
-  toolbarCenterContent?: React.ReactElement,
-  toolbarRightContent?: React.ReactElement,
-  pageTitle: string,
-}
+  leftContent?: React.ReactElement | any;
+  rightContent?: React.ReactElement | any;
+  toolbarLeftContent?: React.ReactElement | any;
+  toolbarCenterContent?: React.ReactElement | any;
+  toolbarRightContent?: React.ReactElement | any;
+  pageTitle: string;
+};
 
 export default React.memo<Props>(function AppHeader(props: Props) {
-  const { themeStyle } = useTheme()
-  const { navigate } = useNavigation()
-  const { styles } = useStyles(getStyles)
+  const {themeStyle} = useTheme();
+  const {styles} = useStyles(getStyles);
 
-  const defaultLeft = <View></View>
-  const defaultRight = <View></View>
-  const defaultToolbarLeft = props.pageTitle
-    ? <Text style={styles.pageTitle}>{props.pageTitle}</Text>
-    : null
-  const defaultToolbarCenter = <View></View>
-  const defaultToolbarRight = <View></View>
+  const defaultLeft = <View />;
+  const defaultRight = <View />;
+  const defaultToolbarLeft = props.pageTitle ? (
+    <Text style={styles.pageTitle}>{props.pageTitle}</Text>
+  ) : null;
+  const defaultToolbarCenter = <View />;
+  const defaultToolbarRight = <View />;
 
   const {
     leftContent = defaultLeft,
@@ -39,7 +33,7 @@ export default React.memo<Props>(function AppHeader(props: Props) {
     toolbarLeftContent = defaultToolbarLeft,
     toolbarCenterContent = defaultToolbarCenter,
     toolbarRightContent = defaultToolbarRight,
-  } = props
+  } = props;
 
   return (
     <View style={styles.container}>
@@ -51,21 +45,15 @@ export default React.memo<Props>(function AppHeader(props: Props) {
         }}
       />
       <View style={styles.toolbar}>
-        <View style={styles.toolbarLeft}>
-          { toolbarLeftContent }
-        </View>
-        <View style={styles.toolbarCenter}>
-          { toolbarCenterContent }
-        </View>
-        <View style={styles.toolbarRight}>
-          { toolbarRightContent }
-        </View>
+        <View style={styles.toolbarLeft}>{toolbarLeftContent}</View>
+        <View style={styles.toolbarCenter}>{toolbarCenterContent}</View>
+        <View style={styles.toolbarRight}>{toolbarRightContent}</View>
       </View>
     </View>
-  )
-})
+  );
+});
 
-const getStyles = (themeStyle: StyleType<Theme>) => ({
+const getStyles = (themeStyle: StyleType) => ({
   container: {
     backgroundColor: themeStyle.backgroundWhite,
   },
@@ -91,7 +79,7 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
     ...themeStyle.getTextStyle({
       color: 'textPurple',
       font: 'anBold',
-      size: 40
+      size: 40,
     }),
   },
 
@@ -99,7 +87,7 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
     ...themeStyle.getTextStyle({
       color: 'textBlack',
       font: 'anBold',
-      size: 18
+      size: 18,
     }),
-  }
-})
+  },
+});

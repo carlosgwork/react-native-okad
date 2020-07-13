@@ -1,37 +1,36 @@
-import * as React from 'react'
-import { Image, View, Text, TouchableOpacity } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import * as React from 'react';
 
-import { useSelector } from 'react-redux'
-import { setAction } from '@redux/actions'
+import {Input} from 'react-native-elements';
 
-import { Input } from 'react-native-elements'
-import LinearGradient from 'react-native-linear-gradient'
-
-import type { Theme, ThemeStyle as StyleType } from '@utils/style'
-import { useStyles, useTheme } from '@global/Hooks'
-import { navigateHome } from '@utils/functions'
+import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import {useStyles, useTheme} from '@global/Hooks';
 
 type Props = {
-  value: string,
-  onChange?: () => any,
-}
+  value: string | undefined;
+  onChange?: (text: string) => void;
+};
 
 export default React.memo<Props>(function AppSearchInput(props: Props) {
-  const { themeStyle } = useTheme()
-  const { navigate } = useNavigation()
-  const { styles } = useStyles(getStyles)
+  const {themeStyle} = useTheme();
+  const {styles} = useStyles(getStyles);
 
-  const {
-    value,
-    onChange,
-  } = props
+  const {value, onChange} = props;
 
   return (
     <Input
       placeholder="Search"
-      leftIcon={{ type: 'ionicon', name: 'ios-search', color: themeStyle.textGray, size: themeStyle.scale(20) }}
-      rightIcon={{ type: 'ionicon', name: 'ios-mic', color: themeStyle.textGray, size: themeStyle.scale(20) }}
+      leftIcon={{
+        type: 'ionicon',
+        name: 'ios-search',
+        color: themeStyle.textGray,
+        size: themeStyle.scale(20),
+      }}
+      rightIcon={{
+        type: 'ionicon',
+        name: 'ios-mic',
+        color: themeStyle.textGray,
+        size: themeStyle.scale(20),
+      }}
       containerStyle={styles.container}
       inputContainerStyle={styles.inputContainer}
       inputStyle={styles.input}
@@ -39,10 +38,10 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
       value={value}
       errorStyle={styles.error}
     />
-  )
-})
+  );
+});
 
-const getStyles = (themeStyle: StyleType<Theme>) => ({
+const getStyles = (themeStyle: StyleType) => ({
   container: {
     paddingHorizontal: 0,
   },
@@ -65,5 +64,5 @@ const getStyles = (themeStyle: StyleType<Theme>) => ({
     height: 0,
     padding: 0,
     margin: 0,
-  }
-})
+  },
+});

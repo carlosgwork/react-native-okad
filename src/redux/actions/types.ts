@@ -1,1 +1,1 @@
-export const LOGOUT = 'LOGOUT'
+export const LOGOUT = 'LOGOUT';

@@ -1,16 +1,18 @@
+export const initialLoading = false;
 
-export const initialLoading = false
-
-export const loading = (state: boolean = initialLoading, action: LoadingAction) => {
-  const { payload = false, type } = action
+export const loading = (
+  state: boolean = initialLoading,
+  action: LoadingAction,
+) => {
+  const {payload = false, type} = action;
   switch (type) {
     case 'clean_loading':
-      return initialLoading
+      return initialLoading;
     case 'set_loading':
-      return payload
+      return payload;
     default:
-      return state
+      return state;
   }
-}
+};
 
-export type LoadingAction = { payload?: boolean, type: string }
+export type LoadingAction = {payload?: boolean; type: string};
