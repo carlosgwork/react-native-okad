@@ -9,6 +9,7 @@ export type Contact = {
   name_last?: string;
   phone_mobile?: string;
   location?: string;
+  count?: number;
   // phone_home?: string,
   // phone_office?: string,
   // more fields

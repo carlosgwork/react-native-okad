@@ -37,7 +37,7 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
           <View
             style={[
               styles.row,
-              index % 2 !== 0 ? styles.rowOdd : styles.rowEven,
+              index % 2 !== 1 ? styles.rowOdd : styles.rowEven,
             ]}
             key={index}>
             {headers.map((header) => (

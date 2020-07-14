@@ -36,80 +36,94 @@ const iPhoneX = Platform.OS === 'ios' && (height === 812 || height === 896);
 
 const fonts = {
   anBold: 'AvenirNextLTPro-Bold',
+  anSemiBold: 'AvenirNextLTPro-Demi',
   anItalic: 'AvenirNextLTPro-It',
   anRegular: 'AvenirNextLTPro-Regular',
 };
 
 const scale = (value: number) => {
-  if (height / width >= 2) {
-    return (value * width) / 768;
-  } else {
-    return (value * height) / 1024;
-  }
+  return value;
 };
 
 const textSizes: {
-  [_: number]: {fontSize: number; letterSpacing: number; lineHeight: number};
+  [_: number]: {
+    fontSize: number;
+    letterSpacing: number;
+    lineHeight: number;
+    height: number;
+  };
 } = {
   [9]: {
     fontSize: scale(9),
     letterSpacing: scale(0.5),
     lineHeight: scale(10),
+    height: scale(10),
   },
   [10]: {
     fontSize: scale(10),
     letterSpacing: scale(0.5),
     lineHeight: scale(10),
+    height: scale(10),
   },
   [11]: {
     fontSize: scale(11),
     letterSpacing: scale(0.5),
     lineHeight: scale(11),
+    height: scale(11),
   },
   [12]: {
     fontSize: scale(12),
     letterSpacing: scale(0.5),
     lineHeight: scale(12),
+    height: scale(12),
   },
   [14]: {
     fontSize: scale(14),
     letterSpacing: scale(0.5),
     lineHeight: scale(14),
+    height: scale(14),
   },
   [16]: {
     fontSize: scale(16),
     letterSpacing: scale(0.5),
     lineHeight: scale(16),
+    height: scale(16),
   },
   [18]: {
     fontSize: scale(18),
     letterSpacing: scale(0.5),
     lineHeight: scale(18),
+    height: scale(18),
   },
   [20]: {
     fontSize: scale(20),
     letterSpacing: scale(0.5),
     lineHeight: scale(20),
+    height: scale(20),
   },
   [24]: {
     fontSize: scale(24),
     letterSpacing: scale(0.5),
     lineHeight: scale(24),
+    height: scale(24),
   },
   [26]: {
     fontSize: scale(26),
     letterSpacing: scale(0.5),
     lineHeight: scale(26),
+    height: scale(26),
   },
   [30]: {
     fontSize: scale(30),
     letterSpacing: 0,
     lineHeight: scale(30),
+    height: scale(30),
   },
   [40]: {
     fontSize: scale(40),
     letterSpacing: 0,
     lineHeight: scale(40),
+    height: scale(40),
   },
 };
 
@@ -142,6 +156,7 @@ const textStyle = (
   fontSize: textSizes[size].fontSize,
   letterSpacing: textSizes[size].letterSpacing,
   lineHeight: textSizes[size].lineHeight,
+  height: textSizes[size].height,
 });
 
 export default function getThemeStyle(theme: Theme) {

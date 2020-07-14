@@ -22,12 +22,14 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
     <TouchableOpacity style={styles.container} onPress={onPress}>
       <LinearGradient
         style={styles.btn}
-        start={{x: 0.0, y: 0.0}}
-        end={{x: 1.0, y: 0.0}}
-        locations={[0.7, 0.3]}
+        start={{x: 1.0, y: 0.0}}
+        end={{x: 0.0, y: 0.0}}
+        locations={[0.7, 0.2]}
         colors={[themeStyle.purple, themeStyle.lightPurple]}>
         <View style={styles.iconCont}>{leftIconContent}</View>
-        <Text style={styles.text}>{title}</Text>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>{title}</Text>
+        </View>
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -47,14 +49,22 @@ const getStyles = (themeStyle: StyleType) => ({
     ...themeStyle.viewCentered,
   },
   iconCont: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(9),
   },
   text: {
     ...themeStyle.getTextStyle({
       color: 'textWhite',
-      font: 'anBold',
+      font: 'anRegular',
       size: 16,
     }),
+    letterSpacing: 2,
+    fontWeight: '500',
     alignSelf: 'center',
+  },
+  textContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 32,
+    paddingRight: 20,
   },
 });

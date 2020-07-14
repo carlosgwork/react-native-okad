@@ -61,12 +61,12 @@ const getStyles = (themeStyle: StyleType) => ({
     flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: themeStyle.scale(20),
-    paddingVertical: themeStyle.scale(5),
+    paddingVertical: themeStyle.scale(10),
     borderBottomWidth: 1,
     borderColor: themeStyle.gray1,
   },
   toolbarLeft: {
-    marginRight: themeStyle.scale(20),
+    marginRight: themeStyle.scale(30),
   },
   toolbarCenter: {
     flex: 1,
@@ -78,7 +78,7 @@ const getStyles = (themeStyle: StyleType) => ({
   pageTitle: {
     ...themeStyle.getTextStyle({
       color: 'textPurple',
-      font: 'anBold',
+      font: 'anSemiBold',
       size: 40,
     }),
   },

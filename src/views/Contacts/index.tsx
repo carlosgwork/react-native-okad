@@ -38,18 +38,21 @@ const mockContacts = [
     name_last: 'Bao',
     phone_mobile: '(555) 555-5555',
     location: 'Charlotte, NC',
+    count: undefined,
   },
   {
     name_first: 'Roy',
     name_last: 'Smith',
     phone_mobile: '(555) 555-5555',
     location: 'Chrotte, NC',
+    count: 1,
   },
   {
     name_first: 'Ben',
     name_last: 'Smith',
     phone_mobile: '(555) 555-5555',
     location: 'Chrotte, NC',
+    count: 2,
   },
 ];
 
@@ -79,8 +82,12 @@ export default function Contacts() {
     switch (header.value) {
       case 'name':
         return (
-          <AppTextButton onPress={onNamePress}>
-            <AppText color={'textPurple'} size={20} font={'anBold'}>
+          <AppTextButton style={styles.cellLayout} onPress={onNamePress}>
+            <AppText
+              style={styles.noSpacing}
+              color={'textPurple'}
+              size={20}
+              font={'anSemiBold'}>
               <>
                 {row.name_first} {row.name_last}
               </>
@@ -88,13 +95,40 @@ export default function Contacts() {
           </AppTextButton>
         );
       case 'location':
-        return <AppText size={20}>{row.location}</AppText>;
+        return (
+          <View style={styles.cellLayout}>
+            <AppText style={styles.noSpacing} size={20}>
+              {row.location}
+            </AppText>
+          </View>
+        );
       case 'phoneNumber':
-        return <AppText size={20}>{row.phone_mobile}</AppText>;
+        return (
+          <View style={styles.cellLayout}>
+            <AppText style={styles.noSpacing} size={20}>
+              {row.phone_mobile}
+            </AppText>
+          </View>
+        );
       case 'actions':
+        if (row.count) {
+          return (
+            <AppTextButton
+              style={{...styles.cellLayout, ...styles.agreementsBtn}}
+              leftIconContent={<></>}>
+              <AppText
+                style={styles.noSpacing}
+                color={'textPurple'}
+                size={20}
+                font={'anSemiBold'}>
+                {`${row.count} agreements`}
+              </AppText>
+            </AppTextButton>
+          );
+        }
         return (
           <AppTextButton
-            style={styles.agreementsBtn}
+            style={{...styles.cellLayout, ...styles.agreementsBtn}}
             leftIconContent={
               <Icon
                 color={themeStyle.textPurple}
@@ -103,8 +137,12 @@ export default function Contacts() {
                 size={20}
               />
             }>
-            <AppText color={'textPurple'} size={20} font={'anBold'}>
-              Agreements
+            <AppText
+              style={styles.noSpacing}
+              color={'textPurple'}
+              size={20}
+              font={'anSemiBold'}>
+              New agreement
             </AppText>
           </AppTextButton>
         );
@@ -130,9 +168,10 @@ export default function Contacts() {
               title={'NEW'}
               leftIconContent={
                 <Icon
-                  name={'ios-add-circle'}
-                  type="ionicon"
                   color={themeStyle.textWhite}
+                  name={'pluscircle'}
+                  type={'antdesign'}
+                  size={22}
                 />
               }
             />
@@ -171,9 +210,18 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   agreementsBtn: {
     justifyContent: 'flex-end',
-    flexDirection: 'row',
   },
   flexlayout: {
     flexDirection: 'row',
+  },
+  cellLayout: {
+    paddingTop: 5,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 5,
+    height: 40,
+  },
+  noSpacing: {
+    letterSpacing: 0,
   },
 });
