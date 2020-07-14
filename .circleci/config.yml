@@ -2,6 +2,15 @@ version: 2.1
 orbs:
   react-native: react-native-community/react-native@4.4.2
 jobs:
+  analyse_js:
+    executor: react-native/linux_js
+    steps:
+      - attach_workspace:
+          at: .
+      - react-native/yarn_install
+      # - run:
+      #     command: yarn eslint . --ext .js,.jsx,.ts,.tsx
+      #     name: Run ESLint
   checkout_code:
     executor: react-native/linux_js
     steps:
@@ -13,8 +22,11 @@ workflows:
   build-and-test:
     jobs:
       - checkout_code
+      - analyse_js:
+          requires:
+            - checkout_code
       - react-native/ios_build_and_test:
           build_configuration: Release
           device: iPhone X
           project_path: ios/osaka.xcodeproj
-          scheme: Example
+          scheme: osaka
