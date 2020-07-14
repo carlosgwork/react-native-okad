@@ -2,7 +2,14 @@ version: 2.1
 orbs:
   react-native: react-native-community/react-native@4.4.2
 jobs:
-  build-and-test:
+  checkout_code:
+    executor: react-native/linux_js
+    steps:
+      - checkout
+      - persist_to_workspace:
+          paths: .
+          root: .
+  ios-build-and-test:
     executor:
       name: node/default
     steps:
@@ -12,6 +19,11 @@ jobs:
             - run: npm install
             - run: npm test
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  build-and-test:
+    jobs:
+      - checkout_code
+      - react-native/ios_build_and_test:
+          build_configuration: Release
+          device: iPhone X
+          project_path: ios/osaka.xcodeproj
+          scheme: Example
