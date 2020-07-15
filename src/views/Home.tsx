@@ -10,7 +10,7 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {logout} from '@redux/actions';
 
 export default function Home() {
-  const {replace} = useNavigation();
+  const {replace} = useNavigation<any>();
   const {styles} = useStyles(getStyles);
 
   const onLogout = React.useCallback(() => {

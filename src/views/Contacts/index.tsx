@@ -8,7 +8,7 @@ import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
 import {useQuery} from '@apollo/react-hooks';
 
-import type {ThemeStyle as StyleType} from '@root/utils/styles';
+import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
 import {Contact, TableHeaderType} from '@utils/types';
@@ -93,6 +93,87 @@ const sortContact = (arr: Contact[], sortBy: string) => {
   });
 };
 
+const cellContent = (
+  header: TableHeaderType,
+  row: Contact,
+  styles: any,
+  themeStyle: ThemeStyle,
+) => {
+  switch (header.value) {
+    case 'name':
+      return (
+        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+          <AppText
+            style={styles.noSpacing}
+            color={'textPurple'}
+            size={20}
+            font={'anSemiBold'}>
+            <>
+              {row.name_first} {row.name_last}
+            </>
+          </AppText>
+        </AppTextButton>
+      );
+    case 'location':
+      return (
+        <View style={styles.cellLayout}>
+          <AppText style={styles.noSpacing} size={20}>
+            {`${row.address.city}, ${row.address.us_state}`}
+          </AppText>
+        </View>
+      );
+    case 'phoneNumber':
+      const phone_number =
+        row.phone_mobile || row.phone_home || row.phone_office || '';
+      return (
+        <View style={styles.cellLayout}>
+          <AppText style={styles.noSpacing} size={20}>
+            {phoneFormat(phone_number)}
+          </AppText>
+        </View>
+      );
+    case 'actions':
+      const count = row.agreements ? row.agreements.length : 0;
+      if (count) {
+        return (
+          <AppTextButton
+            style={{...styles.cellLayout, ...styles.agreementsBtn}}
+            leftIconContent={<></>}>
+            <AppText
+              style={styles.noSpacing}
+              color={'textPurple'}
+              size={20}
+              font={'anSemiBold'}>
+              {count > 1 ? `${count} agreements` : `${count} agreement`}
+            </AppText>
+          </AppTextButton>
+        );
+      }
+      return (
+        <AppTextButton
+          style={{...styles.cellLayout, ...styles.agreementsBtn}}
+          leftIconContent={
+            <Icon
+              color={themeStyle.textPurple}
+              name={'pluscircleo'}
+              type={'antdesign'}
+              size={20}
+            />
+          }>
+          <AppText
+            style={styles.noSpacing}
+            color={'textPurple'}
+            size={20}
+            font={'anSemiBold'}>
+            New agreement
+          </AppText>
+        </AppTextButton>
+      );
+    default:
+      return <></>;
+  }
+};
+
 export default function Contacts() {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
@@ -114,84 +195,21 @@ export default function Contacts() {
     setAction('contacts', {sortOp});
   }, []);
 
-  const cellContent = (header: TableHeaderType, row: Contact) => {
-    switch (header.value) {
-      case 'name':
-        return (
-          <AppTextButton style={styles.cellLayout} onPress={() => {}}>
-            <AppText
-              style={styles.noSpacing}
-              color={'textPurple'}
-              size={20}
-              font={'anSemiBold'}>
-              <>
-                {row.name_first} {row.name_last}
-              </>
-            </AppText>
-          </AppTextButton>
-        );
-      case 'location':
-        return (
-          <View style={styles.cellLayout}>
-            <AppText style={styles.noSpacing} size={20}>
-              {`${row.address.city}, ${row.address.us_state}`}
-            </AppText>
-          </View>
-        );
-      case 'phoneNumber':
-        const phone_number =
-          row.phone_mobile || row.phone_home || row.phone_office || '';
-        return (
-          <View style={styles.cellLayout}>
-            <AppText style={styles.noSpacing} size={20}>
-              {phoneFormat(phone_number)}
-            </AppText>
-          </View>
-        );
-      case 'actions':
-        const count = row.agreements ? row.agreements.length : 0;
-        if (count) {
-          return (
-            <AppTextButton
-              style={{...styles.cellLayout, ...styles.agreementsBtn}}
-              leftIconContent={<></>}>
-              <AppText
-                style={styles.noSpacing}
-                color={'textPurple'}
-                size={20}
-                font={'anSemiBold'}>
-                {count > 1 ? `${count} agreements` : `${count} agreement`}
-              </AppText>
-            </AppTextButton>
-          );
-        }
-        return (
-          <AppTextButton
-            style={{...styles.cellLayout, ...styles.agreementsBtn}}
-            leftIconContent={
-              <Icon
-                color={themeStyle.textPurple}
-                name={'pluscircleo'}
-                type={'antdesign'}
-                size={20}
-              />
-            }>
-            <AppText
-              style={styles.noSpacing}
-              color={'textPurple'}
-              size={20}
-              font={'anSemiBold'}>
-              New agreement
-            </AppText>
-          </AppTextButton>
-        );
-      default:
-        return <></>;
-    }
-  };
+  const onFilterContact = React.useCallback((text) => {
+    const filteredContacts = contacts.contacts.filter(
+      (contact: Contact) =>
+        `${contact.name_first} ${contact.name_last}`
+          .toLowerCase()
+          .indexOf(text.toLowerCase()) > -1,
+    );
+    const sorted = sortContact(filteredContacts, contactsSortOps.sortBy);
+    setVisibleContacts(sorted);
+    setSearchText(text);
+  }, []);
 
   const renderCell = React.useCallback(
-    (header: TableHeaderType, row: Contact) => cellContent(header, row),
+    (header: TableHeaderType, row: Contact) =>
+      cellContent(header, row, styles, themeStyle),
     [contacts],
   );
 
@@ -208,6 +226,7 @@ export default function Contacts() {
     });
     setVisibleContacts(data.contacts);
   }
+
   return (
     <View style={styles.container}>
       <AppHeader
@@ -230,10 +249,7 @@ export default function Contacts() {
           </View>
         }
         toolbarRightContent={
-          <AppSearchInput
-            value={searchText}
-            onChange={(text: string) => setSearchText(text)}
-          />
+          <AppSearchInput value={searchText} onChange={onFilterContact} />
         }
       />
 
