@@ -12,6 +12,7 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
 import {Contact, TableHeaderType} from '@utils/types';
+import {phoneFormat} from '@utils/functions';
 
 import {
   AppHeader,
@@ -105,10 +106,12 @@ export default function Contacts() {
           </View>
         );
       case 'phoneNumber':
+        const phone_number =
+          row.phone_mobile || row.phone_home || row.phone_office || '';
         return (
           <View style={styles.cellLayout}>
             <AppText style={styles.noSpacing} size={20}>
-              {row.phone_mobile || row.phone_home || row.phone_office}
+              {phoneFormat(phone_number)}
             </AppText>
           </View>
         );
@@ -124,7 +127,7 @@ export default function Contacts() {
                 color={'textPurple'}
                 size={20}
                 font={'anSemiBold'}>
-                {`${count} agreements`}
+                {count > 1 ? `${count} agreements` : `${count} agreement`}
               </AppText>
             </AppTextButton>
           );
