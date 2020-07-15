@@ -54,11 +54,12 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
 
 const getStyles = (themeStyle: StyleType) => ({
   container: {
-    paddingVertical: themeStyle.scale(20),
+    paddingVertical: 0,
   },
   headerContainer: {
     flexDirection: 'row',
     paddingHorizontal: themeStyle.scale(20),
+    paddingTop: themeStyle.scale(10),
   },
   rowContainer: {},
   row: {
