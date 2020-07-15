@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -21,7 +21,7 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
   const {headers, sortOp, rows, renderCell, onSortChanged} = props;
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.headerContainer}>
         {headers.map((header, index) => (
           <TableHeader
@@ -48,7 +48,7 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
           </View>
         ))}
       </View>
-    </View>
+    </ScrollView>
   );
 });
 

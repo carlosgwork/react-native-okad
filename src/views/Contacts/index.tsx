@@ -1,10 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
-import {View} from 'react-native';
+import {View, Text} from 'react-native';
+import gql from 'graphql-tag';
 
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
+import {useQuery} from '@apollo/react-hooks';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -18,10 +20,11 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
+  Loading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Name', value: 'name', sortable: false, style: {width: 150}},
+  {label: 'Name', value: 'name', sortable: false, style: {width: 220}},
   {label: 'Location', value: 'location', sortable: true, style: {flex: 1}},
   {
     label: 'Phone Number',
@@ -32,29 +35,27 @@ const HEADERS: TableHeaderType[] = [
   {label: '', value: 'actions', sortable: false, style: {flex: 1}},
 ];
 
-const mockContacts = [
-  {
-    name_first: 'Song',
-    name_last: 'Bao',
-    phone_mobile: '(555) 555-5555',
-    location: 'Charlotte, NC',
-    count: undefined,
-  },
-  {
-    name_first: 'Roy',
-    name_last: 'Smith',
-    phone_mobile: '(555) 555-5555',
-    location: 'Chrotte, NC',
-    count: 1,
-  },
-  {
-    name_first: 'Ben',
-    name_last: 'Smith',
-    phone_mobile: '(555) 555-5555',
-    location: 'Chrotte, NC',
-    count: 2,
-  },
-];
+export const FETCH_TODOS = gql`
+  query {
+    contacts {
+      id
+      email
+      name_first
+      name_last
+      phone_home
+      phone_mobile
+      phone_office
+      address {
+        county
+        city
+        us_state
+      }
+      agreements {
+        id
+      }
+    }
+  }
+`;
 
 export default function Contacts() {
   const {themeStyle} = useTheme();
@@ -62,13 +63,14 @@ export default function Contacts() {
 
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
+  const {data, error, loading} = useQuery(FETCH_TODOS);
 
   const [searchText, setSearchText] = React.useState<string | undefined>('');
 
   React.useEffect(() => {
     // fetchContact()
     setAction('contacts', {
-      contacts: mockContacts,
+      contacts: contacts,
     });
   }, [contactsSortOps]);
 
@@ -98,7 +100,7 @@ export default function Contacts() {
         return (
           <View style={styles.cellLayout}>
             <AppText style={styles.noSpacing} size={20}>
-              {row.location}
+              {`${row.address.city}, ${row.address.us_state}`}
             </AppText>
           </View>
         );
@@ -106,12 +108,13 @@ export default function Contacts() {
         return (
           <View style={styles.cellLayout}>
             <AppText style={styles.noSpacing} size={20}>
-              {row.phone_mobile}
+              {row.phone_mobile || row.phone_home || row.phone_office}
             </AppText>
           </View>
         );
       case 'actions':
-        if (row.count) {
+        const count = row.agreements ? row.agreements.length : 0;
+        if (count) {
           return (
             <AppTextButton
               style={{...styles.cellLayout, ...styles.agreementsBtn}}
@@ -121,7 +124,7 @@ export default function Contacts() {
                 color={'textPurple'}
                 size={20}
                 font={'anSemiBold'}>
-                {`${row.count} agreements`}
+                {`${count} agreements`}
               </AppText>
             </AppTextButton>
           );
@@ -156,6 +159,18 @@ export default function Contacts() {
     [contacts],
   );
 
+  if (!contacts.contacts.length) {
+    if (error) {
+      console.error(error);
+      return <Text>Error</Text>;
+    }
+    if (loading) {
+      return <Loading />;
+    }
+    setAction('contacts', {
+      contacts: data.contacts,
+    });
+  }
   return (
     <View style={styles.container}>
       <AppHeader
