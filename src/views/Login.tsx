@@ -14,7 +14,7 @@ import {navigateHome} from '@utils/functions';
 
 export default function Login() {
   const {themeStyle} = useTheme();
-  const {replace} = useNavigation();
+  const {replace} = useNavigation<any>();
   const {styles} = useStyles(getStyles);
   const onGoogleLogin = React.useCallback(async () => {
     // Login google

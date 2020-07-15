@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import * as React from 'react';
+import React, {useState} from 'react';
 import {View, Text} from 'react-native';
 import gql from 'graphql-tag';
 
@@ -58,6 +58,41 @@ export const FETCH_TODOS = gql`
   }
 `;
 
+const sortContact = (arr: Contact[], sortBy: string) => {
+  return arr.sort((a: Contact, b: Contact) => {
+    let cmpA = '',
+      cmpB = '';
+    switch (sortBy) {
+      case 'phoneNumber':
+        cmpA = (
+          a.phone_mobile ||
+          a.phone_home ||
+          a.phone_office ||
+          ''
+        ).toUpperCase();
+        cmpB = (
+          b.phone_mobile ||
+          b.phone_home ||
+          b.phone_office ||
+          ''
+        ).toUpperCase();
+        break;
+      case 'location':
+        cmpA = (a.address.city + ', ' + a.address.us_state).toUpperCase();
+        cmpB = (b.address.city + ', ' + b.address.us_state).toUpperCase();
+        break;
+      default:
+    }
+    let comparison = 0;
+    if (cmpA > cmpB) {
+      comparison = 1;
+    } else if (cmpA < cmpB) {
+      comparison = -1;
+    }
+    return comparison;
+  });
+};
+
 export default function Contacts() {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
@@ -65,27 +100,25 @@ export default function Contacts() {
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
   const {data, error, loading} = useQuery(FETCH_TODOS);
+  const [searchText, setSearchText] = useState<string | undefined>('');
+  const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
+    contacts.contacts,
+  );
 
-  const [searchText, setSearchText] = React.useState<string | undefined>('');
-
-  React.useEffect(() => {
-    // fetchContact()
-    setAction('contacts', {
-      contacts: contacts,
-    });
-  }, [contactsSortOps]);
-
-  const onNamePress = React.useCallback(() => {
-    // handler
-  }, []);
   const onSortChanged = React.useCallback((sortOp) => {
+    let sorted = sortContact(contacts.contacts, sortOp.sortBy);
+    if (sortOp.sortOrder === 'DESC') {
+      sorted = sorted.reverse();
+    }
+    setVisibleContacts(sorted);
     setAction('contacts', {sortOp});
   }, []);
+
   const cellContent = (header: TableHeaderType, row: Contact) => {
     switch (header.value) {
       case 'name':
         return (
-          <AppTextButton style={styles.cellLayout} onPress={onNamePress}>
+          <AppTextButton style={styles.cellLayout} onPress={() => {}}>
             <AppText
               style={styles.noSpacing}
               color={'textPurple'}
@@ -173,6 +206,7 @@ export default function Contacts() {
     setAction('contacts', {
       contacts: data.contacts,
     });
+    setVisibleContacts(data.contacts);
   }
   return (
     <View style={styles.container}>
@@ -205,9 +239,10 @@ export default function Contacts() {
 
       <AppDataTable
         headers={HEADERS}
+        key={visibleContacts.length || contactsSortOps}
         sortOp={contactsSortOps}
         renderCell={renderCell}
-        rows={contacts.contacts}
+        rows={visibleContacts}
         onSortChanged={onSortChanged}
       />
     </View>

@@ -32,10 +32,9 @@ export type Contact = {
   // created: Date,
   // last_modified?: Date,
   email?: string;
-  name_first?: string;
-  name_last?: string;
+  name_first: string;
+  name_last: string;
   phone_mobile?: string;
-  location?: string;
   count?: number;
   phone_home?: string;
   phone_office?: string;
