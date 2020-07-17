@@ -61,3 +61,32 @@ export type UserType = {
 export type ReduxState = {
   user: UserType;
 };
+
+export type Catalog = {
+  id: number;
+  public_id?: number;
+  created?: Date;
+  sku: string;
+  name: string;
+  description: string;
+  category: string;
+  cost: number;
+  price: number;
+  installation_fee: number;
+  taxable: boolean;
+  square_id?: string;
+  qbo_id?: string;
+};
+
+export type CatalogKeys = keyof Catalog;
+
+export type Vendor = {
+  id: number;
+  public_id: number;
+  created: Date;
+  last_modified: Date;
+  name: string;
+  short_name: string;
+  logo_uri: string;
+  catalog_items: Catalog[];
+};

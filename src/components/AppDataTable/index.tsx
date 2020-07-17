@@ -58,7 +58,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   headerContainer: {
     flexDirection: 'row',
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHoriz: themeStyle.scale(20),
     paddingTop: themeStyle.scale(10),
   },
   rowContainer: {},

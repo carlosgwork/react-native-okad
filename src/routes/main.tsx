@@ -5,7 +5,7 @@ import {Icon} from 'react-native-elements';
 import Home from '@root/views/Home';
 import Contacts from '@root/views/Contacts';
 import Agreements from '@root/views/Agreements';
-import Catalog from '@root/views/Catalog';
+import Catalog from '@root/views/Catalogs';
 
 const MainTab = createBottomTabNavigator();
 import {useTheme} from '@global/Hooks';
