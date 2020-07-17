@@ -34,18 +34,20 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
       </View>
       <View style={styles.rowContainer}>
         {rows.map((row, index) => (
-          <View
-            style={[
-              styles.row,
-              index % 2 !== 1 ? styles.rowOdd : styles.rowEven,
-            ]}
-            key={index}>
-            {headers.map((header) => (
-              <View style={[styles.cell, header.style]} key={header.value}>
-                {renderCell(header, row)}
-              </View>
-            ))}
-          </View>
+          <React.Fragment key={index}>
+            <View
+              style={[
+                styles.row,
+                index % 2 !== 1 ? styles.rowOdd : styles.rowEven,
+              ]}>
+              {headers.map((header) => (
+                <View style={[styles.cell, header.style]} key={header.value}>
+                  {renderCell(header, row)}
+                </View>
+              ))}
+            </View>
+            <View style={styles.divider} />
+          </React.Fragment>
         ))}
       </View>
     </ScrollView>
@@ -58,15 +60,19 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   headerContainer: {
     flexDirection: 'row',
-    paddingHoriz: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(20),
     paddingTop: themeStyle.scale(10),
   },
   rowContainer: {},
   row: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderColor: themeStyle.gray,
     paddingHorizontal: themeStyle.scale(20),
+  },
+  divider: {
+    flexDirection: 'row',
+    height: 1,
+    backgroundColor: themeStyle.gray1,
+    marginLeft: themeStyle.scale(50),
   },
   rowOdd: {},
   rowEven: {

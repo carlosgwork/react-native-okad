@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
 import numeral from 'numeral';
-import {setAction} from '@redux/actions';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -100,37 +99,37 @@ type Props = {
   vendorName: string;
   catalogs: Catalog[];
   catalogSortOps: TableSortOps;
+  sortChanged: (_: TableSortOps) => void;
 };
 
 export default function VendorRow({
   vendorName,
   catalogs,
   catalogSortOps,
+  sortChanged,
 }: Props) {
   const {styles} = useStyles(getStyles);
 
   const [visibleCatalogs, setVisibleCatalogs] = useState<Catalog[]>(catalogs);
 
-  useEffect(() => {
-    console.log('------ props catalogs: ', catalogs);
-  }, [catalogs]);
-
-  const onSortChanged = React.useCallback((sortOp) => {
-    let sorted = sortCatalog(catalogs, sortOp.sortBy);
+  const onSortChanged = (sortOp: TableSortOps) => {
+    let sorted = sortCatalog(catalogs, sortOp.sortBy as CatalogKeys);
     if (sortOp.sortOrder === 'DESC') {
       sorted = sorted.reverse();
     }
     setVisibleCatalogs(sorted);
-    setAction('catalogs', {sortOp});
-  }, []);
+    sortChanged(sortOp);
+  };
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Catalog) => cellContent(header, row, styles),
     [catalogs],
   );
   return (
-    <View>
-      <AppText>{vendorName}</AppText>
+    <View style={styles.vendorRow}>
+      <View style={styles.vendorName}>
+        <AppText style={styles.vendorNameText}>{vendorName}</AppText>
+      </View>
       <AppDataTable
         headers={HEADERS}
         key={
@@ -157,14 +156,32 @@ const getStyles = (themeStyle: StyleType) => ({
       size: 18,
     }),
   },
+  vendorRow: {
+    paddingBottom: 20,
+  },
   cellLayout: {
     paddingTop: 5,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
     paddingBottom: 5,
     height: 40,
   },
   noSpacing: {
     letterSpacing: 0,
+  },
+  vendorName: {
+    marginVertical: 10,
+    paddingVertical: 15,
+    marginLeft: themeStyle.scale(20),
+    borderBottomWidth: 1,
+    borderBottomColor: themeStyle.gray1,
+  },
+  vendorNameText: {
+    ...themeStyle.getTextStyle({
+      color: 'textBlack',
+      font: 'anSemiBold',
+      size: 18,
+    }),
   },
 });

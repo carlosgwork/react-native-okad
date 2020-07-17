@@ -13,11 +13,12 @@ import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {TableSortOps} from '@root/utils/types';
+import {TableSortOps, Vendor} from '@root/utils/types';
 import {emptyTableSortOption} from '@utils/constants';
 import {Loading} from '@root/components';
 import VendorRow from './vendorRow';
 import {VendorsState} from '@root/redux/reducers/vendors';
+import {AppHeader, AppSearchInput} from '@root/components';
 
 export const FETCH_VENDORS = gql`
   query Vendors($pageNum: Int!) {
@@ -44,7 +45,7 @@ export default function Catalogs() {
     (state: any): VendorsState => state.vendors,
   );
   const [pageNum, setPageNum] = useState<number>(0);
-
+  const [searchText, setSearchText] = useState<string | undefined>('');
   const {data, loading, error} = useQuery(FETCH_VENDORS, {
     variables: {pageNum},
   });
@@ -53,16 +54,23 @@ export default function Catalogs() {
   const [vendorsSortOps, setVendorsSortOps] = useState<TableSortOps[]>([]);
 
   useEffect(() => {
-    console.log('-------- vendor changed .... sort ops changed', vendors);
     const sortOps: TableSortOps[] = vendors.map((vendor) => {
       const opt = sortOptions.filter(
         (option) => option.vendor_id === vendor.id,
       );
       return opt.length > 0 ? opt[0].sortOps : emptyTableSortOption;
     });
-    console.log('--- -sortOps:', sortOps);
     setVendorsSortOps(sortOps);
   }, [vendors, sortOptions]);
+
+  const onFilterCatalog = React.useCallback((text) => setSearchText(text), []);
+
+  const onSortChanged = (sortOp: TableSortOps, index: number) => {
+    const newVendorSortOps = vendorsSortOps.slice();
+    newVendorSortOps[index] = sortOp;
+    setVendorsSortOps(newVendorSortOps);
+    setAction('catalogs', {sortOptions: newVendorSortOps});
+  };
 
   const renderFooter = () => {
     if (!loadingTable) {
@@ -95,7 +103,6 @@ export default function Catalogs() {
         </View>
       );
     }
-    console.log('---------- vendors load: ', data.vendors);
     setAction('vendors', {
       vendors: data.vendors,
     });
@@ -107,11 +114,26 @@ export default function Catalogs() {
       </View>
     );
   }
-  console.log('------ vendors and sortops: ', vendors, vendorsSortOps);
+  let filterdVendors = vendors.slice();
+  if (searchText) {
+    filterdVendors = vendors.filter(
+      (vendor: Vendor) =>
+        vendor.name.toLowerCase().indexOf(searchText.toLowerCase()) > -1,
+    );
+  }
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
+      <AppHeader
+        leftContent={null}
+        rightContent={null}
+        pageTitle={'Catalog'}
+        toolbarCenterContent={null}
+        toolbarRightContent={
+          <AppSearchInput value={searchText} onChange={onFilterCatalog} />
+        }
+      />
       <FlatList
-        data={vendors}
+        data={filterdVendors}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({item, index}) => (
           <VendorRow
@@ -119,6 +141,9 @@ export default function Catalogs() {
             vendorName={item.name}
             catalogs={item.catalog_items}
             catalogSortOps={vendorsSortOps[index]}
+            sortChanged={(sortOps: TableSortOps) =>
+              onSortChanged(sortOps, index)
+            }
           />
         )}
         ListFooterComponent={renderFooter}
@@ -132,6 +157,10 @@ export default function Catalogs() {
 }
 
 const getStyles = (themeStyle: StyleType) => ({
+  container: {
+    flex: 1,
+    backgroundColor: themeStyle.backgroundWhite,
+  },
   text: {
     ...themeStyle.getTextStyle({
       color: 'textBlack',

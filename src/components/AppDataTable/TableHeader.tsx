@@ -39,7 +39,11 @@ export default React.memo<Props>(function TableHeader(props: Props) {
     : View;
   return (
     <Container style={[styles.container, header.style]} onPress={onHandleSort}>
-      <AppText color={'textBlack2'} font={'anBold'} style={styles.text}>
+      <AppText
+        color={'textBlack2'}
+        font={'anSemiBold'}
+        size={14}
+        style={styles.text}>
         {header.label}
       </AppText>
       {sortOp.sortBy === header.value && (
