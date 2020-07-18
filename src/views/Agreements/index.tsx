@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {View, Text} from 'react-native';
+import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
 import gql from 'graphql-tag';
 
 import {useSelector} from 'react-redux';
@@ -9,7 +9,7 @@ import {useQuery} from '@apollo/react-hooks';
 import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
-import {useStyles, useTheme} from '@global/Hooks';
+import {useStyles} from '@global/Hooks';
 
 import {Agreement, TableHeaderType} from '@utils/types';
 
@@ -24,7 +24,7 @@ import {
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Id', value: 'id', sortable: false, style: {width: 100}},
-  {label: 'Contact', value: 'contact', sortable: true, style: {width: 200}},
+  {label: 'Contact', value: 'contact', sortable: true, style: {width: 220}},
   {
     label: 'Shipping Address',
     value: 'shipping_address',
@@ -71,12 +71,20 @@ const sortAgreement = (arr: Agreement[], sortBy: string) => {
       cmpB = '';
     switch (sortBy) {
       case 'contact':
-        cmpA = `${a.contact?.name_first} ${a.contact?.name_last}`.toUpperCase();
-        cmpB = `${b.contact?.name_first} ${b.contact?.name_last}`.toUpperCase();
+        cmpA = `${a.contact?.name_first || ''} ${
+          a.contact?.name_last || ''
+        }`.toUpperCase();
+        cmpB = `${b.contact?.name_first || ''} ${
+          b.contact?.name_last || ''
+        }`.toUpperCase();
         break;
       case 'shipping_address':
-        cmpA = (a.address?.city + ', ' + a.address?.us_state).toUpperCase();
-        cmpB = (b.address?.city + ', ' + b.address?.us_state).toUpperCase();
+        cmpA = `${a.address?.city || ''}${a.address?.city ? ', ' : ''}${
+          a.address?.us_state || ''
+        }`.toUpperCase();
+        cmpB = `${b.address?.city || ''}${b.address?.city ? ', ' : ''}${
+          b.address?.us_state || ''
+        }`.toUpperCase();
         break;
       case 'agreement_template_id':
         cmpA = `${a.agreement_template_id}`.toUpperCase();
@@ -109,7 +117,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
             size={20}
             font={'anSemiBold'}>
             <>
-              {row.contact?.name_first} {row.contact?.name_last}
+              {row.contact?.name_first || ''} {row.contact?.name_last || ''}
             </>
           </AppText>
         </AppTextButton>
@@ -118,7 +126,9 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={20}>
-            {`${row.address?.city}, ${row.address?.us_state}`}
+            {`${row.address?.city || ''}${row.address?.city ? ', ' : ''}${
+              row.address?.us_state || ''
+            }`}
           </AppText>
         </View>
       );
@@ -134,7 +144,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={20}>
-            {row.agreement_template_id}
+            {`${row.agreement_template_id}`}
           </AppText>
         </View>
       );
@@ -142,7 +152,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={20}>
-            {row.id}
+            {`${row.id}`}
           </AppText>
         </View>
       );
@@ -152,7 +162,6 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
 };
 
 export default function Agreements() {
-  const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
   const agreements = useSelector((state: any) => state.agreements);
@@ -172,11 +181,32 @@ export default function Agreements() {
     setAction('agreements', {sortOp});
   }, []);
 
-  const onFilterAgreement = (text) => setSearchText(text);
+  const onFilterAgreement = (text: string) => {
+    const filteredAgreements = agreements.agreements.filter(
+      (agreement: Agreement) =>
+        `${agreement.contact?.name_first || ''} ${
+          agreement.contact?.name_last || ''
+        }`
+          .toLowerCase()
+          .indexOf(text.toLowerCase()) > -1,
+    );
+    setVisibleAgreements(filteredAgreements);
+    setSearchText(text);
+  };
+
+  const isCloseToBottom = ({
+    layoutMeasurement,
+    contentOffset,
+    contentSize,
+  }: NativeScrollEvent): boolean => {
+    return (
+      layoutMeasurement.height + contentOffset.y >= contentSize.height - 50
+    );
+  };
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Agreement) =>
-      cellContent(header, row, styles, themeStyle),
+      cellContent(header, row, styles),
     [agreements],
   );
 
@@ -195,7 +225,13 @@ export default function Agreements() {
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      onScroll={({nativeEvent}): void => {
+        if (isCloseToBottom(nativeEvent as NativeScrollEvent)) {
+          console.log('========= load more');
+        }
+      }}
+      style={styles.container}>
       <AppHeader
         leftContent={null}
         rightContent={null}
@@ -214,7 +250,7 @@ export default function Agreements() {
         rows={visibleAgreements}
         onSortChanged={onSortChanged}
       />
-    </View>
+    </ScrollView>
   );
 }
 
