@@ -55,7 +55,7 @@ const textSizes: {
 } = {
   [9]: {
     fontSize: scale(9),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(10),
     height: scale(10),
   },
@@ -79,31 +79,31 @@ const textSizes: {
   },
   [14]: {
     fontSize: scale(14),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(14),
     height: scale(14),
   },
   [16]: {
     fontSize: scale(16),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(16),
     height: scale(16),
   },
   [18]: {
     fontSize: scale(18),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(18),
     height: scale(18),
   },
   [20]: {
     fontSize: scale(20),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(20),
     height: scale(20),
   },
   [24]: {
     fontSize: scale(24),
-    letterSpacing: scale(0.5),
+    letterSpacing: scale(0.3),
     lineHeight: scale(24),
     height: scale(24),
   },

@@ -2,7 +2,7 @@ import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
 
-import Home from '@root/views/Home';
+import Home from '@root/views/Dashboard';
 import Contacts from '@root/views/Contacts';
 import Agreements from '@root/views/Agreements';
 import Catalog from '@root/views/Catalogs';
@@ -15,25 +15,38 @@ export function MainTabRoutes() {
   return (
     <MainTab.Navigator
       initialRouteName="Contacts"
-      headerMode="none"
       screenOptions={({route}) => ({
         tabBarIcon: ({color}) => {
           let iconName;
-
-          iconName = 'ios-home';
-          if (route.name === 'Home') {
-            // iconName = focused
-            //   ? 'ios-information-circle'
-            //   : 'ios-information-circle-outline'
-          } else if (route.name === 'Settings') {
+          switch (route.name) {
+            case 'Home':
+              iconName = 'ios-home';
+              break;
+            case 'Contacts':
+              iconName = 'ios-people';
+              break;
+            case 'Agreements':
+              iconName = 'ios-document';
+              break;
+            case 'Catalog':
+              iconName = 'ios-pricetags';
+              break;
+            default:
+              iconName = 'ios-people';
           }
-
-          return <Icon name={iconName} type="ionicon" color={color} />;
+          return (
+            <Icon name={iconName} type="ionicon" color={color} size={26} />
+          );
         },
       })}
       tabBarOptions={{
         activeTintColor: themeStyle.purple,
         inactiveTintColor: themeStyle.gray,
+        labelStyle: {
+          fontSize: 16,
+          letterSpacing: 0.5,
+          paddingVertical: 5,
+        },
       }}>
       <MainTab.Screen name="Home" component={Home} />
       <MainTab.Screen name="Contacts" component={Contacts} />

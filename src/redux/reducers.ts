@@ -5,6 +5,7 @@ import {contacts, ContactsState} from './reducers/contacts';
 import {catalogs, CatalogsState} from './reducers/catalogs';
 import {vendors, VendorsState} from './reducers/vendors';
 import {UserType} from '../utils/types';
+import {agreements, AgreementsState} from './reducers/agreements';
 
 export const reducers = {
   toast,
@@ -13,6 +14,7 @@ export const reducers = {
   contacts,
   catalogs,
   vendors,
+  agreements,
 };
 
 export type ReducerKeys = keyof typeof reducers;
@@ -24,4 +26,5 @@ export type ReduxState = {
   contacts: ContactsState;
   catalogs: CatalogsState;
   vendors: VendorsState;
+  agreements: AgreementsState;
 };

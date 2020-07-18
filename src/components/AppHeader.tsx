@@ -4,7 +4,7 @@ import {View, Text} from 'react-native';
 import {Header} from 'react-native-elements';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
-import {useStyles, useTheme} from '@global/Hooks';
+import {useStyles} from '@global/Hooks';
 
 type Props = {
   leftContent?: React.ReactElement | any;
@@ -16,7 +16,6 @@ type Props = {
 };
 
 export default React.memo<Props>(function AppHeader(props: Props) {
-  const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
   const defaultLeft = <View />;
@@ -36,13 +35,11 @@ export default React.memo<Props>(function AppHeader(props: Props) {
   } = props;
 
   return (
-    <View style={styles.container}>
+    <View>
       <Header
-        leftComponent={leftContent}
-        rightComponent={rightContent}
-        containerStyle={{
-          backgroundColor: themeStyle.backgroundWhite,
-        }}
+        leftComponent={<View style={styles.topContainer}>{leftContent}</View>}
+        rightComponent={<View style={styles.topContainer}>{rightContent}</View>}
+        containerStyle={styles.headerTopContainer}
       />
       <View style={styles.toolbar}>
         <View style={styles.toolbarLeft}>{toolbarLeftContent}</View>
@@ -54,8 +51,9 @@ export default React.memo<Props>(function AppHeader(props: Props) {
 });
 
 const getStyles = (themeStyle: StyleType) => ({
-  container: {
+  headerTopContainer: {
     backgroundColor: themeStyle.backgroundWhite,
+    borderBottomWidth: 0,
   },
   toolbar: {
     flexDirection: 'row',
@@ -65,14 +63,21 @@ const getStyles = (themeStyle: StyleType) => ({
     borderBottomWidth: 1,
     borderColor: themeStyle.gray1,
   },
+  topContainer: {
+    paddingVertical: themeStyle.scale(20),
+    paddingRight: themeStyle.scale(10),
+  },
   toolbarLeft: {
+    flex: 1,
     marginRight: themeStyle.scale(30),
   },
   toolbarCenter: {
     flex: 1,
   },
   toolbarRight: {
-    marginLeft: themeStyle.scale(20),
+    flex: 1,
+    marginLeft: themeStyle.scale(30),
+    alignItems: 'flex-end',
   },
 
   pageTitle: {

@@ -1,5 +1,13 @@
 import {ViewStyle} from 'react-native';
 
+export type AgreementEventEnum =
+  | 'printed'
+  | 'emailed'
+  | 'texted'
+  | 'viewed'
+  | 'modified'
+  | 'accepted';
+
 export type Address = {
   county?: string;
   city: string;
@@ -24,6 +32,17 @@ export type Agreement = {
   shipping_address_id?: number;
   signature?: number;
   user_id?: number;
+  events: AgreementEvent;
+  contact?: Contact;
+  address?: Address;
+  addressByBillingAddressId?: Address;
+};
+
+export type AgreementEvent = {
+  id: number;
+  created: Date;
+  agreement_id: number;
+  type: AgreementEventEnum;
 };
 
 export type Contact = {
@@ -39,7 +58,7 @@ export type Contact = {
   phone_home?: string;
   phone_office?: string;
   address: Address;
-  agreements: Agreement[];
+  agreements?: Agreement[];
 };
 
 export type TableHeaderType = {
