@@ -1,6 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
+import {
+  View,
+  Text,
+  ScrollView,
+  NativeScrollEvent,
+  ActivityIndicator,
+} from 'react-native';
 import gql from 'graphql-tag';
 
 import {useSelector} from 'react-redux';
@@ -11,7 +17,7 @@ import moment from 'moment';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
-import {Agreement, TableHeaderType} from '@utils/types';
+import {Agreement, TableHeaderType, TableSortOps} from '@utils/types';
 
 import {
   AppHeader,
@@ -19,11 +25,10 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
-  Loading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Id', value: 'id', sortable: false, style: {width: 100}},
+  {label: 'Id', value: 'id', sortable: true, style: {width: 100}},
   {label: 'Contact', value: 'contact', sortable: true, style: {width: 220}},
   {
     label: 'Shipping Address',
@@ -40,9 +45,9 @@ const HEADERS: TableHeaderType[] = [
   {label: 'Created', value: 'created', sortable: true, style: {width: 150}},
 ];
 
-export const FETCH_TODOS = gql`
-  query {
-    agreements {
+export const FETCH_AGREEMENTS = gql`
+  query AgreementQuery($offset: Int!) {
+    agreements(limit: 10, offset: $offset) {
       created
       agreement_template_id
       number
@@ -65,11 +70,107 @@ export const FETCH_TODOS = gql`
   }
 `;
 
-const sortAgreement = (arr: Agreement[], sortBy: string) => {
-  return arr.sort((a: Agreement, b: Agreement) => {
-    let cmpA = '',
-      cmpB = '';
-    switch (sortBy) {
+export default function Agreements() {
+  const {styles} = useStyles(getStyles);
+
+  const agreements = useSelector((state: any) => state.agreements);
+  const agreementsSortOps = agreements.sortOp;
+  const [offset, setOffset] = useState<number>(0);
+  const {error, loading} = useQuery(FETCH_AGREEMENTS, {
+    variables: {offset},
+    onCompleted: (data) => {
+      const newData = agreements.agreements.concat(data.agreements);
+      setAction('agreements', {
+        agreements: newData,
+      });
+      setVisibleAgreements(newData);
+    },
+  });
+  const [searchText, setSearchText] = useState<string | undefined>('');
+  const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>(
+    agreements.agreements,
+  );
+
+  const onSortChanged = React.useCallback((sortOp) => {
+    let sorted = sortAgreement(agreements.agreements, sortOp);
+    setVisibleAgreements(sorted);
+    setAction('agreements', {sortOp});
+  }, []);
+
+  const onFilterAgreement = (text: string) => {
+    const filteredAgreements = agreements.agreements.filter(
+      (agreement: Agreement) =>
+        `${agreement.contact?.name_first || ''} ${
+          agreement.contact?.name_last || ''
+        }`
+          .toLowerCase()
+          .indexOf(text.toLowerCase()) > -1,
+    );
+    let sorted = sortAgreement(filteredAgreements, agreementsSortOps);
+    setVisibleAgreements(sorted);
+    setSearchText(text);
+  };
+
+  const onContainerScroll = ({
+    nativeEvent,
+  }: {
+    nativeEvent: NativeScrollEvent;
+  }): void => {
+    const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
+    if (
+      layoutMeasurement.height + contentOffset.y >=
+      contentSize.height + 100
+    ) {
+      console.log('--------- fetching data');
+      const offsetNum = offset + 10;
+      setOffset(offsetNum);
+    }
+  };
+
+  const renderCell = React.useCallback(
+    (header: TableHeaderType, row: Agreement) =>
+      cellContent(header, row, styles),
+    [agreements],
+  );
+
+  if (error) {
+    console.error(error);
+    return <Text>Error</Text>;
+  }
+  console.log('-----  data: ', visibleAgreements);
+  return (
+    <ScrollView
+      onScroll={onContainerScroll}
+      scrollEventThrottle={300}
+      style={styles.container}>
+      <AppHeader
+        leftContent={null}
+        rightContent={null}
+        pageTitle={'Agreements'}
+        toolbarCenterContent={null}
+        toolbarRightContent={
+          <AppSearchInput value={searchText} onChange={onFilterAgreement} />
+        }
+      />
+      <AppDataTable
+        headers={HEADERS}
+        key={visibleAgreements.length || agreementsSortOps}
+        sortOp={agreementsSortOps}
+        renderCell={renderCell}
+        rows={visibleAgreements}
+        onSortChanged={onSortChanged}
+      />
+      {loading && (
+        <ActivityIndicator animating size="large" style={styles.loader} />
+      )}
+    </ScrollView>
+  );
+}
+
+const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
+  const sorted = arr.sort((a: Agreement, b: Agreement) => {
+    let cmpA, cmpB;
+    switch (sortOp.sortBy) {
       case 'contact':
         cmpA = `${a.contact?.name_first || ''} ${
           a.contact?.name_last || ''
@@ -87,14 +188,16 @@ const sortAgreement = (arr: Agreement[], sortBy: string) => {
         }`.toUpperCase();
         break;
       case 'agreement_template_id':
-        cmpA = `${a.agreement_template_id}`.toUpperCase();
-        cmpB = `${b.agreement_template_id}`.toUpperCase();
+        cmpA = a.agreement_template_id;
+        cmpB = b.agreement_template_id;
         break;
       case 'created':
         cmpA = `${a.created}`.toUpperCase();
         cmpB = `${b.created}`.toUpperCase();
         break;
       default:
+        cmpA = a.id;
+        cmpB = b.id;
     }
     let comparison = 0;
     if (cmpA > cmpB) {
@@ -104,6 +207,10 @@ const sortAgreement = (arr: Agreement[], sortBy: string) => {
     }
     return comparison;
   });
+  if (sortOp.sortOrder === 'DESC') {
+    sorted.reverse();
+  }
+  return sorted;
 };
 
 const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
@@ -161,99 +268,6 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
   }
 };
 
-export default function Agreements() {
-  const {styles} = useStyles(getStyles);
-
-  const agreements = useSelector((state: any) => state.agreements);
-  const agreementsSortOps = agreements.sortOp;
-  const {data, error, loading} = useQuery(FETCH_TODOS);
-  const [searchText, setSearchText] = useState<string | undefined>('');
-  const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>(
-    agreements.agreements,
-  );
-
-  const onSortChanged = React.useCallback((sortOp) => {
-    let sorted = sortAgreement(agreements.agreements, sortOp.sortBy);
-    if (sortOp.sortOrder === 'DESC') {
-      sorted = sorted.reverse();
-    }
-    setVisibleAgreements(sorted);
-    setAction('agreements', {sortOp});
-  }, []);
-
-  const onFilterAgreement = (text: string) => {
-    const filteredAgreements = agreements.agreements.filter(
-      (agreement: Agreement) =>
-        `${agreement.contact?.name_first || ''} ${
-          agreement.contact?.name_last || ''
-        }`
-          .toLowerCase()
-          .indexOf(text.toLowerCase()) > -1,
-    );
-    setVisibleAgreements(filteredAgreements);
-    setSearchText(text);
-  };
-
-  const isCloseToBottom = ({
-    layoutMeasurement,
-    contentOffset,
-    contentSize,
-  }: NativeScrollEvent): boolean => {
-    return (
-      layoutMeasurement.height + contentOffset.y >= contentSize.height - 50
-    );
-  };
-
-  const renderCell = React.useCallback(
-    (header: TableHeaderType, row: Agreement) =>
-      cellContent(header, row, styles),
-    [agreements],
-  );
-
-  if (!agreements.agreements.length) {
-    if (error) {
-      console.error(error);
-      return <Text>Error</Text>;
-    }
-    if (loading) {
-      return <Loading />;
-    }
-    setAction('agreements', {
-      agreements: data.agreements,
-    });
-    setVisibleAgreements(data.agreements);
-  }
-
-  return (
-    <ScrollView
-      onScroll={({nativeEvent}): void => {
-        if (isCloseToBottom(nativeEvent as NativeScrollEvent)) {
-          console.log('========= load more');
-        }
-      }}
-      style={styles.container}>
-      <AppHeader
-        leftContent={null}
-        rightContent={null}
-        pageTitle={'Agreements'}
-        toolbarCenterContent={null}
-        toolbarRightContent={
-          <AppSearchInput value={searchText} onChange={onFilterAgreement} />
-        }
-      />
-
-      <AppDataTable
-        headers={HEADERS}
-        key={visibleAgreements.length || agreementsSortOps}
-        sortOp={agreementsSortOps}
-        renderCell={renderCell}
-        rows={visibleAgreements}
-        onSortChanged={onSortChanged}
-      />
-    </ScrollView>
-  );
-}
-
 const getStyles = (themeStyle: StyleType) => ({
   container: {
     flex: 1,
@@ -281,5 +295,10 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   noSpacing: {
     letterSpacing: 0,
+  },
+  loader: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
   },
 });

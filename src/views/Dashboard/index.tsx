@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView} from 'react-native';
 import gql from 'graphql-tag';
