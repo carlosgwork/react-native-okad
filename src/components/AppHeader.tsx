@@ -68,14 +68,12 @@ const getStyles = (themeStyle: StyleType) => ({
     paddingRight: themeStyle.scale(10),
   },
   toolbarLeft: {
-    flex: 1,
     marginRight: themeStyle.scale(30),
   },
   toolbarCenter: {
     flex: 1,
   },
   toolbarRight: {
-    flex: 1,
     marginLeft: themeStyle.scale(30),
     alignItems: 'flex-end',
   },

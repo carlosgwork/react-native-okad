@@ -44,6 +44,7 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
 const getStyles = (themeStyle: StyleType) => ({
   container: {
     paddingHorizontal: 0,
+    width: 300,
   },
   inputContainer: {
     borderWidth: 1,

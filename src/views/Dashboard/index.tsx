@@ -78,7 +78,9 @@ export default function Dashboard() {
         }
         pageTitle={'Dashboard'}
         toolbarCenterContent={
-          <AppSearchInput value={searchText} onChange={onFilterAgreement} />
+          <View style={styles.searchContainer}>
+            <AppSearchInput value={searchText} onChange={onFilterAgreement} />
+          </View>
         }
         toolbarRightContent={
           <Image
@@ -106,6 +108,9 @@ export default function Dashboard() {
 }
 
 const getStyles = (themeStyle: StyleType) => ({
+  searchContainer: {
+    alignItems: 'center',
+  },
   container: {
     flex: 1,
     backgroundColor: themeStyle.backgroundWhite,
