@@ -25,7 +25,7 @@ const HEADERS: TableHeaderType[] = [
   {label: '', value: 'actions', sortable: false, style: {width: 50}},
 ];
 
-const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | undefined) => {
+const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | '') => {
   if (!sortBy) {
     return arr;
   }
