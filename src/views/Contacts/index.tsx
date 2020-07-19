@@ -11,7 +11,7 @@ import {useQuery} from '@apollo/react-hooks';
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
-import {Contact, TableHeaderType} from '@utils/types';
+import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
 import {phoneFormat} from '@utils/functions';
 
 import {
@@ -25,7 +25,7 @@ import {
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Name', value: 'name', sortable: false, style: {width: 220}},
+  {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
   {label: 'Location', value: 'location', sortable: true, style: {flex: 1}},
   {
     label: 'Phone Number',
@@ -80,6 +80,10 @@ const sortContact = (arr: Contact[], sortBy: string) => {
       case 'location':
         cmpA = (a.address.city + ', ' + a.address.us_state).toUpperCase();
         cmpB = (b.address.city + ', ' + b.address.us_state).toUpperCase();
+        break;
+      case 'name':
+        cmpA = (a.name_first + ' ' + a.name_last).toUpperCase();
+        cmpB = (b.name_first + ' ' + b.name_last).toUpperCase();
         break;
       default:
     }
@@ -186,16 +190,16 @@ export default function Contacts() {
     contacts.contacts,
   );
 
-  const onSortChanged = React.useCallback((sortOp) => {
+  const onSortChanged = (sortOp: TableSortOps) => {
     let sorted = sortContact(contacts.contacts, sortOp.sortBy);
     if (sortOp.sortOrder === 'DESC') {
       sorted = sorted.reverse();
     }
     setVisibleContacts(sorted);
     setAction('contacts', {sortOp});
-  }, []);
+  };
 
-  const onFilterContact = React.useCallback((text) => {
+  const onFilterContact = (text: string) => {
     const filteredContacts = contacts.contacts.filter(
       (contact: Contact) =>
         `${contact.name_first} ${contact.name_last}`
@@ -205,7 +209,7 @@ export default function Contacts() {
     const sorted = sortContact(filteredContacts, contactsSortOps.sortBy);
     setVisibleContacts(sorted);
     setSearchText(text);
-  }, []);
+  };
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Contact) =>
