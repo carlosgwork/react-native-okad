@@ -1,12 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  NativeScrollEvent,
-  ActivityIndicator,
-} from 'react-native';
+import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
 import gql from 'graphql-tag';
 
 import {useSelector} from 'react-redux';
@@ -25,6 +19,7 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
+  CircularLoading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
@@ -45,9 +40,11 @@ const HEADERS: TableHeaderType[] = [
   {label: 'Created', value: 'created', sortable: true, style: {width: 150}},
 ];
 
+const FETCH_COUNT = 20;
+
 export const FETCH_AGREEMENTS = gql`
   query AgreementQuery($offset: Int!) {
-    agreements(limit: 10, offset: $offset) {
+    agreements(limit: 20, offset: $offset) {
       created
       agreement_template_id
       number
@@ -91,11 +88,11 @@ export default function Agreements() {
     agreements.agreements,
   );
 
-  const onSortChanged = React.useCallback((sortOp) => {
+  const onSortChanged = (sortOp: TableSortOps) => {
     let sorted = sortAgreement(agreements.agreements, sortOp);
     setVisibleAgreements(sorted);
     setAction('agreements', {sortOp});
-  }, []);
+  };
 
   const onFilterAgreement = (text: string) => {
     const filteredAgreements = agreements.agreements.filter(
@@ -117,13 +114,20 @@ export default function Agreements() {
     nativeEvent: NativeScrollEvent;
   }): void => {
     const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
-    if (
-      layoutMeasurement.height + contentOffset.y >=
-      contentSize.height + 100
-    ) {
-      console.log('--------- fetching data');
-      const offsetNum = offset + 10;
-      setOffset(offsetNum);
+    if (loading) {
+      return;
+    }
+    if (layoutMeasurement.height > contentSize.height) {
+      if (contentOffset.y > 60) {
+        setOffset(offset + FETCH_COUNT);
+      }
+    } else {
+      if (
+        layoutMeasurement.height + contentOffset.y >=
+        contentSize.height + 60
+      ) {
+        setOffset(offset + FETCH_COUNT);
+      }
     }
   };
 
@@ -137,12 +141,9 @@ export default function Agreements() {
     console.error(error);
     return <Text>Error</Text>;
   }
-  console.log('-----  data: ', visibleAgreements);
+
   return (
-    <ScrollView
-      onScroll={onContainerScroll}
-      scrollEventThrottle={300}
-      style={styles.container}>
+    <View style={styles.container}>
       <AppHeader
         leftContent={null}
         rightContent={null}
@@ -152,18 +153,21 @@ export default function Agreements() {
           <AppSearchInput value={searchText} onChange={onFilterAgreement} />
         }
       />
-      <AppDataTable
-        headers={HEADERS}
-        key={visibleAgreements.length || agreementsSortOps}
-        sortOp={agreementsSortOps}
-        renderCell={renderCell}
-        rows={visibleAgreements}
-        onSortChanged={onSortChanged}
-      />
-      {loading && (
-        <ActivityIndicator animating size="large" style={styles.loader} />
-      )}
-    </ScrollView>
+      <ScrollView
+        onScroll={onContainerScroll}
+        scrollEventThrottle={300}
+        style={styles.container}>
+        <AppDataTable
+          headers={HEADERS}
+          key={visibleAgreements.length || agreementsSortOps}
+          sortOp={agreementsSortOps}
+          renderCell={renderCell}
+          rows={visibleAgreements}
+          onSortChanged={onSortChanged}
+        />
+        <CircularLoading loading={loading} />
+      </ScrollView>
+    </View>
   );
 }
 
@@ -295,10 +299,5 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   noSpacing: {
     letterSpacing: 0,
-  },
-  loader: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
   },
 });

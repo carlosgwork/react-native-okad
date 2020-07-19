@@ -8,7 +8,12 @@ import {useQuery} from '@apollo/react-hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {Agreement} from '@utils/types';
-import {AppHeader, AppText, AppSearchInput, Loading} from '@root/components';
+import {
+  AppHeader,
+  AppText,
+  AppSearchInput,
+  CircularLoading,
+} from '@root/components';
 import AgreementTile from './AgreementTile';
 
 export const FETCH_AGREEMENTS = gql`
@@ -29,8 +34,16 @@ export const FETCH_AGREEMENTS = gql`
 export default function Dashboard() {
   const {styles} = useStyles(getStyles);
   const [BgColors, setBgColors] = useState<string[]>([]);
-  const {data, error, loading} = useQuery(FETCH_AGREEMENTS, {
+  const {error, loading} = useQuery(FETCH_AGREEMENTS, {
     variables: {type: 'accepted'},
+    onCompleted: (data) => {
+      setSearchText('');
+      setAgreements(data.agreements as Agreement[]);
+      setBgColors(
+        randomColor({luminosity: 'dark', count: data.agreements.length}),
+      );
+      setVisibleAgreements(data.agreements);
+    },
   });
   const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [searchText, setSearchText] = useState<string | undefined>('');
@@ -48,20 +61,11 @@ export default function Dashboard() {
     setSearchText(text);
   };
 
-  if (!agreements.length) {
-    if (error) {
-      console.error(error);
-      return <Text>Error</Text>;
-    }
-    if (loading) {
-      return <Loading />;
-    }
-    setAgreements(data.agreements as Agreement[]);
-    setBgColors(
-      randomColor({luminosity: 'dark', count: data.agreements.length}),
-    );
-    setVisibleAgreements(data.agreements);
+  if (error) {
+    console.error(error);
+    return <Text>Error</Text>;
   }
+
   return (
     <View style={styles.container}>
       <AppHeader
@@ -102,6 +106,7 @@ export default function Dashboard() {
             />
           ))}
         </View>
+        <CircularLoading loading={loading} />
       </ScrollView>
     </View>
   );

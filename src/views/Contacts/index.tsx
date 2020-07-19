@@ -21,7 +21,7 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
-  Loading,
+  CircularLoading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
@@ -58,11 +58,11 @@ export const FETCH_TODOS = gql`
   }
 `;
 
-const sortContact = (arr: Contact[], sortBy: string) => {
-  return arr.sort((a: Contact, b: Contact) => {
+const sortContact = (arr: Contact[], sortOp: TableSortOps) => {
+  const sorted = arr.sort((a: Contact, b: Contact) => {
     let cmpA = '',
       cmpB = '';
-    switch (sortBy) {
+    switch (sortOp.sortBy) {
       case 'phoneNumber':
         cmpA = (
           a.phone_mobile ||
@@ -95,6 +95,10 @@ const sortContact = (arr: Contact[], sortBy: string) => {
     }
     return comparison;
   });
+  if (sortOp.sortOrder === 'DESC') {
+    sorted.reverse();
+  }
+  return sorted;
 };
 
 const cellContent = (
@@ -184,17 +188,23 @@ export default function Contacts() {
 
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
-  const {data, error, loading} = useQuery(FETCH_TODOS);
+  const {error, loading} = useQuery(FETCH_TODOS, {
+    onCompleted: (data) => {
+      setSearchText('');
+      const newData = contacts.contacts.concat(data.contacts);
+      setAction('contacts', {
+        contacts: newData,
+      });
+      setVisibleContacts(newData);
+    },
+  });
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
     contacts.contacts,
   );
 
   const onSortChanged = (sortOp: TableSortOps) => {
-    let sorted = sortContact(contacts.contacts, sortOp.sortBy);
-    if (sortOp.sortOrder === 'DESC') {
-      sorted = sorted.reverse();
-    }
+    let sorted = sortContact(contacts.contacts, sortOp);
     setVisibleContacts(sorted);
     setAction('contacts', {sortOp});
   };
@@ -206,7 +216,7 @@ export default function Contacts() {
           .toLowerCase()
           .indexOf(text.toLowerCase()) > -1,
     );
-    const sorted = sortContact(filteredContacts, contactsSortOps.sortBy);
+    const sorted = sortContact(filteredContacts, contactsSortOps);
     setVisibleContacts(sorted);
     setSearchText(text);
   };
@@ -217,18 +227,9 @@ export default function Contacts() {
     [contacts],
   );
 
-  if (!contacts.contacts.length) {
-    if (error) {
-      console.error(error);
-      return <Text>Error</Text>;
-    }
-    if (loading) {
-      return <Loading />;
-    }
-    setAction('contacts', {
-      contacts: data.contacts,
-    });
-    setVisibleContacts(data.contacts);
+  if (error) {
+    console.error(error);
+    return <Text>Error</Text>;
   }
 
   return (
@@ -256,7 +257,6 @@ export default function Contacts() {
           <AppSearchInput value={searchText} onChange={onFilterContact} />
         }
       />
-
       <AppDataTable
         headers={HEADERS}
         key={visibleContacts.length || contactsSortOps}
@@ -265,6 +265,7 @@ export default function Contacts() {
         rows={visibleContacts}
         onSortChanged={onSortChanged}
       />
+      <CircularLoading loading={loading} />
     </View>
   );
 }
