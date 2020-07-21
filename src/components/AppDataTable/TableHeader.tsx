@@ -51,6 +51,7 @@ export default React.memo<Props>(function TableHeader(props: Props) {
           name={sortOp.sortOrder === 'ASC' ? 'caret-down' : 'caret-up'}
           type="ionicon"
           color={themeStyle.textBlack2}
+          size={16}
         />
       )}
     </Container>
