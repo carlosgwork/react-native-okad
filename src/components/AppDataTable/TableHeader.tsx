@@ -48,9 +48,7 @@ export default React.memo<Props>(function TableHeader(props: Props) {
       </AppText>
       {sortOp.sortBy === header.value && (
         <Icon
-          name={
-            sortOp.sortOrder === 'ASC' ? 'md-arrow-dropdown' : 'md-arrow-dropup'
-          }
+          name={sortOp.sortOrder === 'ASC' ? 'caret-down' : 'caret-up'}
           type="ionicon"
           color={themeStyle.textBlack2}
         />

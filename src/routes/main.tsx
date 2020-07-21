@@ -3,7 +3,7 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
 
 import Home from '@root/views/Dashboard';
-import Contacts from '@root/views/Contacts';
+import ContactsRoutes from './contacts';
 import Agreements from '@root/views/Agreements';
 import Catalog from '@root/views/Catalogs';
 
@@ -49,7 +49,7 @@ export function MainTabRoutes() {
         },
       }}>
       <MainTab.Screen name="Home" component={Home} />
-      <MainTab.Screen name="Contacts" component={Contacts} />
+      <MainTab.Screen name="Contacts" component={ContactsRoutes} />
       <MainTab.Screen name="Agreements" component={Agreements} />
       <MainTab.Screen name="Catalog" component={Catalog} />
     </MainTab.Navigator>

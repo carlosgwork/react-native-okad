@@ -1,4 +1,4 @@
-import {TableSortOps, Catalog} from './types';
+import {TableSortOps, Catalog, Contact} from './types';
 
 export const emptyTableSortOption: TableSortOps = {
   sortOrder: 'ASC',
@@ -15,4 +15,16 @@ export const emptyCatalog: Catalog = {
   installation_fee: 0,
   taxable: false,
   id: 0,
+};
+
+export const emptyContact: Contact = {
+  name_first: '',
+  name_last: '',
+  address: {
+    city: '',
+    us_state: '',
+    postal_code: '',
+    line1: '',
+    id: 0,
+  },
 };

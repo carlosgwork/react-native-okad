@@ -12,7 +12,9 @@ import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
 import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
+import {ContactsProps, AppRouteEnum} from '@routes/types';
 import {phoneFormat} from '@utils/functions';
+import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {
   AppHeader,
@@ -182,7 +184,7 @@ const cellContent = (
   }
 };
 
-export default function Contacts() {
+export default function Contacts({navigation}: ContactsProps) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
@@ -239,7 +241,9 @@ export default function Contacts() {
         rightContent={null}
         pageTitle={'Contacts'}
         toolbarCenterContent={
-          <View style={styles.flexlayout}>
+          <TouchableOpacity
+            onPress={() => navigation.push(AppRouteEnum.NewContact)}
+            style={styles.flexlayout}>
             <AppGradButton
               title={'NEW'}
               leftIconContent={
@@ -251,7 +255,7 @@ export default function Contacts() {
                 />
               }
             />
-          </View>
+          </TouchableOpacity>
         }
         toolbarRightContent={
           <AppSearchInput value={searchText} onChange={onFilterContact} />
