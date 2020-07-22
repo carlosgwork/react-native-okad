@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, Modal} from 'react-native';
 import {Input} from 'react-native-elements';
 import Geolocation, {
   GeolocationResponse,
@@ -7,13 +7,22 @@ import Geolocation, {
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {AppHeader, AppText, NavBackBtn} from '@root/components';
-import {ContactsProps} from '@routes/types';
+import {AppHeader, AppText, AppGradButton} from '@root/components';
 import {Contact, Address} from '@root/utils/types';
 import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';
 
-export default function NewContact({navigation}: ContactsProps) {
+type Props = {
+  modalVisible: boolean;
+  closeModal: () => void;
+  createContact: () => void;
+};
+
+export default function NewContact({
+  modalVisible,
+  closeModal,
+  createContact,
+}: Props) {
   const {styles} = useStyles(getStyles);
   const [form, setForm] = useState<Contact>(emptyContact);
   const changeForm = (field: keyof Contact, value: string) => {
@@ -77,148 +86,196 @@ export default function NewContact({navigation}: ContactsProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <AppHeader
-        leftContent={
-          <NavBackBtn title="Back" onClick={() => navigation.goBack()} />
-        }
-        rightContent={null}
-        pageTitle={'New contact'}
-        toolbarCenterContent={null}
-        toolbarRightContent={
-          <TouchableOpacity onPress={getAddressFromCurrentLocation}>
-            <AppText size={14} color={'lightPurple'} font="anSemiBold">
-              Use my current location
-            </AppText>
-          </TouchableOpacity>
-        }
-      />
-      <View style={styles.mainContent}>
-        <View style={styles.row}>
-          <View style={styles.col8}>
-            <Input
-              placeholder="John"
-              label="First Name"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeForm('name_first', val)}
-              value={form.name_first}
-            />
+    <Modal animationType="fade" transparent={true} visible={modalVisible}>
+      <View style={styles.container}>
+        <AppHeader
+          leftContent={
+            <TouchableOpacity onPress={closeModal}>
+              <AppText size={14} color={'lightPurple'} font="anSemiBold">
+                Cancel
+              </AppText>
+            </TouchableOpacity>
+          }
+          rightContent={null}
+          pageTitle={'New contact'}
+          toolbarCenterContent={null}
+          toolbarRightContent={
+            <TouchableOpacity onPress={getAddressFromCurrentLocation}>
+              <AppText size={14} color={'lightPurple'} font="anSemiBold">
+                Use my current location
+              </AppText>
+            </TouchableOpacity>
+          }
+        />
+        <View style={styles.mainContent}>
+          <View style={styles.row}>
+            <View style={styles.col2}>
+              <Input
+                placeholder="Mr."
+                label="Title"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+              />
+            </View>
+            <View style={styles.col7}>
+              <Input
+                placeholder="John"
+                label="First Name"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('name_first', val)}
+                value={form.name_first}
+              />
+            </View>
+            <View style={styles.col7}>
+              <Input
+                placeholder="Doe"
+                label="Last Name"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('name_last', val)}
+                value={form.name_last}
+              />
+            </View>
           </View>
-          <View style={styles.col8}>
-            <Input
-              placeholder="Doe"
-              label="Last Name"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeForm('name_last', val)}
-              value={form.name_last}
-            />
+          <View style={styles.row}>
+            <View style={styles.col16}>
+              <Input
+                label="Company"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('company', val)}
+                value={form.company}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col16}>
+              <Input
+                label="Address"
+                placeholder="123 Maple Ln"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeAddress('line1', val)}
+                value={form.address.line1}
+              />
+            </View>
+            <View style={styles.col16}>
+              <Input
+                placeholder="Apt4"
+                inputStyle={styles.input}
+                labelStyle={styles.labelStyle}
+                onChangeText={(val) => changeAddress('line2', val)}
+                value={form.address.line2}
+              />
+            </View>
+            <View style={styles.col11}>
+              <Input
+                placeholder="Los Angeles"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeAddress('city', val)}
+                value={form.address.city}
+              />
+            </View>
+            <View style={styles.col2}>
+              <Input
+                placeholder="CA"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeAddress('us_state', val)}
+                value={form.address.us_state}
+              />
+            </View>
+            <View style={styles.col3}>
+              <Input
+                placeholder="90210"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeAddress('postal_code', val)}
+                value={form.address.postal_code}
+                keyboardType="phone-pad"
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col8}>
+              <Input
+                placeholder="(888) 991-3991"
+                label="PHONE (MOBILE)"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('phone_mobile', val)}
+                value={form.phone_mobile}
+                textContentType="telephoneNumber"
+                dataDetectorTypes="phoneNumber"
+                keyboardType="phone-pad"
+                maxLength={15}
+              />
+            </View>
+            <View style={styles.col8}>
+              <Input
+                placeholder="(888) 991-3992"
+                label="PHONE (OFFICE)"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('phone_office', val)}
+                value={form.phone_office}
+                textContentType="telephoneNumber"
+                dataDetectorTypes="phoneNumber"
+                keyboardType="phone-pad"
+                maxLength={15}
+              />
+            </View>
+          </View>
+          <View style={styles.row}>
+            <View style={styles.col16}>
+              <Input
+                label="Email"
+                placeholder="john.doe@gmail.com"
+                labelStyle={styles.labelStyle}
+                inputStyle={styles.input}
+                onChangeText={(val) => changeForm('email', val)}
+                value={form.email}
+              />
+            </View>
           </View>
         </View>
-        <View style={styles.row}>
-          <View style={styles.col16}>
-            <Input
-              label="Company"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeForm('company', val)}
-              value={form.company}
-            />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.col16}>
-            <Input
-              label="Address"
-              placeholder="123 Maple Ln"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeAddress('line1', val)}
-              value={form.address.line1}
-            />
-          </View>
-          <View style={styles.col16}>
-            <Input
-              placeholder="Apt4"
-              inputStyle={styles.input}
-              labelStyle={styles.labelStyle}
-              onChangeText={(val) => changeAddress('line2', val)}
-              value={form.address.line2}
-            />
-          </View>
-          <View style={styles.col11}>
-            <Input
-              placeholder="Los Angeles"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeAddress('city', val)}
-              value={form.address.city}
-            />
-          </View>
-          <View style={styles.col2}>
-            <Input
-              placeholder="CA"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeAddress('us_state', val)}
-              value={form.address.us_state}
-            />
-          </View>
-          <View style={styles.col3}>
-            <Input
-              placeholder="90210"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeAddress('postal_code', val)}
-              value={form.address.postal_code}
-              keyboardType="phone-pad"
-            />
-          </View>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.col8}>
-            <Input
-              placeholder="(888) 991-3991"
-              label="PHONE (MOBILE)"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeForm('phone_mobile', val)}
-              value={form.phone_mobile}
-              textContentType="telephoneNumber"
-              dataDetectorTypes="phoneNumber"
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-          </View>
-          <View style={styles.col8}>
-            <Input
-              placeholder="(888) 991-3992"
-              label="PHONE (OFFICE)"
-              labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
-              onChangeText={(val) => changeForm('phone_office', val)}
-              value={form.phone_office}
-              textContentType="telephoneNumber"
-              dataDetectorTypes="phoneNumber"
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-          </View>
+        <View style={styles.bottomBtnView}>
+          <AppGradButton
+            containerStyle={styles.createBtnContainer}
+            textStyle={styles.createBtnText}
+            btnStyle={styles.createBtn}
+            title={'Create Contact'}
+            leftIconContent={<></>}
+            onPress={createContact}
+          />
         </View>
       </View>
-    </View>
+    </Modal>
   );
 }
 
 const getStyles = (themeStyle: StyleType) => ({
   container: {
-    flex: 1,
+    marginTop: '5%',
+    height: '95%',
     backgroundColor: themeStyle.backgroundWhite,
+    borderRadius: themeStyle.scale(20),
+    shadowColor: themeStyle.black,
+    shadowOffset: {
+      width: 0,
+      height: -1,
+    },
+    shadowOpacity: 0.6,
+    shadowRadius: 12.35,
+    elevation: 19,
+    flexDirection: 'column',
   },
   mainContent: {
     paddingVertical: themeStyle.scale(10),
     paddingHorizontal: themeStyle.scale(15),
+    flex: 1,
   },
   row: {
     flexDirection: 'row',
@@ -228,7 +285,10 @@ const getStyles = (themeStyle: StyleType) => ({
     marginTop: themeStyle.scale(30),
   },
   col8: {
-    width: '48%',
+    width: '49%',
+  },
+  col7: {
+    width: '42%',
   },
   col16: {
     width: '100%',
@@ -254,5 +314,20 @@ const getStyles = (themeStyle: StyleType) => ({
       font: 'anSemiBold',
       size: 12,
     }),
+  },
+  bottomBtnView: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+  },
+  createBtnContainer: {
+    width: '100%',
+  },
+  createBtn: {
+    borderTopLeftRadius: 0,
+    paddingVertical: 10,
+    borderTopRightRadius: 0,
+  },
+  createBtnText: {
+    textTransform: 'uppercase',
   },
 });

@@ -54,6 +54,9 @@ const getStyles = (themeStyle: StyleType) => ({
   headerTopContainer: {
     backgroundColor: themeStyle.backgroundWhite,
     borderBottomWidth: 0,
+    paddingHorizontal: themeStyle.scale(20),
+    borderTopLeftRadius: themeStyle.scale(20),
+    borderTopRightRadius: themeStyle.scale(20),
   },
   toolbar: {
     flexDirection: 'row',
@@ -64,8 +67,7 @@ const getStyles = (themeStyle: StyleType) => ({
     borderColor: themeStyle.gray1,
   },
   topContainer: {
-    paddingVertical: themeStyle.scale(20),
-    paddingRight: themeStyle.scale(10),
+    paddingVertical: themeStyle.scale(10),
   },
   toolbarLeft: {
     marginRight: themeStyle.scale(30),

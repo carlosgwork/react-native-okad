@@ -12,7 +12,6 @@ import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
 import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
-import {ContactsProps, AppRouteEnum} from '@routes/types';
 import {phoneFormat} from '@utils/functions';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
@@ -25,6 +24,7 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
+import NewContact from './New';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
@@ -184,7 +184,7 @@ const cellContent = (
   }
 };
 
-export default function Contacts({navigation}: ContactsProps) {
+export default function Contacts() {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
@@ -201,6 +201,7 @@ export default function Contacts({navigation}: ContactsProps) {
     },
   });
   const [searchText, setSearchText] = useState<string | undefined>('');
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
     contacts.contacts,
   );
@@ -229,6 +230,10 @@ export default function Contacts({navigation}: ContactsProps) {
     [contacts],
   );
 
+  const createContact = () => {
+    console.log('------ create contact');
+  };
+
   if (error) {
     console.error(error);
     return <Text>Error</Text>;
@@ -242,7 +247,7 @@ export default function Contacts({navigation}: ContactsProps) {
         pageTitle={'Contacts'}
         toolbarCenterContent={
           <TouchableOpacity
-            onPress={() => navigation.push(AppRouteEnum.NewContact)}
+            onPress={() => setModalVisible(true)}
             style={styles.flexlayout}>
             <AppGradButton
               title={'NEW'}
@@ -270,6 +275,11 @@ export default function Contacts({navigation}: ContactsProps) {
         onSortChanged={onSortChanged}
       />
       <CircularLoading loading={loading} />
+      <NewContact
+        modalVisible={modalVisible}
+        closeModal={() => setModalVisible(false)}
+        createContact={createContact}
+      />
     </View>
   );
 }
