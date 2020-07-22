@@ -9,6 +9,9 @@ import {useStyles, useTheme} from '@global/Hooks';
 type Props = {
   leftIconContent?: React.ReactElement;
   title: string;
+  btnStyle?: object;
+  containerStyle?: object;
+  textStyle?: object;
   onPress?: () => any;
 };
 
@@ -16,19 +19,28 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
-  const {leftIconContent = null, onPress, title} = props;
+  const {
+    leftIconContent = null,
+    onPress,
+    title,
+    btnStyle,
+    containerStyle,
+    textStyle,
+  } = props;
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress}>
+    <TouchableOpacity
+      style={{...styles.container, ...containerStyle}}
+      onPress={onPress}>
       <LinearGradient
-        style={styles.btn}
+        style={{...styles.btn, ...btnStyle}}
         start={{x: 1.0, y: 0.0}}
         end={{x: 0.0, y: 0.0}}
         locations={[0.7, 0.2]}
         colors={[themeStyle.purple, themeStyle.lightPurple]}>
         <View style={styles.iconCont}>{leftIconContent}</View>
         <View style={styles.textContainer}>
-          <Text style={styles.text}>{title}</Text>
+          <Text style={{...styles.text, ...textStyle}}>{title}</Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -64,7 +76,7 @@ const getStyles = (themeStyle: StyleType) => ({
   textContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    height: 32,
+    minHeight: 32,
     paddingRight: 20,
   },
 });
