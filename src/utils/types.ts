@@ -110,3 +110,8 @@ export type Vendor = {
   logo_uri: string;
   catalog_items: Catalog[];
 };
+
+export type GeolocationParams = {
+  lat: number;
+  long: number;
+};

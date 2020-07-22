@@ -1,12 +1,16 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import {Input} from 'react-native-elements';
+import Geolocation, {
+  GeolocationResponse,
+} from '@react-native-community/geolocation';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText, NavBackBtn} from '@root/components';
 import {ContactsProps} from '@routes/types';
 import {Contact, Address} from '@root/utils/types';
+import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';
 
 export default function NewContact({navigation}: ContactsProps) {
@@ -48,6 +52,29 @@ export default function NewContact({navigation}: ContactsProps) {
     newForm.address = newAddress;
     setForm(newForm);
   };
+  const getAddressFromCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position: GeolocationResponse) => {
+        const params = {
+          long: position.coords.longitude,
+          lat: position.coords.latitude,
+        };
+        fetchAddressFromLocation(params).then((addr: Address) => {
+          const newForm = Object.assign({}, form);
+          newForm.address = addr;
+          setForm(newForm);
+        });
+      },
+      (error) => {
+        console.log(error);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 20000,
+        maximumAge: 1000,
+      },
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -59,9 +86,11 @@ export default function NewContact({navigation}: ContactsProps) {
         pageTitle={'New contact'}
         toolbarCenterContent={null}
         toolbarRightContent={
-          <AppText size={14} color={'lightPurple'} font="anSemiBold">
-            Use my current location
-          </AppText>
+          <TouchableOpacity onPress={getAddressFromCurrentLocation}>
+            <AppText size={14} color={'lightPurple'} font="anSemiBold">
+              Use my current location
+            </AppText>
+          </TouchableOpacity>
         }
       />
       <View style={styles.mainContent}>
@@ -144,7 +173,6 @@ export default function NewContact({navigation}: ContactsProps) {
               onChangeText={(val) => changeAddress('postal_code', val)}
               value={form.address.postal_code}
               keyboardType="phone-pad"
-              textContentType="postalCode"
             />
           </View>
         </View>

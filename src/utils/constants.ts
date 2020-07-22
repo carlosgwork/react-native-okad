@@ -1,5 +1,8 @@
 import {TableSortOps, Catalog, Contact} from './types';
 
+export const API_USER = 'KQAG24htn07JRCX4VTGYJmM98QEuNlkMigWa';
+export const API_PASS = '';
+
 export const emptyTableSortOption: TableSortOps = {
   sortOrder: 'ASC',
   sortBy: '',
