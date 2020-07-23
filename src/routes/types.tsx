@@ -3,19 +3,22 @@ import {RouteProp} from '@react-navigation/native';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
-  NewContact = 'NewContact',
+  NewContactModal = 'NewContactModal',
   SETTINGS = 'SETTINGS',
 }
 
 type ContactsStackParamList = {
-  [AppRouteEnum.NewContact]: undefined;
+  [AppRouteEnum.NewContactModal]: undefined;
 };
 
 type SettingsStackParamList = {};
 
 type AppStackParamList = ContactsStackParamList & SettingsStackParamList;
 
-export type ContactsProps = {
-  navigation: StackNavigationProp<AppStackParamList, AppRouteEnum.NewContact>;
-  route: RouteProp<AppStackParamList, AppRouteEnum.NewContact>;
+export type ContactsNavProps = {
+  navigation: StackNavigationProp<
+    AppStackParamList,
+    AppRouteEnum.NewContactModal
+  >;
+  route: RouteProp<AppStackParamList, AppRouteEnum.NewContactModal>;
 };

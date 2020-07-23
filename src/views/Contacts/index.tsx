@@ -1,17 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {View, Text} from 'react-native';
+import {TouchableOpacity, View, Text} from 'react-native';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
-import {useQuery, useMutation} from '@apollo/react-hooks';
+import {useQuery} from '@apollo/react-hooks';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 
 import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
 import {phoneFormat} from '@utils/functions';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 
 import {
   AppHeader,
@@ -22,8 +21,8 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
-import NewContact from './New';
-import {FETCH_CONTACTS, CREATE_CONTACT} from './graphql';
+import {FETCH_CONTACTS} from './graphql';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
@@ -85,6 +84,7 @@ const cellContent = (
   row: Contact,
   styles: any,
   themeStyle: ThemeStyle,
+  navigation: any,
 ) => {
   switch (header.value) {
     case 'name':
@@ -139,6 +139,7 @@ const cellContent = (
       return (
         <AppTextButton
           style={{...styles.cellLayout, ...styles.agreementsBtn}}
+          onPress={() => navigation.navigate('NewAgreement')}
           leftIconContent={
             <Icon
               color={themeStyle.textPurple}
@@ -161,7 +162,7 @@ const cellContent = (
   }
 };
 
-export default function Contacts() {
+export default function Contacts({navigation}: ContactsNavProps) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
@@ -177,9 +178,7 @@ export default function Contacts() {
       setVisibleContacts(newData);
     },
   });
-  const [insert_contacts] = useMutation(CREATE_CONTACT);
   const [searchText, setSearchText] = useState<string | undefined>('');
-  const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
     contacts.contacts,
   );
@@ -204,30 +203,9 @@ export default function Contacts() {
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Contact) =>
-      cellContent(header, row, styles, themeStyle),
+      cellContent(header, row, styles, themeStyle, navigation),
     [contacts],
   );
-
-  const createContact = (form: Contact) => {
-    setModalVisible(false);
-    insert_contacts({
-      variables: {
-        company: form.company,
-        email: form.email,
-        name_first: form.name_first,
-        name_last: form.name_last,
-        phone_mobile: form.phone_mobile,
-        phone_office: form.phone_office,
-        title: form.title,
-        city: form.address.city,
-        line1: form.address.line1,
-        line2: form.address.line2,
-        postal_code: form.address.postal_code,
-        us_state: form.address.us_state,
-        organization_id: 1,
-      },
-    });
-  };
 
   if (error) {
     console.error(error);
@@ -241,11 +219,10 @@ export default function Contacts() {
         rightContent={null}
         pageTitle={'Contacts'}
         toolbarCenterContent={
-          <TouchableOpacity
-            onPress={() => setModalVisible(true)}
-            style={styles.flexlayout}>
+          <TouchableOpacity style={styles.flexlayout}>
             <AppGradButton
               title={'NEW'}
+              onPress={() => navigation.navigate(AppRouteEnum.NewContactModal)}
               leftIconContent={
                 <Icon
                   color={themeStyle.textWhite}
@@ -270,11 +247,6 @@ export default function Contacts() {
         onSortChanged={onSortChanged}
       />
       <CircularLoading loading={loading} />
-      <NewContact
-        modalVisible={modalVisible}
-        closeModal={() => setModalVisible(false)}
-        createContact={createContact}
-      />
     </View>
   );
 }
