@@ -60,6 +60,7 @@ export type Contact = {
   address: Address;
   agreements?: Agreement[];
   company?: string;
+  title?: string;
 };
 
 export type TableHeaderType = {

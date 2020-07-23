@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
 import {View, Text} from 'react-native';
-import gql from 'graphql-tag';
-
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
-import {useQuery} from '@apollo/react-hooks';
+import {useQuery, useMutation} from '@apollo/react-hooks';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -25,6 +23,7 @@ import {
   CircularLoading,
 } from '@root/components';
 import NewContact from './New';
+import {FETCH_CONTACTS, CREATE_CONTACT} from './graphql';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
@@ -37,28 +36,6 @@ const HEADERS: TableHeaderType[] = [
   },
   {label: '', value: 'actions', sortable: false, style: {flex: 1}},
 ];
-
-export const FETCH_TODOS = gql`
-  query {
-    contacts {
-      id
-      email
-      name_first
-      name_last
-      phone_home
-      phone_mobile
-      phone_office
-      address {
-        county
-        city
-        us_state
-      }
-      agreements {
-        id
-      }
-    }
-  }
-`;
 
 const sortContact = (arr: Contact[], sortOp: TableSortOps) => {
   const sorted = arr.sort((a: Contact, b: Contact) => {
@@ -190,7 +167,7 @@ export default function Contacts() {
 
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
-  const {error, loading} = useQuery(FETCH_TODOS, {
+  const {error, loading} = useQuery(FETCH_CONTACTS, {
     onCompleted: (data) => {
       setSearchText('');
       const newData = contacts.contacts.concat(data.contacts);
@@ -200,6 +177,7 @@ export default function Contacts() {
       setVisibleContacts(newData);
     },
   });
+  const [insert_contacts] = useMutation(CREATE_CONTACT);
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
@@ -230,8 +208,25 @@ export default function Contacts() {
     [contacts],
   );
 
-  const createContact = () => {
-    console.log('------ create contact');
+  const createContact = (form: Contact) => {
+    setModalVisible(false);
+    insert_contacts({
+      variables: {
+        company: form.company,
+        email: form.email,
+        name_first: form.name_first,
+        name_last: form.name_last,
+        phone_mobile: form.phone_mobile,
+        phone_office: form.phone_office,
+        title: form.title,
+        city: form.address.city,
+        line1: form.address.line1,
+        line2: form.address.line2,
+        postal_code: form.address.postal_code,
+        us_state: form.address.us_state,
+        organization_id: 1,
+      },
+    });
   };
 
   if (error) {

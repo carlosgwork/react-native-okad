@@ -28,6 +28,7 @@ export const emptyContact: Contact = {
     us_state: '',
     postal_code: '',
     line1: '',
+    line2: '',
     id: 0,
   },
 };

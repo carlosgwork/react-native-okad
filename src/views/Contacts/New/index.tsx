@@ -4,6 +4,7 @@ import {Input} from 'react-native-elements';
 import Geolocation, {
   GeolocationResponse,
 } from '@react-native-community/geolocation';
+import phone from 'phone';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -15,7 +16,7 @@ import {emptyContact} from '@root/utils/constants';
 type Props = {
   modalVisible: boolean;
   closeModal: () => void;
-  createContact: () => void;
+  createContact: (_: Contact) => void;
 };
 
 export default function NewContact({
@@ -24,6 +25,7 @@ export default function NewContact({
   createContact,
 }: Props) {
   const {styles} = useStyles(getStyles);
+  const [error, setError] = useState<Contact>(emptyContact);
   const [form, setForm] = useState<Contact>(emptyContact);
   const changeForm = (field: keyof Contact, value: string) => {
     const newForm: Contact = Object.assign({}, form);
@@ -74,8 +76,8 @@ export default function NewContact({
           setForm(newForm);
         });
       },
-      (error) => {
-        console.log(error);
+      (err) => {
+        console.log(err);
       },
       {
         enableHighAccuracy: true,
@@ -83,6 +85,72 @@ export default function NewContact({
         maximumAge: 1000,
       },
     );
+  };
+  const validateForm = () => {
+    let valid = true;
+    const newError = Object.assign({}, emptyContact);
+    const newForm = Object.assign({}, form);
+    if (!form.name_first) {
+      newError.name_first = 'Required';
+      valid = false;
+    }
+    if (!form.name_last) {
+      newError.name_last = 'Required';
+      valid = false;
+    }
+    if (!form.company) {
+      newError.company = 'Required';
+      valid = false;
+    }
+    if (form.phone_mobile && phone(form.phone_mobile).length === 0) {
+      newError.phone_mobile = 'Invalid Phone number';
+      valid = false;
+    } else {
+      newForm.phone_mobile = phone(form.phone_mobile)[0];
+    }
+    if (form.phone_office && phone(form.phone_office).length === 0) {
+      newError.phone_office = 'Invalid Phone number';
+      valid = false;
+    } else {
+      newForm.phone_office = phone(form.phone_office)[0];
+    }
+    if (!form.address.line1) {
+      newError.address.line1 = 'Required';
+      valid = false;
+    }
+    if (!form.address.line1) {
+      newError.address.line1 = 'Required';
+      valid = false;
+    }
+    if (!form.address.us_state) {
+      newError.address.us_state = 'Required';
+      valid = false;
+    }
+    if (form.address.us_state && form.address.us_state.length !== 2) {
+      newError.address.us_state = 'Invalid State';
+      valid = false;
+    }
+    if (!form.address.city) {
+      newError.address.city = 'Required';
+      valid = false;
+    }
+    if (!form.address.postal_code) {
+      newError.address.postal_code = 'Required';
+      valid = false;
+    }
+    if (!form.address.line2) {
+      newForm.address.line2 = '';
+    }
+    const re = /^(([^<>()\\[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    if (form.email && !re.test(String(form.email).toLowerCase())) {
+      newError.email = 'Email is invalid';
+      valid = false;
+    }
+    if (!valid) {
+      setError(newError);
+      return;
+    }
+    createContact(newForm);
   };
 
   return (
@@ -115,6 +183,8 @@ export default function NewContact({
                 label="Title"
                 labelStyle={styles.labelStyle}
                 inputStyle={styles.input}
+                onChangeText={(val) => changeForm('title', val)}
+                value={form.title}
               />
             </View>
             <View style={styles.col7}>
@@ -125,6 +195,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeForm('name_first', val)}
                 value={form.name_first}
+                errorMessage={error.name_first}
               />
             </View>
             <View style={styles.col7}>
@@ -135,6 +206,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeForm('name_last', val)}
                 value={form.name_last}
+                errorMessage={error.name_last}
               />
             </View>
           </View>
@@ -146,6 +218,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeForm('company', val)}
                 value={form.company}
+                errorMessage={error.company}
               />
             </View>
           </View>
@@ -158,6 +231,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeAddress('line1', val)}
                 value={form.address.line1}
+                errorMessage={error.address.line1}
               />
             </View>
             <View style={styles.col16}>
@@ -176,6 +250,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeAddress('city', val)}
                 value={form.address.city}
+                errorMessage={error.address.city}
               />
             </View>
             <View style={styles.col2}>
@@ -185,6 +260,8 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeAddress('us_state', val)}
                 value={form.address.us_state}
+                maxLength={2}
+                errorMessage={error.address.us_state}
               />
             </View>
             <View style={styles.col3}>
@@ -195,6 +272,7 @@ export default function NewContact({
                 onChangeText={(val) => changeAddress('postal_code', val)}
                 value={form.address.postal_code}
                 keyboardType="phone-pad"
+                errorMessage={error.address.postal_code}
               />
             </View>
           </View>
@@ -211,6 +289,7 @@ export default function NewContact({
                 dataDetectorTypes="phoneNumber"
                 keyboardType="phone-pad"
                 maxLength={15}
+                errorMessage={error.phone_mobile}
               />
             </View>
             <View style={styles.col8}>
@@ -225,6 +304,7 @@ export default function NewContact({
                 dataDetectorTypes="phoneNumber"
                 keyboardType="phone-pad"
                 maxLength={15}
+                errorMessage={error.phone_office}
               />
             </View>
           </View>
@@ -237,6 +317,7 @@ export default function NewContact({
                 inputStyle={styles.input}
                 onChangeText={(val) => changeForm('email', val)}
                 value={form.email}
+                errorMessage={error.email}
               />
             </View>
           </View>
@@ -248,7 +329,7 @@ export default function NewContact({
             btnStyle={styles.createBtn}
             title={'Create Contact'}
             leftIconContent={<></>}
-            onPress={createContact}
+            onPress={validateForm}
           />
         </View>
       </View>

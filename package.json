@@ -28,6 +28,7 @@
     "hex-to-rgba": "^2.0.1",
     "moment": "^2.27.0",
     "numeral": "^2.0.6",
+    "phone": "^2.4.13",
     "query-string": "^6.13.1",
     "randomcolor": "^0.6.2",
     "react": "16.11.0",
