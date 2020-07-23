@@ -9,7 +9,6 @@ import {useBackHandler} from '@global/Hooks';
 import {setAction} from '@redux/actions';
 
 import {MainTabRoutes} from './main';
-import ContactsRoutes from './contacts';
 
 // Gets the current screen from navigation state
 const getActiveRouteName = (state: NavigationState): string | undefined => {

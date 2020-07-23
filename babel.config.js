@@ -15,9 +15,9 @@ module.exports = {
           '@routes': './src/routes',
           '@assets': './src/assets',
           '@views': './src/views',
-        }
-      }
+        },
+      },
     ],
-    'jest-hoist'
-  ]
+    'jest-hoist',
+  ],
 };
