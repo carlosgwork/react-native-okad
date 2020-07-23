@@ -19,6 +19,7 @@ const defaultColors = {
   textPurple: '#5D396E',
   textWhite: '#FFF',
   textGray: '#979797',
+  textLightPurple: '#855C9C',
 };
 
 function getThemeColors(theme: Theme): AppColors {
