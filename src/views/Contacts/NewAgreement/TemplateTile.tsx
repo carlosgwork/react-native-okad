@@ -1,10 +1,10 @@
 import React from 'react';
-import {TouchableOpacity, Image} from 'react-native';
+import {TouchableOpacity, Image, ImageSourcePropType} from 'react-native';
 import {ThemeStyle} from '@root/utils/styles';
 import {useStyles} from '@root/global/Hooks';
 
 type Props = {
-  logo: string;
+  logo: ImageSourcePropType;
 };
 
 export default function AgreementTile({logo}: Props) {
@@ -14,17 +14,19 @@ export default function AgreementTile({logo}: Props) {
       style={{
         ...styles.container,
       }}>
-      <Image source={require(logo)} style={styles.logo} />
+      <Image source={logo} style={styles.logo} />
     </TouchableOpacity>
   );
 }
 
 const getStyles = (themeStyle: ThemeStyle) => ({
   container: {
-    paddingVertical: themeStyle.scale(10),
-    width: '48%',
+    paddingTop: themeStyle.scale(10),
+    width: '49%',
   },
   logo: {
+    resizeMode: 'contain',
     width: '100%',
+    height: themeStyle.scale(140),
   },
 });

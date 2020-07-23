@@ -1,7 +1,7 @@
 import React from 'react';
 import {Icon} from 'react-native-elements';
 
-import {AppText} from '@root/components';
+import AppText from './AppText';
 import {useStyles, useTheme} from '@global/Hooks';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 
@@ -35,5 +35,6 @@ const getStyles = () => ({
     alignItems: 'center',
     flexWrap: 'nowrap',
     height: 40,
+    marginLeft: -10,
   },
 });

@@ -54,6 +54,7 @@ const getStyles = (themeStyle: StyleType) => ({
   headerTopContainer: {
     backgroundColor: themeStyle.backgroundWhite,
     borderBottomWidth: 0,
+    marginHorizontal: 0,
     paddingHorizontal: themeStyle.scale(20),
     borderTopLeftRadius: themeStyle.scale(20),
     borderTopRightRadius: themeStyle.scale(20),

@@ -1401,6 +1401,11 @@
   resolved "https://registry.yarnpkg.com/@types/numeral/-/numeral-0.0.28.tgz#e43928f0bda10b169b6f7ecf99e3ddf836b8ebe4"
   integrity sha512-Sjsy10w6XFHDktJJdXzBJmoondAKW+LcGpRFH+9+zXEDj0cOH8BxJuZA9vUDSMAzU1YRJlsPKmZEEiTYDlICLw==
 
+"@types/phone@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@types/phone/-/phone-2.4.0.tgz#8c02c0513884136fef5948b7781b76e6c7c44997"
+  integrity sha512-oClvNb2ATpf3fmDMuJOzRBRWjUwssc+cTfMPTXf5YmeSnveadSMmuwd3CjpJtU24Mg3VvpA9uNWwh5f75dgCLg==
+
 "@types/prop-types@*":
   version "15.7.3"
   resolved "https://registry.yarnpkg.com/@types/prop-types/-/prop-types-15.7.3.tgz#2ab0d5da2e5815f94b0b9d4b95d1e5f243ab2ca7"
