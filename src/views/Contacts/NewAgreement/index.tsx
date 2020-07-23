@@ -20,14 +20,18 @@ const Templates = [
   },
 ];
 
-export default function NewAgreement({navigation}: ContactsNavProps) {
+export default function NewAgreement({route, navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
+  const {itemId, parent = '', itemTitle = ''} = route.params || {};
 
   return (
     <View style={styles.container}>
       <AppHeader
         leftContent={
-          <NavBackBtn title="Back" onClick={() => navigation.pop()} />
+          <NavBackBtn
+            title={itemId ? itemTitle : parent}
+            onClick={() => navigation.pop()}
+          />
         }
         rightContent={
           <TouchableOpacity

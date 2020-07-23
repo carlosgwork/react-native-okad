@@ -139,7 +139,9 @@ const cellContent = (
       return (
         <AppTextButton
           style={{...styles.cellLayout, ...styles.agreementsBtn}}
-          onPress={() => navigation.navigate('NewAgreement')}
+          onPress={() =>
+            navigation.navigate('NewAgreement', {parent: 'Contacts'})
+          }
           leftIconContent={
             <Icon
               color={themeStyle.textPurple}
@@ -222,7 +224,9 @@ export default function Contacts({navigation}: ContactsNavProps) {
           <TouchableOpacity style={styles.flexlayout}>
             <AppGradButton
               title={'NEW'}
-              onPress={() => navigation.navigate(AppRouteEnum.NewContactModal)}
+              onPress={() =>
+                navigation.navigate(AppRouteEnum.NewContactModal, {})
+              }
               leftIconContent={
                 <Icon
                   color={themeStyle.textWhite}

@@ -8,7 +8,11 @@ export enum AppRouteEnum {
 }
 
 type ContactsStackParamList = {
-  [AppRouteEnum.NewContactModal]: undefined;
+  [AppRouteEnum.NewContactModal]: Partial<{
+    itemId: number;
+    itemTitle: string;
+    parent: string;
+  }>;
 };
 
 type SettingsStackParamList = {};
