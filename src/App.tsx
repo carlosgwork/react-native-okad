@@ -11,9 +11,6 @@ import getThemeStyle, {Theme} from '@root/utils/styles';
 import {ApolloProvider} from 'react-apollo';
 import makeApolloClient from './apollo';
 
-// if (!__DEV__) {
-// }
-
 export default function App() {
   const [theme, setTheme] = React.useState<Theme>('normal');
   const currentTheme = React.useMemo(
