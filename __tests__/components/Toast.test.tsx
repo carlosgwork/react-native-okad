@@ -1,5 +1,5 @@
 import React from 'react';
-import Loading from '@components/Loading';
+import Toast from '@components/Toast';
 import configureStore from 'redux-mock-store';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
@@ -14,29 +14,52 @@ const currentTheme = {
   themeStyle: getThemeStyle(theme),
 } as ThemeContextType;
 
-describe('Loading Component', () => {
-  it('renders null while state.loading is false', () => {
+describe('Toast Component', () => {
+  it('renders null if text value is empty', () => {
     const store = mockStore({
-      loading: false,
+      toast: {
+        type: 'success',
+        text: '',
+      },
     });
     const tree = renderer.create(
       <Provider store={store}>
         <ThemeContext.Provider value={currentTheme}>
-          <Loading />
+          <Toast />
         </ThemeContext.Provider>
       </Provider>,
     );
     expect(tree.toJSON()).toMatchSnapshot();
   });
 
-  it('renders a loading component while state.loading is true', () => {
+  it('renders a success toast', () => {
     const store = mockStore({
-      loading: true,
+      toast: {
+        type: 'success',
+        text: 'Success!',
+      },
     });
     const tree = renderer.create(
       <Provider store={store}>
         <ThemeContext.Provider value={currentTheme}>
-          <Loading />
+          <Toast />
+        </ThemeContext.Provider>
+      </Provider>,
+    );
+    expect(tree.toJSON()).toMatchSnapshot();
+  });
+
+  it('renders a failed toast', () => {
+    const store = mockStore({
+      toast: {
+        type: 'danger',
+        text: 'Failed!',
+      },
+    });
+    const tree = renderer.create(
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Toast />
         </ThemeContext.Provider>
       </Provider>,
     );
