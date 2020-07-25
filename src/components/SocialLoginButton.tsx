@@ -24,8 +24,14 @@ export default React.memo<Props>(function SocialLoginButton(props: Props) {
   let content = null;
   if (provider === 'google') {
     content = [
-      <Image source={GoogleLogo} style={styles.iconStyle as ImageStyle} />,
-      <Text style={styles.text}>Sign in with Google</Text>,
+      <Image
+        key="logo-image"
+        source={GoogleLogo}
+        style={styles.iconStyle as ImageStyle}
+      />,
+      <Text key="logo-text" style={styles.text}>
+        Sign in with Google
+      </Text>,
     ];
   }
   return (

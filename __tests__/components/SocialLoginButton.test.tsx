@@ -1,10 +1,10 @@
 import React from 'react';
-import NavBackBtn from '@components/NavBackBtn';
+import SocialLoginButton from '@components/SocialLoginButton';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
 import renderer from 'react-test-renderer';
-import {shallow} from 'enzyme';
 import * as ThemeContextModules from '@global/Hooks';
+import {shallow} from 'enzyme';
 
 const theme = 'normal';
 const currentTheme = {
@@ -13,29 +13,31 @@ const currentTheme = {
   themeStyle: getThemeStyle(theme),
 } as ThemeContextType;
 
-describe('NavBack Button Component', () => {
-  it('renders a back button for stack navigation', () => {
+describe('SocialLoginButton Component', () => {
+  it('renders a Google SigIn button', () => {
     const mockPressEvent = jest.fn();
     const tree = renderer.create(
       <ThemeContext.Provider value={currentTheme}>
-        <NavBackBtn title="Back" onClick={mockPressEvent} />
+        <SocialLoginButton provider="google" onPress={mockPressEvent} />
       </ThemeContext.Provider>,
     );
     expect(tree.toJSON()).toMatchSnapshot();
   });
 
-  it('should have a "Back" text', () => {
+  it('should have a "Sign in with Google" text', () => {
     const mockPressEvent = jest.fn();
     jest
       .spyOn(ThemeContextModules, 'useTheme')
       .mockImplementation(() => currentTheme);
     const wrapper = shallow(
       <ThemeContext.Provider value={currentTheme}>
-        <NavBackBtn title="Back" onClick={mockPressEvent} />
+        <SocialLoginButton provider="google" onPress={mockPressEvent} />
       </ThemeContext.Provider>,
     ).dive();
-    expect(wrapper.find('Memo(AppText)').length).toBe(1);
-    expect(wrapper.find('Memo(AppText)').text()).toEqual('Back');
+    expect(wrapper.find('Text').length).toBe(1);
+    expect(
+      wrapper.find('Text').at(0).contains('Sign in with Google'),
+    ).toBeTruthy();
   });
 
   it('should fire an event when it is clicked', () => {
@@ -45,10 +47,10 @@ describe('NavBack Button Component', () => {
       .mockImplementation(() => currentTheme);
     const wrapper = shallow(
       <ThemeContext.Provider value={currentTheme}>
-        <NavBackBtn title="Back" onClick={mockPressEvent} />
+        <SocialLoginButton provider="google" onPress={mockPressEvent} />
       </ThemeContext.Provider>,
     ).dive();
-    wrapper.find('TouchableOpacity').simulate('press');
+    wrapper.find('ForwardRef').simulate('press');
     expect(mockPressEvent).toHaveBeenCalled();
   });
 });
