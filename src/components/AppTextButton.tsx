@@ -1,7 +1,6 @@
 import * as React from 'react';
 import {View, TouchableOpacity, ViewStyle} from 'react-native';
 
-import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
 type Props = {
@@ -11,7 +10,7 @@ type Props = {
   style?: ViewStyle;
 };
 
-export default React.memo<Props>(function AppGradButton(props: Props) {
+export default React.memo<Props>(function AppTextButton(props: Props) {
   const {styles} = useStyles(getStyles);
 
   const {
@@ -33,9 +32,9 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
   );
 });
 
-const getStyles = (themeStyle: StyleType) => ({
+const getStyles = () => ({
   container: {},
   iconCont: {
-    marginRight: themeStyle.scale(10),
+    marginRight: 10,
   },
 });

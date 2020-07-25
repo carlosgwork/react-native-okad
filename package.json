@@ -93,7 +93,7 @@
       "<rootDir>/jest/setup.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(react-native|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings)/)"
+      "node_modules/(?!(react-native|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient)/)"
     ]
   }
 }

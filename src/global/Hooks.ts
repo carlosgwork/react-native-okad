@@ -53,7 +53,7 @@ export const usePinchGesture = (reset: boolean) => {
 };
 
 export const useStyles = (getStyles: GetStyles): UseStyles => {
-  const {theme, themeStyle}: ThemeContextType = useContext(ThemeContext);
+  const {theme, themeStyle}: ThemeContextType = React.useContext(ThemeContext);
   const styles = useMemo(() => getStyles(themeStyle), [getStyles, themeStyle]);
   return {styles, theme, themeStyle};
 };
