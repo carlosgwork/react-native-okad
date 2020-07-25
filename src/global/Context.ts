@@ -8,4 +8,8 @@ export type ThemeContextType = {
   themeStyle: ThemeStyle;
 };
 
-export const ThemeContext = React.createContext<ThemeContextType>({});
+export const ThemeContext = React.createContext<ThemeContextType>({
+  setTheme: () => {},
+  theme: 'normal',
+  themeStyle: {},
+});
