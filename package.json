@@ -92,6 +92,9 @@
       "./node_modules/react-native-gesture-handler/jestSetup.js",
       "<rootDir>/jest/setup.js"
     ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/__tests__/__mocks__/"
+    ],
     "transformIgnorePatterns": [
       "node_modules/(?!(react-native|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient)/)"
     ]
