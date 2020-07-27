@@ -4,7 +4,7 @@ import {TouchableOpacity, View, Text} from 'react-native';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
-import {useQuery} from '@apollo/react-hooks';
+import {useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';

@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
-import gql from 'graphql-tag';
-import {useQuery} from '@apollo/react-hooks';
+import {gql, useQuery} from '@apollo/client';
 import {setAction} from '@redux/actions';
 import {useSelector} from 'react-redux';
 

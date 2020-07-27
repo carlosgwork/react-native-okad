@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
-import gql from 'graphql-tag';
+import {gql, useQuery} from '@apollo/client';
 
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
-import {useQuery} from '@apollo/react-hooks';
 import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';

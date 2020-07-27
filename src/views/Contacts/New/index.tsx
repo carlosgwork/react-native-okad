@@ -6,7 +6,7 @@ import Geolocation, {
 } from '@react-native-community/geolocation';
 import phone from 'phone';
 import {ContactsNavProps} from '@root/routes/types';
-import {useMutation} from '@apollo/react-hooks';
+import {useMutation} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';

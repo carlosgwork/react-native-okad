@@ -1,9 +1,8 @@
 import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView} from 'react-native';
-import gql from 'graphql-tag';
 import randomColor from 'randomcolor';
 
-import {useQuery} from '@apollo/react-hooks';
+import {gql, useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';

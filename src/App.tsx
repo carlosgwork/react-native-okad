@@ -8,7 +8,7 @@ import store from '@redux/store';
 import {ThemeContext} from '@global/Context';
 import getThemeStyle, {Theme} from '@root/utils/styles';
 
-import {ApolloProvider} from 'react-apollo';
+import {ApolloProvider} from '@apollo/client';
 import makeApolloClient from './apollo';
 
 export default function App() {
