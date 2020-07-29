@@ -137,8 +137,11 @@ export default function Agreements() {
   );
 
   if (error) {
-    console.error(error);
-    return <Text>Error</Text>;
+    return (
+      <View style={styles.emptyContainer}>
+        <Text>Loading Error</Text>
+      </View>
+    );
   }
 
   return (
@@ -298,5 +301,10 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   noSpacing: {
     letterSpacing: 0,
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 250,
   },
 });
