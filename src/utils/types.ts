@@ -116,3 +116,7 @@ export type GeolocationParams = {
   lat: number;
   long: number;
 };
+
+export type TouchElementProps = {
+  onPress: () => {};
+};
