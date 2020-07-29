@@ -61,8 +61,11 @@ export default function Dashboard() {
   };
 
   if (error) {
-    console.error(error);
-    return <Text>Error</Text>;
+    return (
+      <View style={styles.emptyContainer}>
+        <Text>Loading Error</Text>
+      </View>
+    );
   }
 
   return (
@@ -147,5 +150,10 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     paddingVertical: themeStyle.scale(30),
     paddingLeft: themeStyle.scale(20),
+  },
+  emptyContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingTop: 250,
   },
 });
