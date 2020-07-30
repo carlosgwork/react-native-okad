@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView} from 'react-native';
 import randomColor from 'randomcolor';
+import {Button} from 'react-native-elements';
+import {GoogleSignin} from '@react-native-community/google-signin';
 
 import {gql, useQuery} from '@apollo/client';
 
@@ -14,6 +16,8 @@ import {
   CircularLoading,
 } from '@root/components';
 import AgreementTile from './AgreementTile';
+import {logout} from '@redux/actions';
+import {useNavigation} from '@react-navigation/native';
 
 export const FETCH_AGREEMENTS = gql`
   query AgreementsQuery($type: agreement_event!) {
@@ -32,6 +36,8 @@ export const FETCH_AGREEMENTS = gql`
 
 export default function Dashboard() {
   const {styles} = useStyles(getStyles);
+  const {replace} = useNavigation<any>();
+
   const [BgColors, setBgColors] = useState<string[]>([]);
   const {error, loading} = useQuery(FETCH_AGREEMENTS, {
     variables: {type: 'accepted'},
@@ -48,6 +54,17 @@ export default function Dashboard() {
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
   const [showDetails, setShowDetails] = useState<boolean>(false);
+
+  const onLogout = async () => {
+    try {
+      // await GoogleSignin.revokeAccess();
+      // await GoogleSignin.signOut();
+      logout();
+      replace('Auth');
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const onFilterAgreement = (text: string) => {
     const filteredAgreements = agreements.filter(
@@ -110,6 +127,11 @@ export default function Dashboard() {
         </View>
         <CircularLoading loading={loading} />
       </ScrollView>
+      <Button
+        style={{marginTop: 100, height: 100}}
+        onPress={onLogout}
+        title={'Logout'}
+      />
     </View>
   );
 }

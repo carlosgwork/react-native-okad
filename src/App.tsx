@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {StatusBar, StatusBarStyle, Text} from 'react-native';
-
 import {Provider} from 'react-redux';
 import {Loading, Toast} from '@root/components';
 import Routes from '@routes/index';
