@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity, Alert} from 'react-native';
 import {Input} from 'react-native-elements';
 import Geolocation, {
   GeolocationResponse,
@@ -18,7 +18,12 @@ import {CREATE_CONTACT} from '../graphql';
 
 export default function NewContact({navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
-  const [insert_contacts] = useMutation(CREATE_CONTACT);
+  const [insert_contacts] = useMutation(CREATE_CONTACT, {
+    onCompleted() {
+      Alert.alert('New contact was successfully created.');
+      setTimeout(() => navigation.pop(), 2000);
+    },
+  });
   const [error, setError] = useState<Contact>(emptyContact);
   const [form, setForm] = useState<Contact>(emptyContact);
   const changeForm = (field: keyof Contact, value: string) => {
@@ -144,24 +149,24 @@ export default function NewContact({navigation}: ContactsNavProps) {
       setError(newError);
       return;
     }
-    createContact();
+    createContact(newForm);
   };
 
-  const createContact = () => {
+  const createContact = (formData: Contact) => {
     insert_contacts({
       variables: {
-        company: form.company,
-        email: form.email,
-        name_first: form.name_first,
-        name_last: form.name_last,
-        phone_mobile: form.phone_mobile,
-        phone_office: form.phone_office,
-        title: form.title,
-        city: form.address.city,
-        line1: form.address.line1,
-        line2: form.address.line2,
-        postal_code: form.address.postal_code,
-        us_state: form.address.us_state,
+        company: formData.company,
+        email: formData.email,
+        name_first: formData.name_first,
+        name_last: formData.name_last,
+        phone_mobile: formData.phone_mobile,
+        phone_office: formData.phone_office,
+        title: formData.title,
+        city: formData.address.city,
+        line1: formData.address.line1,
+        line2: formData.address.line2,
+        postal_code: formData.address.postal_code,
+        us_state: formData.address.us_state,
         organization_id: 1,
       },
     });
