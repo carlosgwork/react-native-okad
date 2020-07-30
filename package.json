@@ -16,6 +16,8 @@
     "@react-native-community/geolocation": "^2.0.2",
     "@react-native-community/google-signin": "^4.0.3",
     "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-firebase/app": "^8.2.0",
+    "@react-native-firebase/auth": "^8.2.0",
     "@react-navigation/bottom-tabs": "^5.7.1",
     "@react-navigation/native": "^5.7.0",
     "@react-navigation/stack": "^5.7.0",
@@ -41,7 +43,6 @@
     "react-native": "0.62.2",
     "react-native-device-info": "^5.6.2",
     "react-native-elements": "^2.0.4",
-    "react-native-firebase": "^5.6.0",
     "react-native-gesture-handler": "^1.6.1",
     "react-native-infinite-scroll-view": "^0.4.5",
     "react-native-linear-gradient": "^2.5.6",
@@ -104,7 +105,7 @@
       "<rootDir>/__tests__/__mocks__/"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(react-native|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient)/)"
+      "node_modules/(?!(react-native|@react-navigation|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient|react-native-iphone-x-helper)/)"
     ]
   }
 }

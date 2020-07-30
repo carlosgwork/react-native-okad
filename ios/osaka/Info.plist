@@ -27,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.57301850215-2tr1itrnlbuj5n392ur4ipso9pidrfcj</string>
+				<string>com.googleusercontent.apps.561572760348-r39qqr3krprgmrv0agqg0bhult3t0rs7</string>
 			</array>
 		</dict>
 	</array>
@@ -49,7 +49,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string/>
+	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AvenirNextLTPro-Bold.otf</string>

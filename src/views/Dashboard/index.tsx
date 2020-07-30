@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, Text, Switch, Image, ScrollView} from 'react-native';
+import {View, Text, Switch, Image, ScrollView, Alert} from 'react-native';
 import randomColor from 'randomcolor';
 import {Button} from 'react-native-elements';
 import {GoogleSignin} from '@react-native-community/google-signin';
@@ -57,12 +57,12 @@ export default function Dashboard() {
 
   const onLogout = async () => {
     try {
-      // await GoogleSignin.revokeAccess();
-      // await GoogleSignin.signOut();
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
       logout();
       replace('Auth');
     } catch (err) {
-      console.error(err);
+      Alert.alert('Something else went wrong... ', err.toString());
     }
   };
 

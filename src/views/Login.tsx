@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import firebase from 'react-native-firebase';
+import {firebase} from '@react-native-firebase/auth';
 import {setAction} from '@redux/actions';
-
+import {Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
+  User,
 } from '@react-native-community/google-signin';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -24,35 +25,31 @@ export default function Login() {
   useEffect(() => {
     GoogleSignin.configure({
       webClientId:
-        '57301850215-kvvoss7e43i23qbsvspf8m74q7ug3vkd.apps.googleusercontent.com',
+        '561572760348-93oaqnoojcmjcqkolfjm5iqcblhnek9h.apps.googleusercontent.com',
+      offlineAccess: false,
     });
   }, []);
 
   const signIn = async () => {
     setLoading(true);
+    if (loading) {
+      return;
+    }
     try {
       await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const credential = firebase.auth.GoogleAuthProvider.credential(
-        userInfo.idToken,
-      );
-      // login with credential
-      const firebaseUserCredential = await firebase
-        .auth()
-        .signInWithCredential(credential);
-      console.log('---------- credential:', firebaseUserCredential);
+      const {idToken}: User = await GoogleSignin.signIn();
+      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      const userInfo = await firebase.auth().signInWithCredential(credential);
       setLoading(false);
       setAction('user', userInfo.user);
       navigateHome(replace);
     } catch (error) {
-      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        // user cancelled the login flow
-      } else if (error.code === statusCodes.IN_PROGRESS) {
-        // operation (e.g. sign in) is in progress already
-      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      setLoading(false);
+      if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
         // play services not available or outdated
+        Alert.alert('Google Play Services is not available.');
       } else {
-        // some other error happened
+        console.log(error);
       }
     }
   };
