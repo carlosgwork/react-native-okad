@@ -129,7 +129,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.osaka"
+        applicationId "com.gamburd.osaka"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

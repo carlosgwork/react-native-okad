@@ -1,4 +1,4 @@
-package com.osaka;
+package com.gamburd.osaka;
 
 import com.facebook.react.ReactActivity;
 

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.osaka">
+  package="com.gamburd.osaka">
 
     <uses-permission android:name="android.permission.INTERNET" />
 

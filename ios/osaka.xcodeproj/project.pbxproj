@@ -21,6 +21,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* osakaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* osakaTests.m */; };
 		711282CA24BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 711282C924BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf */; };
+		71755DAD24D2B33A001C43D1 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 71755DAC24D2B337001C43D1 /* GoogleService-Info.plist */; };
 		82C0D75629E5C9D08BE3334D /* libPods-osaka.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 029416373D7B9ECA081963ED /* libPods-osaka.a */; };
 		D47D0F7F2C44563D730A07A8 /* libPods-osaka-osakaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CD53BED67222C1AF6DC09C6 /* libPods-osaka-osakaTests.a */; };
 		D506A7A2F7F2448B604F85DE /* libPods-osaka-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 733CEC7CBFFBA03A832E5CC6 /* libPods-osaka-tvOSTests.a */; };
@@ -101,6 +102,7 @@
 		714E496324C7CF3D00C5B341 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = ../assets/fonts/MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
 		714E496424C7CF3E00C5B341 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Zocial.ttf; path = ../assets/fonts/Zocial.ttf; sourceTree = "<group>"; };
 		714E496524C7CF3E00C5B341 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome5_Solid.ttf; path = ../assets/fonts/FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
+		71755DAC24D2B337001C43D1 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		733CEC7CBFFBA03A832E5CC6 /* libPods-osaka-tvOSTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-osaka-tvOSTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		734CD3FB8C5B4F4EB70A1F47 /* Entypo.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Entypo.ttf; path = ../assets/fonts/Entypo.ttf; sourceTree = "<group>"; };
 		7AF605C6F339703C3783D35B /* Pods-osaka-osakaTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osaka-osakaTests.debug.xcconfig"; path = "Target Support Files/Pods-osaka-osakaTests/Pods-osaka-osakaTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
+				71755DAC24D2B337001C43D1 /* GoogleService-Info.plist */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -459,6 +462,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				04C4E5CD249805C3003CCB37 /* SF Pro Icons Regular.ttf in Resources */,
+				71755DAD24D2B33A001C43D1 /* GoogleService-Info.plist in Resources */,
 				04D60575249768C600E0A425 /* AvenirNextLTPro-Regular.otf in Resources */,
 				04D60576249768C600E0A425 /* AvenirNextLTPro-It.otf in Resources */,
 				711282CA24BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf in Resources */,
@@ -587,6 +591,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-osaka/Pods-osaka-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -606,6 +611,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
@@ -635,6 +641,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-osaka-osakaTests/Pods-osaka-osakaTests-resources.sh",
+				"${PODS_ROOT}/GoogleSignIn/Resources/GoogleSignIn.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -654,6 +661,7 @@
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/GoogleSignIn.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AntDesign.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Entypo.ttf",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/EvilIcons.ttf",
@@ -863,7 +871,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamburd.osaka;
 				PRODUCT_NAME = osaka;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -886,7 +894,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gamburd.osaka;
 				PRODUCT_NAME = osaka;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

@@ -1,4 +1,4 @@
-package com.osaka;
+package com.gamburd.osaka;
 
 import android.app.Application;
 import android.content.Context;
