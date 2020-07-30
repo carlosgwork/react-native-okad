@@ -13,6 +13,8 @@ import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
 import configureStore from 'redux-mock-store';
 import {DASHBOARD_MOCKDATA} from '../../__mocks__/Dashboard';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import {NavigationContainer} from '@react-navigation/native';
 
 let wrapper: ReactWrapper;
 let queryHandler;
@@ -35,6 +37,7 @@ const store = mockStore({
 });
 
 let mockClient: any;
+const MainTab = createBottomTabNavigator();
 
 describe('Dashboard Page', () => {
   beforeEach(() => {
@@ -50,7 +53,11 @@ describe('Dashboard Page', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Dashboard />
+            <NavigationContainer>
+              <MainTab.Navigator>
+                <MainTab.Screen name="Home" component={Dashboard} />
+              </MainTab.Navigator>
+            </NavigationContainer>
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -69,7 +76,11 @@ describe('Dashboard Page', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Dashboard />
+            <NavigationContainer>
+              <MainTab.Navigator>
+                <MainTab.Screen name="Home" component={Dashboard} />
+              </MainTab.Navigator>
+            </NavigationContainer>
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -84,7 +95,11 @@ describe('Dashboard Page', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Dashboard />
+            <NavigationContainer>
+              <MainTab.Navigator>
+                <MainTab.Screen name="Home" component={Dashboard} />
+              </MainTab.Navigator>
+            </NavigationContainer>
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -97,6 +112,21 @@ describe('Dashboard Page', () => {
   });
 
   it('should have 2 AgreementTiles', async () => {
+    wrapper = mount(
+      <ApolloProvider client={mockClient as any}>
+        <Provider store={store}>
+          <ThemeContext.Provider value={currentTheme}>
+            <NavigationContainer>
+              <MainTab.Navigator>
+                <MainTab.Screen name="Home" component={Dashboard} />
+              </MainTab.Navigator>
+            </NavigationContainer>
+          </ThemeContext.Provider>
+        </Provider>
+      </ApolloProvider>,
+    );
+    await wait(0);
+    wrapper.update();
     expect(wrapper.find('Memo(AppText)').first().text()).toEqual(
       'Recent Open Agreements',
     );
