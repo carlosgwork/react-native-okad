@@ -5,15 +5,17 @@ import {useStyles} from '@root/global/Hooks';
 
 type Props = {
   logo: ImageSourcePropType;
+  onPress: () => void;
 };
 
-export default function AgreementTile({logo}: Props) {
+export default function AgreementTile({logo, onPress}: Props) {
   const {styles} = useStyles(getStyles);
   return (
     <TouchableOpacity
       style={{
         ...styles.container,
-      }}>
+      }}
+      onPress={onPress}>
       <Image source={logo} style={styles.logo} />
     </TouchableOpacity>
   );

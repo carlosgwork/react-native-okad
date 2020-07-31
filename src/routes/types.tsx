@@ -4,13 +4,18 @@ import {RouteProp} from '@react-navigation/native';
 export enum AppRouteEnum {
   MAIN = 'MAIN',
   NewContactModal = 'NewContactModal',
+  NewAgreement = 'NewAgreement',
+  BrunoStraightStairlift = 'BrunoStraightStairlift',
   SETTINGS = 'SETTINGS',
 }
 
-type ContactsStackParamList = {
+export type ContactsStackParamList = {
   [AppRouteEnum.NewContactModal]: Partial<{
     itemId: number;
     itemTitle: string;
+    parent: string;
+  }>;
+  [AppRouteEnum.BrunoStraightStairlift]: Partial<{
     parent: string;
   }>;
 };

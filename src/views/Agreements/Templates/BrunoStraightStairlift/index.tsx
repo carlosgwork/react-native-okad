@@ -1,36 +1,22 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Image, ScrollView, TouchableOpacity} from 'react-native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {AppHeader, AppText, NavBackBtn} from '@root/components';
-import TemplateTile from './TemplateTile';
-import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
-
-const Templates = [
-  {
-    name: 'BrunoStraightStairlift',
-    logo: require('@assets/images/template-logos/bruno-straight-stairlift.png'),
-  },
-  {
-    name: 'BrunoCustomStairlift',
-    logo: require('@assets/images/template-logos/bruno-custom-stairlift.png'),
-  },
-  {
-    name: 'HarmarStraightStairlift',
-    logo: require('@assets/images/template-logos/harmar-straight-stairlift.png'),
-  },
-];
+import {
+  AppHeader,
+  AppText,
+  NavBackBtn,
+  IndoorOutdoorSwitch,
+  CircularLoading,
+} from '@root/components';
+import {ContactsNavProps} from '@root/routes/types';
 
 export default function NewAgreement({route, navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
   const {itemId, parent = '', itemTitle = ''} = route.params || {};
-  const navigateTemplate = (index: number) => {
-    const templateName = Templates[index].name as keyof ContactsStackParamList;
-    navigation.navigate(templateName, {
-      parent: 'NewAgreement',
-    });
-  };
+  const [isIndoor, setIsIndoor] = useState<boolean>(true);
+  const [loadingCatalogs, setLoadingCatalogs] = useState<boolean>(false);
 
   return (
     <View style={styles.container}>
@@ -50,7 +36,7 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
             </AppText>
           </TouchableOpacity>
         }
-        pageTitle={'New Agreement'}
+        pageTitle={'Bruno Straight Stairlift'}
         toolbarCenterContent={null}
         toolbarRightContent={
           <Image
@@ -60,17 +46,9 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
         }
       />
       <ScrollView style={styles.mainContent}>
-        <AppText size={20} color={'textBlack2'} font={'anSemiBold'}>
-          Templates
-        </AppText>
-        <View style={styles.rowLayout}>
-          {Templates.map((template, index) => (
-            <TemplateTile
-              key={index}
-              logo={template.logo}
-              onPress={() => navigateTemplate(index)}
-            />
-          ))}
+        <IndoorOutdoorSwitch isIndoor={isIndoor} setIsIndoor={setIsIndoor} />
+        <View style={styles.galleryContainer}>
+          <CircularLoading loading={loadingCatalogs} />
         </View>
       </ScrollView>
     </View>
@@ -100,5 +78,8 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     paddingVertical: themeStyle.scale(30),
     paddingHorizontal: themeStyle.scale(20),
+  },
+  galleryContainer: {
+    marginTop: themeStyle.scale(30),
   },
 });

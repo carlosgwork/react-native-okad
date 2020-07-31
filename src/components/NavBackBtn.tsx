@@ -1,9 +1,8 @@
 import React from 'react';
 import {Icon} from 'react-native-elements';
-
+import {TouchableOpacity} from 'react-native';
 import AppText from './AppText';
 import {useStyles, useTheme} from '@global/Hooks';
-import {TouchableOpacity} from 'react-native-gesture-handler';
 
 type Props = {
   title: string;
