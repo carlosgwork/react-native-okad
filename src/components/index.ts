@@ -10,3 +10,4 @@ export {default as AppDataTable} from './AppDataTable';
 export {default as AppTextButton} from './AppTextButton';
 export {default as CircularLoading} from './CircularLoading';
 export {default as NavBackBtn} from './NavBackBtn';
+export {default as IndoorOutdoorSwitch} from './IndoorOutdoorSwitch';
