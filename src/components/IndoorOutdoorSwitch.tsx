@@ -3,7 +3,6 @@ import {View, TouchableOpacity} from 'react-native';
 import {useStyles} from '@global/Hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import AppText from './AppText';
-import hexToRgba from 'hex-to-rgba';
 
 type Props = {
   isIndoor: boolean;
@@ -73,6 +72,6 @@ const getStyles = (themeStyle: StyleType) => ({
   active: {
     borderWidth: 2,
     borderColor: themeStyle.lightPurple,
-    backgroundColor: hexToRgba(themeStyle.lightPurple, 0.1),
+    backgroundColor: themeStyle.lightPurple10,
   },
 });

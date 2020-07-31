@@ -5,6 +5,7 @@ import getThemeStyle from '@root/utils/styles';
 import renderer from 'react-test-renderer';
 import {shallow} from 'enzyme';
 import * as ThemeContextModules from '@global/Hooks';
+import {TouchElementProps} from '@root/utils/types';
 
 const theme = 'normal';
 const currentTheme = {
@@ -48,7 +49,7 @@ describe('NavBack Button Component', () => {
         <NavBackBtn title="Back" onClick={mockPressEvent} />
       </ThemeContext.Provider>,
     ).dive();
-    wrapper.find('TouchableOpacity').simulate('press');
+    (wrapper.find('ForwardRef').first().props() as TouchElementProps).onPress();
     expect(mockPressEvent).toHaveBeenCalled();
   });
 });
