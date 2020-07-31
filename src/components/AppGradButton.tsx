@@ -38,7 +38,9 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
         end={{x: 0.0, y: 0.0}}
         locations={[0.7, 0.2]}
         colors={[themeStyle.purple, themeStyle.lightPurple]}>
-        <View style={styles.iconCont}>{leftIconContent}</View>
+        {leftIconContent && (
+          <View style={styles.iconCont}>{leftIconContent}</View>
+        )}
         <View style={styles.textContainer}>
           <Text style={{...styles.text, ...textStyle}}>{title}</Text>
         </View>
