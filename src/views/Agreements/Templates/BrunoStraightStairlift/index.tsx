@@ -12,7 +12,7 @@ import {
   IndoorOutdoorSwitch,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps} from '@root/routes/types';
+import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
 
 import ElanImg from '@assets/images/elan_sre_3050.png';
 import EliteImg from '@assets/images/elite_sre_2010.png';
@@ -99,7 +99,10 @@ const catalog_items = {
   outdoor: [],
 };
 
-export default function NewAgreement({route, navigation}: ContactsNavProps) {
+export default function BrunoStraightStairlift({
+  route,
+  navigation,
+}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
   const {itemId, parent = '', itemTitle = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
@@ -168,6 +171,15 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
             <AppGradButton
               btnStyle={styles.ctaInnerBtn}
               title={`Select ${item.subcategory}`}
+              onPress={() =>
+                navigation.navigate(
+                  'ElanTemplate' as keyof ContactsStackParamList,
+                  {
+                    itemTitle: item.name,
+                    parent: 'Bruno Straight Stairlift',
+                  },
+                )
+              }
             />
           </View>
         </View>

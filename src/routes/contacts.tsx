@@ -4,6 +4,7 @@ import Main from '@root/views/Contacts';
 import NewContact from '@root/views/Contacts/New';
 import NewAgreement from '@root/views/Contacts/NewAgreement';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
+import ElanTemplate from '@root/views/Agreements/Templates/BrunoStraightStairlift/Elan';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -16,6 +17,10 @@ function ContactsStackNavigation() {
       <Stack.Screen
         name="BrunoStraightStairlift"
         component={BrunoStraightStairlift}
+      />
+      <Stack.Screen
+        name="ElanTemplate"
+        component={ElanTemplate}
       />
     </Stack.Navigator>
   );

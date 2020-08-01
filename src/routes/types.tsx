@@ -6,6 +6,7 @@ export enum AppRouteEnum {
   NewContactModal = 'NewContactModal',
   NewAgreement = 'NewAgreement',
   BrunoStraightStairlift = 'BrunoStraightStairlift',
+  ElanTemplate = 'ElanTemplate',
   SETTINGS = 'SETTINGS',
 }
 
@@ -17,6 +18,10 @@ export type ContactsStackParamList = {
   }>;
   [AppRouteEnum.BrunoStraightStairlift]: Partial<{
     parent: string;
+  }>;
+  [AppRouteEnum.ElanTemplate]: Partial<{
+    parent: string;
+    itemTitle: string;
   }>;
 };
 
