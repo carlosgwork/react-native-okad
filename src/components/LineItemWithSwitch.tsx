@@ -77,7 +77,7 @@ const getStyles = (themeStyle: StyleType) => ({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: themeStyle.scale(10),
+    marginTop: 10,
   },
   rectWithSwitch: {
     borderRadius: 8,
