@@ -7,10 +7,10 @@ import {
   AppText,
   NavBackBtn,
   LineItemWithSwitch,
+  LineItem,
   AppGradButton,
 } from '@root/components';
 import {ContactsNavProps} from '@root/routes/types';
-import LineItem from '@root/components/LineItem';
 
 const ElanCatalogs = [
   {

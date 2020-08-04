@@ -12,3 +12,4 @@ export {default as CircularLoading} from './CircularLoading';
 export {default as NavBackBtn} from './NavBackBtn';
 export {default as IndoorOutdoorSwitch} from './IndoorOutdoorSwitch';
 export {default as LineItemWithSwitch} from './LineItemWithSwitch';
+export {default as LineItem} from './LineItem';

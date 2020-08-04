@@ -14,7 +14,6 @@ type Props = {
 
 export default function LineItem({item, active, setActive}: Props) {
   const {styles} = useStyles(getStyles);
-  console.log('---- active:', active);
   return (
     <View style={styles.rowLayout}>
       <TouchableOpacity
@@ -65,7 +64,7 @@ const getStyles = (themeStyle: StyleType) => ({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: themeStyle.scale(10),
+    marginTop: 10,
   },
   rectSection: {
     borderWidth: 1,
