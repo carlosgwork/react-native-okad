@@ -1,25 +1,34 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {AppHeader, AppText, NavBackBtn} from '@root/components';
+import {
+  AppHeader,
+  AppText,
+  NavBackBtn,
+  LineItemWithSwitch,
+  AppGradButton,
+} from '@root/components';
 import {ContactsNavProps} from '@root/routes/types';
+import LineItem from '@root/components/LineItem';
 
 const ElanCatalogs = [
   {
     title: 'Seat',
     items: [
       {
+        id: 1,
         name: 'Manual Swivel Seat',
         price_total: 729,
         price_monthly: 12.15,
+        category: 'seat',
       },
       {
+        id: 2,
         name: 'Power-Assisted Swivel Seat',
         price_total: 729,
         price_monthly: 12.15,
+        category: 'seat',
       },
     ],
   },
@@ -27,14 +36,18 @@ const ElanCatalogs = [
     title: 'Footrest',
     items: [
       {
+        id: 3,
         name: 'Manual Folding Footrest',
         price_total: undefined,
         price_monthly: undefined,
+        category: 'Footrest',
       },
       {
+        id: 4,
         name: 'Power Folding Footrest',
         price_total: 499,
         price_monthly: 8.33,
+        category: 'Footrest',
       },
     ],
   },
@@ -42,20 +55,26 @@ const ElanCatalogs = [
     title: 'Rail',
     items: [
       {
+        id: 5,
         name: 'Fixed Rail',
         price_total: undefined,
         price_monthly: undefined,
         icon: 'image-outline',
+        category: 'Rail',
       },
       {
+        id: 6,
         name: 'Manual Folding Rail',
         price_total: 699,
         price_monthly: 8.33,
+        category: 'Rail',
       },
       {
+        id: 7,
         name: 'Power Folding Rail',
         price_total: 1399,
         price_monthly: 8.33,
+        category: 'Rail',
       },
     ],
   },
@@ -63,10 +82,10 @@ const ElanCatalogs = [
     title: 'Additional Rail Options',
     items: [
       {
+        id: 8,
         name: 'Foot of Length',
         price_total: 100,
         price_monthly: 12.15,
-        length: 3,
         icon: undefined,
         type: 'switch',
       },
@@ -74,80 +93,43 @@ const ElanCatalogs = [
   },
 ];
 
-type AdditionalItemProps = {
-  styles: any;
-  item: any;
-  active: boolean;
-  setActive: () => void;
-};
-
-const AdditionalItem = ({
-  styles,
-  item,
-  active,
-  setActive,
-}: AdditionalItemProps) => {
-  return (
-    <View style={styles.rowLayout}>
-      <TouchableOpacity
-        style={[styles.rowLayout, styles.rectSection, active && styles.active]}
-        onPress={setActive}>
-        <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-          {item.name}
-        </AppText>
-        <View style={styles.rowLayout}>
-          {(item.price_monthly || item.price_total) && (
-            <>
-              <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {`+$${item.price_total} `}
-              </AppText>
-              <AppText color={'textBlack2'} size={18} font={'anRegular'}>
-                or
-              </AppText>
-              <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {` $${item.price_monthly}/month`}
-              </AppText>
-            </>
-          )}
-          {!(item.price_monthly || item.price_total) && (
-            <>
-              <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                &nbsp;
-              </AppText>
-            </>
-          )}
-        </View>
-      </TouchableOpacity>
-      <View>
-        {item.type !== 'switch' && (
-          <TouchableOpacity style={styles.playIcon}>
-            <Icon
-              name={item.icon ? item.icon : 'play-outline'}
-              color={'#855C9C'}
-              size={34}
-            />
-          </TouchableOpacity>
-        )}
-        {item.type === 'switch' && (
-          <View style={styles.sizeCtrl}>
-            <TouchableOpacity
-              style={[styles.sizeCtrlIcon, styles.minusCtrlIcon]}>
-              <Icon name={'remove-outline'} color={'#855C9C'} size={34} />
-            </TouchableOpacity>
-            <View style={styles.ctrlDivider} />
-            <TouchableOpacity style={styles.sizeCtrlIcon}>
-              <Icon name={'add-outline'} color={'#855C9C'} size={34} />
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-    </View>
-  );
+type LineItem = {
+  id: number;
+  name: string;
+  price_total: number;
+  price_monthly: number;
+  icon?: string;
+  type?: string;
+  category?: string;
 };
 
 export default function ElanTemplate({route, navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
   const {parent = '', itemTitle = ''} = route.params || {};
+  const [sizes, setSizes] = useState<any>({});
+  const [cart, setCart] = useState<any>([]);
+  const updateSize = (item: LineItem, size: number) => {
+    sizes[item.id] = size > 0 ? size : 0;
+    const newSizes = Object.assign({}, sizes);
+    setSizes(newSizes);
+  };
+  const chooseItem = (item: LineItem) => {
+    const itemIndex = cart.findIndex((it: LineItem) => it.id === item.id);
+
+    if (itemIndex < 0) {
+      let itemIndex2 = cart.findIndex(
+        (it: LineItem) => it.category === item.category,
+      );
+      while (itemIndex2 > -1) {
+        cart.splice(itemIndex2, 1);
+        itemIndex2 = cart.findIndex(
+          (it: LineItem) => it.category === item.category,
+        );
+      }
+      cart.push(item);
+      setCart(cart.slice());
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -179,17 +161,39 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
             <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
               {catalog.title}
             </AppText>
-            {catalog.items.map((item: any, id: number) => (
-              <AdditionalItem
-                key={id}
-                active={false}
-                item={item}
-                setActive={() => {}}
-                styles={styles}
-              />
+            {catalog.items.map((item: LineItem, id: number) => (
+              <>
+                {item.type === 'switch' ? (
+                  <LineItemWithSwitch
+                    key={id}
+                    item={item}
+                    size={sizes[item.id] || 0}
+                    setSize={(num) => updateSize(item, num)}
+                  />
+                ) : (
+                  <LineItem
+                    key={id}
+                    active={
+                      cart.findIndex((it: LineItem) => it.id === item.id) > -1
+                    }
+                    item={item}
+                    setActive={() => chooseItem(item)}
+                  />
+                )}
+              </>
             ))}
           </View>
         ))}
+      </View>
+      <View style={styles.bottomBtnView}>
+        <AppGradButton
+          containerStyle={styles.createBtnContainer}
+          textStyle={styles.createBtnText}
+          btnStyle={styles.createBtn}
+          title={'$10,403 or $145.88/month'}
+          leftIconContent={<></>}
+          onPress={() => {}}
+        />
       </View>
     </View>
   );
@@ -267,41 +271,30 @@ const getStyles = (themeStyle: StyleType) => ({
     top: 0,
     left: 0,
   },
-  rectSection: {
-    borderWidth: 1,
-    borderColor: themeStyle.lightPurple,
-    borderRadius: 8,
-    flex: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
   uppercaseText: {
     textTransform: 'uppercase',
-  },
-  playIcon: {
-    paddingLeft: 25,
-    paddingRight: 10,
   },
   block: {
     paddingBottom: 40,
   },
-  sizeCtrl: {
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: themeStyle.textLightPurple,
-    borderRadius: 8,
+  bottomBtnView: {
+    alignSelf: 'flex-end',
+    position: 'absolute',
+    bottom: 0,
     flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 20,
   },
-  sizeCtrlIcon: {
-    paddingHorizontal: 20,
-    height: 28,
-    marginTop: -10,
+  createBtnContainer: {
+    width: '100%',
   },
-  ctrlDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: themeStyle.lightBorderColor,
+  createBtn: {
+    borderTopLeftRadius: 0,
+    paddingVertical: 10,
+    borderTopRightRadius: 0,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    fontSize: 30,
+  },
+  createBtnText: {
+    textTransform: 'uppercase',
   },
 });

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 
-import React, {useContext, useEffect, useMemo, useRef, Ref} from 'react';
+import React, {useEffect, useMemo, useRef, Ref} from 'react';
 import {Animated, BackHandler} from 'react-native';
 import {State} from 'react-native-gesture-handler';
 import {ThemeContext, ThemeContextType} from './Context';

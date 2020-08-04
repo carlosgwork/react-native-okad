@@ -15,10 +15,10 @@ export type ContactsStackParamList = {
     itemId: number;
     itemTitle: string;
     parent: string;
-  }>;
+  
   [AppRouteEnum.BrunoStraightStairlift]: Partial<{
     parent: string;
-  }>;
+  }>;}>;
   [AppRouteEnum.ElanTemplate]: Partial<{
     parent: string;
     itemTitle: string;

@@ -14,8 +14,7 @@ import {
 } from '@root/components';
 import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
 
-import ElanImg from '@assets/images/elan_sre_3050.png';
-import EliteImg from '@assets/images/elite_sre_2010.png';
+import {ElanImage, EliteImage} from '@assets/assets';
 
 const {width: viewportWidth} = Dimensions.get('window');
 
@@ -33,7 +32,7 @@ const catalog_items = {
       price_total: 3149,
       price_monthly: 52,
       public_id: '42e4eccc-c84e-4cae-bee6-857130e2632c',
-      image: ElanImg,
+      image: ElanImage,
       qbo_id: null,
       sku: 'SRE-3050',
       square_id: null,
@@ -53,7 +52,7 @@ const catalog_items = {
       price_monthly: 70,
       public_id: '0768aa12-26e2-4344-a21a-6a9bf008b79e',
       qbo_id: null,
-      image: EliteImg,
+      image: EliteImage,
       sku: 'SRE-2010',
       square_id: null,
       taxable: true,
@@ -71,7 +70,7 @@ const catalog_items = {
       price_total: 3149,
       price_monthly: 52,
       qbo_id: null,
-      image: ElanImg,
+      image: ElanImage,
       sku: 'SRE-ELAN-R',
       square_id: null,
       taxable: true,
@@ -89,7 +88,7 @@ const catalog_items = {
       price_total: 4249,
       price_monthly: 70,
       qbo_id: null,
-      image: EliteImg,
+      image: EliteImage,
       sku: 'SRE-ELITE-R',
       square_id: null,
       taxable: true,
