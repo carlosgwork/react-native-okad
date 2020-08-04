@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {View, Image, TouchableOpacity, Text, Dimensions} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Carousel from 'react-native-snap-carousel';
+import numeral from 'numeral';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -15,88 +16,11 @@ import {
 import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
 
 import {ElanImage, EliteImage} from '@assets/assets';
+import {setAction} from '@root/redux/actions';
+import {ProductItemProps} from '@root/utils/types';
+import {ELAN_PRODUCTS} from './data';
 
 const {width: viewportWidth} = Dimensions.get('window');
-
-const catalog_items = {
-  indoor: [
-    {
-      category: 'Stairlifts',
-      cost: 155000,
-      created: '2020-07-31T23:26:50.479677+00:00',
-      description:
-        '300 lb. weight capacity\nModern styling\nPadded seat and backrest\nFolding seat, footrest and armrests\nColor-matched upholstery\nPrice includes installation & training',
-      id: 1,
-      installation_fee: 45000,
-      name: 'Elan SRE-3050',
-      price_total: 3149,
-      price_monthly: 52,
-      public_id: '42e4eccc-c84e-4cae-bee6-857130e2632c',
-      image: ElanImage,
-      qbo_id: null,
-      sku: 'SRE-3050',
-      square_id: null,
-      taxable: true,
-      subcategory: 'Elan',
-    },
-    {
-      category: 'Stairlifts',
-      cost: 239400,
-      created: '2020-07-31T23:26:50.479677+00:00',
-      description:
-        '400 lb. weight capacity\nContemporary styling\nDeluxe padded seat and backrest\nFolding seat, footrest and armrests\nOptional custom upholstery\nPrice includes installation & training',
-      id: 2,
-      installation_fee: 45000,
-      name: 'Elite SRE-2010',
-      price_total: 4249,
-      price_monthly: 70,
-      public_id: '0768aa12-26e2-4344-a21a-6a9bf008b79e',
-      qbo_id: null,
-      image: EliteImage,
-      sku: 'SRE-2010',
-      square_id: null,
-      taxable: true,
-      subcategory: 'Elite',
-    },
-    {
-      category: 'Stairlifts',
-      cost: 155000,
-      created: '2020-07-31T23:26:50.479677+00:00',
-      description:
-        '300 lb. weight capacity\nModern styling\nPadded seat and backrest\nFolding seat, footrest and armrests\nColor-matched upholstery\nPrice includes installation & training',
-      id: 1,
-      installation_fee: 45000,
-      name: 'Bruno Elan (Reconditioned)',
-      price_total: 3149,
-      price_monthly: 52,
-      qbo_id: null,
-      image: ElanImage,
-      sku: 'SRE-ELAN-R',
-      square_id: null,
-      taxable: true,
-      subcategory: 'Elan',
-    },
-    {
-      category: 'Stairlifts',
-      cost: 155000,
-      created: '2020-07-31T23:26:50.479677+00:00',
-      description:
-        '300 lb. weight capacity\nModern styling\nPadded seat and backrest\nFolding seat, footrest and armrests\nColor-matched upholstery\nPrice includes installation & training',
-      id: 1,
-      installation_fee: 45000,
-      name: 'Bruno Elite (Reconditioned)',
-      price_total: 4249,
-      price_monthly: 70,
-      qbo_id: null,
-      image: EliteImage,
-      sku: 'SRE-ELITE-R',
-      square_id: null,
-      taxable: true,
-      subcategory: 'Elite',
-    },
-  ],
-  outdoor: [],
-};
 
 export default function BrunoStraightStairlift({
   route,
@@ -107,10 +31,30 @@ export default function BrunoStraightStairlift({
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
-  const _renderItem = ({item, index}: any) => {
+  const _renderItem = ({item, index}: ProductItemProps) => {
+    const selectProduct = () => {
+      setAction('cart', {product: item});
+      navigation.navigate('ElanTemplate' as keyof ContactsStackParamList, {
+        itemTitle: item.name,
+        parent: 'Bruno Straight Stairlift',
+      });
+    };
+
+    let productImage;
+    const category = item.name.split(' ')[0];
+    switch (category) {
+      case 'Elan':
+        productImage = ElanImage;
+        break;
+      case 'Elite':
+        productImage = EliteImage;
+        break;
+      default:
+    }
+
     return (
       <View key={index} style={styles.slideItem}>
-        <Image style={styles.imageStyle} source={item.image} />
+        <Image style={styles.imageStyle} source={productImage} />
         {item.name.indexOf('Reconditioned') > -1 && (
           <View style={styles.diagonalBox}>
             <AppText
@@ -155,30 +99,26 @@ export default function BrunoStraightStairlift({
             <AppText
               color={'lightPurple'}
               font={'anSemiBold'}
-              size={18}>{`Starting at $${item.price_total}`}</AppText>
+              size={18}>{`Starting at $${numeral(item.price / 100).format(
+              '0,0.00',
+            )}`}</AppText>
             <AppText size={16} color={'lightPurple'}>
               {' or '}
             </AppText>
             <AppText
               color={'lightPurple'}
               font={'anSemiBold'}
-              size={18}>{`$${item.price_monthly}/month`}</AppText>
+              size={18}>{`$${numeral(item.price / 100 / 60).format(
+              '0,0.00',
+            )}/month`}</AppText>
           </View>
         </View>
         <View style={styles.ctaBtnContainer}>
           <View style={styles.ctaBtn}>
             <AppGradButton
               btnStyle={styles.ctaInnerBtn}
-              title={`Select ${item.subcategory}`}
-              onPress={() =>
-                navigation.navigate(
-                  'ElanTemplate' as keyof ContactsStackParamList,
-                  {
-                    itemTitle: item.name,
-                    parent: 'Bruno Straight Stairlift',
-                  },
-                )
-              }
+              title={`Select ${category}`}
+              onPress={selectProduct}
             />
           </View>
         </View>
@@ -217,7 +157,9 @@ export default function BrunoStraightStairlift({
         <IndoorOutdoorSwitch isIndoor={isIndoor} setIsIndoor={setIsIndoor} />
         <View style={styles.galleryContainer}>
           <Carousel
-            data={isIndoor ? catalog_items.indoor : catalog_items.outdoor}
+            data={
+              (isIndoor ? ELAN_PRODUCTS.indoor : ELAN_PRODUCTS.outdoor) as any[]
+            }
             renderItem={_renderItem}
             sliderWidth={viewportWidth}
             itemWidth={viewportWidth / 2.2}
@@ -270,7 +212,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   itemContent: {
     width: '100%',
-    paddingHorizontal: '15%',
+    paddingHorizontal: '10%',
     borderRightWidth: 1,
     borderRightColor: '#C6C6C8',
     paddingBottom: 30,

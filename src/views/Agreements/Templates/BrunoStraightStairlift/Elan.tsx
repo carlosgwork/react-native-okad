@@ -1,5 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
+import numeral from 'numeral';
+import {useSelector} from 'react-redux';
+import {setAction} from '@redux/actions';
+
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {
@@ -11,6 +15,7 @@ import {
   AppGradButton,
 } from '@root/components';
 import {ContactsNavProps} from '@root/routes/types';
+import {LineItemType} from '@root/utils/types';
 
 const ElanCatalogs = [
   {
@@ -19,15 +24,13 @@ const ElanCatalogs = [
       {
         id: 1,
         name: 'Manual Swivel Seat',
-        price_total: 729,
-        price_monthly: 12.15,
+        price: 72900,
         category: 'seat',
       },
       {
         id: 2,
         name: 'Power-Assisted Swivel Seat',
-        price_total: 729,
-        price_monthly: 12.15,
+        price: 72900,
         category: 'seat',
       },
     ],
@@ -38,15 +41,13 @@ const ElanCatalogs = [
       {
         id: 3,
         name: 'Manual Folding Footrest',
-        price_total: undefined,
-        price_monthly: undefined,
+        price: 0,
         category: 'Footrest',
       },
       {
         id: 4,
         name: 'Power Folding Footrest',
-        price_total: 499,
-        price_monthly: 8.33,
+        price: 50000,
         category: 'Footrest',
       },
     ],
@@ -57,23 +58,20 @@ const ElanCatalogs = [
       {
         id: 5,
         name: 'Fixed Rail',
-        price_total: undefined,
-        price_monthly: undefined,
+        price: 0,
         icon: 'image-outline',
         category: 'Rail',
       },
       {
         id: 6,
         name: 'Manual Folding Rail',
-        price_total: 699,
-        price_monthly: 8.33,
+        price: 70000,
         category: 'Rail',
       },
       {
         id: 7,
         name: 'Power Folding Rail',
-        price_total: 1399,
-        price_monthly: 8.33,
+        price: 140000,
         category: 'Rail',
       },
     ],
@@ -83,9 +81,8 @@ const ElanCatalogs = [
     items: [
       {
         id: 8,
-        name: 'Foot of Length',
-        price_total: 100,
-        price_monthly: 12.15,
+        name: "20' Rail Installation Kit",
+        price: 25500,
         icon: undefined,
         type: 'switch',
       },
@@ -93,43 +90,56 @@ const ElanCatalogs = [
   },
 ];
 
-type LineItem = {
-  id: number;
-  name: string;
-  price_total: number;
-  price_monthly: number;
-  icon?: string;
-  type?: string;
-  category?: string;
-};
-
 export default function ElanTemplate({route, navigation}: ContactsNavProps) {
-  const {styles} = useStyles(getStyles);
   const {parent = '', itemTitle = ''} = route.params || {};
-  const [sizes, setSizes] = useState<any>({});
-  const [cart, setCart] = useState<any>([]);
-  const updateSize = (item: LineItem, size: number) => {
-    sizes[item.id] = size > 0 ? size : 0;
-    const newSizes = Object.assign({}, sizes);
-    setSizes(newSizes);
-  };
-  const chooseItem = (item: LineItem) => {
-    const itemIndex = cart.findIndex((it: LineItem) => it.id === item.id);
 
+  const {product, items} = useSelector((state: any) => state.cart);
+
+  const {styles} = useStyles(getStyles);
+  const updateQty = (item: LineItemType, qty: number) => {
+    console.log(qty);
+    const itemIndex = items.findIndex((it: LineItemType) => it.id === item.id);
     if (itemIndex < 0) {
-      let itemIndex2 = cart.findIndex(
-        (it: LineItem) => it.category === item.category,
+      items.push(item);
+    }
+    const newItems = items.map((it: LineItemType) => {
+      if (it.id === item.id) {
+        it.quantity = qty;
+        return it;
+      }
+      return it;
+    });
+    setAction('cart', {items: newItems});
+  };
+  const chooseItem = (item: LineItemType) => {
+    const newItems = items.slice();
+    const itemIndex = newItems.findIndex(
+      (it: LineItemType) => it.id === item.id,
+    );
+    if (itemIndex < 0) {
+      let itemIndex2 = newItems.findIndex(
+        (it: LineItemType) => it.category === item.category,
       );
       while (itemIndex2 > -1) {
-        cart.splice(itemIndex2, 1);
-        itemIndex2 = cart.findIndex(
-          (it: LineItem) => it.category === item.category,
+        newItems.splice(itemIndex2, 1);
+        itemIndex2 = newItems.findIndex(
+          (it: LineItemType) => it.category === item.category,
         );
       }
-      cart.push(item);
-      setCart(cart.slice());
+      newItems.push(item);
+      setAction('cart', {items: newItems});
     }
   };
+
+  // Calculate Total Price
+  let totalPrice = product.price;
+  items.map((item: LineItemType) => {
+    if (item.quantity) {
+      totalPrice += item.price * item.quantity;
+    } else {
+      totalPrice += item.price;
+    }
+  });
 
   return (
     <View style={styles.container}>
@@ -161,20 +171,25 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
             <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
               {catalog.title}
             </AppText>
-            {catalog.items.map((item: LineItem, id: number) => (
+            {catalog.items.map((item: LineItemType, id: number) => (
               <>
                 {item.type === 'switch' ? (
                   <LineItemWithSwitch
                     key={id}
                     item={item}
-                    size={sizes[item.id] || 0}
-                    setSize={(num) => updateSize(item, num)}
+                    qty={
+                      items[
+                        items.findIndex((it: LineItemType) => it.id === item.id)
+                      ]?.quantity || 0
+                    }
+                    setQty={(num) => updateQty(item, num)}
                   />
                 ) : (
                   <LineItem
                     key={id}
                     active={
-                      cart.findIndex((it: LineItem) => it.id === item.id) > -1
+                      items.findIndex((it: LineItemType) => it.id === item.id) >
+                      -1
                     }
                     item={item}
                     setActive={() => chooseItem(item)}
@@ -190,7 +205,9 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
           containerStyle={styles.createBtnContainer}
           textStyle={styles.createBtnText}
           btnStyle={styles.createBtn}
-          title={'$10,403 or $145.88/month'}
+          title={`$${numeral(totalPrice / 100).format('0,0.00')} or $${numeral(
+            totalPrice / 100 / 60,
+          ).format('0,0.00')}/month`}
           leftIconContent={<></>}
           onPress={() => {}}
         />

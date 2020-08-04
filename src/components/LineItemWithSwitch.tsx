@@ -1,18 +1,20 @@
 import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import numeral from 'numeral';
 
 import {useStyles} from '@global/Hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import AppText from './AppText';
+import {LineItemType} from '@root/utils/types';
 
 type Props = {
-  item: any;
-  size: number;
-  setSize: (size: number) => void;
+  item: LineItemType;
+  qty: number;
+  setQty: (qty: number) => void;
 };
 
-export default function LineItemWithSwitch({item, size, setSize}: Props) {
+export default function LineItemWithSwitch({item, qty, setQty}: Props) {
   const {styles} = useStyles(getStyles);
   return (
     <View style={styles.rowLayout}>
@@ -22,28 +24,28 @@ export default function LineItemWithSwitch({item, size, setSize}: Props) {
         </AppText>
         <View style={styles.rowLayout}>
           <View style={styles.sizeCircleContainer}>
-            {size > 0 && (
+            {qty > 0 && (
               <View style={styles.sizeCircle}>
                 <AppText color={'white'} size={20} font={'anSemiBold'}>
-                  {`${size}`}
+                  {`${qty}`}
                 </AppText>
               </View>
             )}
           </View>
-          {(item.price_monthly || item.price_total) && (
+          {item.price && (
             <>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {`+$${item.price_total} `}
+                {`+$${numeral(item.price / 100).format('0,0.00')} `}
               </AppText>
               <AppText color={'textBlack2'} size={18} font={'anRegular'}>
                 or
               </AppText>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {` $${item.price_monthly}/month`}
+                {` $${numeral(item.price / 100 / 60).format('0,0.00')}/month`}
               </AppText>
             </>
           )}
-          {!(item.price_monthly || item.price_total) && (
+          {!item.price && (
             <>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
                 &nbsp;
@@ -56,13 +58,13 @@ export default function LineItemWithSwitch({item, size, setSize}: Props) {
         <View style={styles.sizeCtrl}>
           <TouchableOpacity
             style={[styles.sizeCtrlIcon, styles.minusCtrlIcon]}
-            onPress={() => setSize(size - 1)}>
+            onPress={() => setQty(qty > 1 ? qty - 1 : 0)}>
             <Icon name={'remove-outline'} color={'#855C9C'} size={34} />
           </TouchableOpacity>
           <View style={styles.ctrlDivider} />
           <TouchableOpacity
             style={styles.sizeCtrlIcon}
-            onPress={() => setSize(size + 1)}>
+            onPress={() => setQty(qty + 1)}>
             <Icon name={'add-outline'} color={'#855C9C'} size={34} />
           </TouchableOpacity>
         </View>

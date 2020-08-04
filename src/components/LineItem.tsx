@@ -1,6 +1,7 @@
 import React from 'react';
 import {View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import numeral from 'numeral';
 
 import {useStyles} from '@global/Hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -23,20 +24,20 @@ export default function LineItem({item, active, setActive}: Props) {
           {item.name}
         </AppText>
         <View style={styles.rowLayout}>
-          {(item.price_monthly || item.price_total) && (
+          {item.price !== 0 && (
             <>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {`+$${item.price_total} `}
+                {`+$${numeral(item.price / 100).format('0,0.00')} `}
               </AppText>
               <AppText color={'textBlack2'} size={18} font={'anRegular'}>
                 or
               </AppText>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
-                {` $${item.price_monthly}/month`}
+                {` $${numeral(item.price / 100 / 60).format('0,0.00')}/month`}
               </AppText>
             </>
           )}
-          {!(item.price_monthly || item.price_total) && (
+          {!item.price && (
             <>
               <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
                 &nbsp;

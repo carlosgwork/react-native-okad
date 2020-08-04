@@ -120,3 +120,18 @@ export type GeolocationParams = {
 export type TouchElementProps = {
   onPress: () => {};
 };
+
+export type LineItemType = {
+  id: number;
+  name: string;
+  price: number;
+  icon?: string;
+  type?: string;
+  category?: string;
+  quantity?: number;
+};
+
+export type ProductItemProps = {
+  item: Catalog;
+  index: number;
+};
