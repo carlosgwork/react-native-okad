@@ -11,18 +11,17 @@ import {
   AppText,
   NavBackBtn,
   IndoorOutdoorSwitch,
-  AppGradButton,
 } from '@root/components';
 import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
 
-import {ElanImage, EliteImage} from '@assets/assets';
+import {EliteCRE2110} from '@assets/assets';
 import {setAction} from '@root/redux/actions';
 import {ProductItemProps} from '@root/utils/types';
-import {ELAN_PRODUCTS} from './data';
+import {BRUNO_CUSTOM_PRODUCTS} from './data';
 
 const {width: viewportWidth} = Dimensions.get('window');
 
-export default function BrunoStraightStairlift({
+export default function BrunoCustomStairlift({
   route,
   navigation,
 }: ContactsNavProps) {
@@ -36,53 +35,14 @@ export default function BrunoStraightStairlift({
       setAction('cart', {product: item});
       navigation.navigate('ElanTemplate' as keyof ContactsStackParamList, {
         itemTitle: item.name,
-        parent: 'Bruno Straight Stairlift',
+        parent: 'Bruno Custom Stairlift',
       });
     };
 
-    let productImage;
-    const category = item.name.split(' ')[0];
-    switch (category) {
-      case 'Elan':
-        productImage = ElanImage;
-        break;
-      case 'Elite':
-        productImage = EliteImage;
-        break;
-      default:
-    }
-
     return (
       <View key={index} style={styles.slideItem}>
-        <Image style={styles.imageStyle} source={productImage} />
-        {item.name.indexOf('Reconditioned') > -1 && (
-          <View style={styles.diagonalBox}>
-            <AppText
-              style={styles.uppercaseText}
-              color={'textBlack2'}
-              size={16}
-              font={'anSemiBold'}>
-              Reconditioned
-            </AppText>
-          </View>
-        )}
+        <Image style={styles.imageStyle} source={EliteCRE2110} />
         <View style={styles.rowLayout}>
-          <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'images-outline'}
-              size={24}
-              style={styles.marginRight15}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'ios-videocam-outline'}
-              size={28}
-              style={styles.marginRight15}
-            />
-          </TouchableOpacity>
           <AppText
             style={styles.uppercaseText}
             color={'textBlack2'}
@@ -90,6 +50,22 @@ export default function BrunoStraightStairlift({
             font={'anSemiBold'}>
             {item.name}
           </AppText>
+          <TouchableOpacity>
+            <Icon
+              color={themeStyle.textPurple}
+              name={'images-outline'}
+              size={24}
+              style={styles.marginLeft15}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity>
+            <Icon
+              color={themeStyle.textPurple}
+              name={'ios-videocam-outline'}
+              size={28}
+              style={styles.marginLeft15}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.itemContent}>
           <View>
@@ -114,13 +90,19 @@ export default function BrunoStraightStairlift({
           </View>
         </View>
         <View style={styles.ctaBtnContainer}>
-          <View style={styles.ctaBtn}>
-            <AppGradButton
-              btnStyle={styles.ctaInnerBtn}
-              title={`Select ${category}`}
-              onPress={selectProduct}
+          <TouchableOpacity
+            style={[styles.rowLayout, styles.ctaBtn]}
+            onPress={selectProduct}>
+            <AppText color={'textLightPurple'} size={20} font={'anSemiBold'}>
+              Continue
+            </AppText>
+            <Icon
+              color={themeStyle.textLightPurple}
+              name={'arrow-forward-outline'}
+              size={24}
+              style={styles.marginLeft5}
             />
-          </View>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -144,7 +126,7 @@ export default function BrunoStraightStairlift({
             </AppText>
           </TouchableOpacity>
         }
-        pageTitle={'Bruno Straight Stairlift'}
+        pageTitle={'Bruno Custom Stairlift'}
         toolbarCenterContent={null}
         toolbarRightContent={
           <Image
@@ -158,11 +140,13 @@ export default function BrunoStraightStairlift({
         <View style={styles.galleryContainer}>
           <Carousel
             data={
-              (isIndoor ? ELAN_PRODUCTS.indoor : ELAN_PRODUCTS.outdoor) as any[]
+              (isIndoor
+                ? BRUNO_CUSTOM_PRODUCTS.indoor
+                : BRUNO_CUSTOM_PRODUCTS.outdoor) as any[]
             }
             renderItem={_renderItem}
-            sliderWidth={viewportWidth}
-            itemWidth={viewportWidth / 2.2}
+            sliderWidth={viewportWidth - 40}
+            itemWidth={viewportWidth - 40}
           />
         </View>
       </View>
@@ -197,8 +181,8 @@ const getStyles = (themeStyle: StyleType) => ({
   galleryContainer: {
     marginTop: themeStyle.scale(30),
   },
-  marginRight15: {
-    marginRight: themeStyle.scale(30),
+  marginLeft15: {
+    marginLeft: themeStyle.scale(30),
     paddingVertical: 20,
   },
   imageStyle: {
@@ -207,14 +191,10 @@ const getStyles = (themeStyle: StyleType) => ({
     height: 400,
   },
   slideItem: {
-    paddingHorizontal: 20,
     justifyContent: 'flex-start',
   },
   itemContent: {
     width: '100%',
-    paddingHorizontal: '10%',
-    borderRightWidth: 1,
-    borderRightColor: '#C6C6C8',
     paddingBottom: 30,
   },
   descriptionText: {
@@ -223,11 +203,10 @@ const getStyles = (themeStyle: StyleType) => ({
     fontSize: 16,
   },
   ctaBtnContainer: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
   },
   ctaBtn: {
     textAlign: 'center',
-    width: '40%',
   },
   ctaInnerBtn: {
     paddingRight: 0,
@@ -244,5 +223,9 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   uppercaseText: {
     textTransform: 'uppercase',
+    flex: 1,
+  },
+  marginLeft5: {
+    marginLeft: themeStyle.scale(5),
   },
 });
