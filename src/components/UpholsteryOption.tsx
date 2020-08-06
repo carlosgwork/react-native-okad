@@ -6,10 +6,11 @@ import numeral from 'numeral';
 import {useStyles} from '@global/Hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import AppText from './AppText';
+import {LineItemType} from '@root/utils/types';
 
 type Props = {
   item: any;
-  setActive: (_: ColorOptionType) => void;
+  setActive: (_: LineItemType) => void;
 };
 
 type ColorOptionType = {
@@ -77,7 +78,8 @@ export default function UpholsteryOption({item, setActive}: Props) {
     SUPPORTED_COLORS[0],
   );
   const changeColor = (index: number) => {
-    setActive(SUPPORTED_COLORS[index]);
+    const newItem = {...item, ...SUPPORTED_COLORS[index]};
+    setActive(newItem);
     setActiveColor(SUPPORTED_COLORS[index]);
   };
 

@@ -218,7 +218,6 @@ export default function EliteCRE2110Template({
 
   const {styles} = useStyles(getStyles);
   const updateQty = (item: LineItemType, qty: number) => {
-    console.log(qty);
     const itemIndex = items.findIndex((it: LineItemType) => it.id === item.id);
     if (itemIndex < 0) {
       items.push(item);
@@ -253,11 +252,22 @@ export default function EliteCRE2110Template({
     }
     setAction('cart', {items: newItems});
   };
+  const chooseUpholstery = (item: LineItemType) => {
+    const newItems = items.slice();
+    const itemIndex = newItems.findIndex(
+      (it: LineItemType) => it.id === item.id,
+    );
+    if (itemIndex > -1) {
+      newItems.splice(itemIndex, 1);
+    }
+    newItems.push(item);
+    setAction('cart', {items: newItems});
+  };
 
   // Calculate Total Price
   let totalPrice = product.price;
   items.map((item: LineItemType) => {
-    if (item.quantity) {
+    if (item.quantity !== undefined) {
       totalPrice += item.price * item.quantity;
     } else {
       totalPrice += item.price;
@@ -330,7 +340,7 @@ export default function EliteCRE2110Template({
                     <UpholsteryOption
                       key={id}
                       item={item}
-                      setActive={() => chooseItem(item)}
+                      setActive={(it: LineItemType) => chooseUpholstery(it)}
                     />
                   )}
                   {item.type === undefined && (
