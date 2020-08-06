@@ -18,7 +18,7 @@ export default function LineItemWithSwitch({item, qty, setQty}: Props) {
   const {styles} = useStyles(getStyles);
   return (
     <View style={styles.rowLayout}>
-      <TouchableOpacity style={[styles.rowLayout, styles.rectWithSwitch]}>
+      <View style={[styles.rowLayout, styles.rectWithSwitch]}>
         <AppText color={'textBlack2'} size={18} font={'anSemiBold'}>
           {item.name}
         </AppText>
@@ -53,7 +53,7 @@ export default function LineItemWithSwitch({item, qty, setQty}: Props) {
             </>
           )}
         </View>
-      </TouchableOpacity>
+      </View>
       <View>
         <View style={styles.sizeCtrl}>
           <TouchableOpacity
