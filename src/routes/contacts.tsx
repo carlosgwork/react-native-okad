@@ -2,6 +2,7 @@ import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import Main from '@root/views/Contacts';
 import NewContact from '@root/views/Contacts/New';
+import ContactDetails from '@root/views/Contacts/Details';
 import NewAgreement from '@root/views/Contacts/NewAgreement';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
 import BrunoCustomStairlift from '@root/views/Agreements/Templates/BrunoCustomStairlift';
@@ -15,6 +16,7 @@ function ContactsStackNavigation() {
   return (
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="MainContacts" component={Main} />
+      <Stack.Screen name="ContactDetails" component={ContactDetails} />
       <Stack.Screen name="NewAgreement" component={NewAgreement} />
       <Stack.Screen
         name="BrunoStraightStairlift"

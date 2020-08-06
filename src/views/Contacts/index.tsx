@@ -89,7 +89,14 @@ const cellContent = (
   switch (header.value) {
     case 'name':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() =>
+            navigation.navigate(AppRouteEnum.ContactDetails, {
+              itemId: row.id,
+              itemTitle: `${row.name_first} ${row.name_last}`,
+            })
+          }>
           <AppText
             style={styles.noSpacing}
             color={'textPurple'}

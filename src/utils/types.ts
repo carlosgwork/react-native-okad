@@ -50,6 +50,7 @@ export type Contact = {
   // public_id: string,
   // created: Date,
   // last_modified?: Date,
+  id: number;
   email?: string;
   name_first: string;
   name_last: string;
