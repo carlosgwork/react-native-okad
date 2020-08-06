@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {View, Image, TouchableOpacity, ScrollView} from 'react-native';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
@@ -11,34 +11,59 @@ import {
   AppText,
   NavBackBtn,
   LineItemWithSwitch,
+  LineItemWithImage,
   LineItem,
+  UpholsteryOption,
   AppGradButton,
 } from '@root/components';
 import {ContactsNavProps} from '@root/routes/types';
 import {LineItemType} from '@root/utils/types';
+import {
+  BurnoEliteCreImg90Turn,
+  BurnoEliteCreImg180Turn,
+  BurnoEliteCreImgRadius,
+  BurnoEliteCreImgStraight,
+  BurnoEliteCreImgIL,
+} from '@assets/assets';
 
 const ElanCatalogs = [
   {
     title: 'Staircase Type',
     items: [
       {
+        id: 1,
+        name: '90° Turn',
+        price: 500000,
+        image: BurnoEliteCreImg90Turn,
+        type: 'image',
+      },
+      {
+        id: 2,
+        name: '180° Turn',
+        price: 400000,
+        image: BurnoEliteCreImg180Turn,
+        type: 'image',
+      },
+      {
+        id: 3,
+        name: 'Radius',
+        price: 600000,
+        image: BurnoEliteCreImgRadius,
+        type: 'image',
+      },
+      {
+        id: 4,
+        name: 'Intermediate Landing',
+        price: 700000,
+        image: BurnoEliteCreImgIL,
+        type: 'image',
+      },
+      {
         id: 5,
-        name: 'Fixed Rail',
-        price: 0,
-        icon: 'image-outline',
-        category: 'Rail',
-      },
-      {
-        id: 6,
-        name: 'Manual Folding Rail',
-        price: 70000,
-        category: 'Rail',
-      },
-      {
-        id: 7,
-        name: 'Power Folding Rail',
-        price: 140000,
-        category: 'Rail',
+        name: 'Straight Overrun',
+        price: 800000,
+        image: BurnoEliteCreImgStraight,
+        type: 'image',
       },
     ],
   },
@@ -96,9 +121,97 @@ const ElanCatalogs = [
       },
     ],
   },
+  {
+    title: 'Park Stations',
+    items: [
+      {
+        id: 13,
+        name: '90°',
+        price: 205500,
+        icon: undefined,
+        type: 'switch',
+      },
+      {
+        id: 14,
+        name: '180°',
+        price: 237000,
+        icon: undefined,
+        type: 'switch',
+      },
+      {
+        id: 15,
+        name: 'Mid-Park',
+        price: 34000,
+        icon: undefined,
+        type: 'switch',
+      },
+    ],
+  },
+  {
+    title: 'Seat',
+    items: [
+      {
+        id: 16,
+        name: 'Manual Swivel Seat',
+        price: 0,
+        category: 'seat',
+      },
+      {
+        id: 17,
+        name: 'Power Swivel Seat',
+        price: 72900,
+        category: 'seat',
+      },
+    ],
+  },
+  {
+    title: 'Footrest',
+    items: [
+      {
+        id: 18,
+        name: 'Manual Folding Footrest',
+        price: 0,
+        category: 'Footrest',
+      },
+      {
+        id: 19,
+        name: 'Power Folding Footrest',
+        price: 50000,
+        category: 'Footrest',
+      },
+    ],
+  },
+  {
+    title: 'Upholstery Options',
+    items: [
+      {
+        id: 40,
+        name: 'Maroon Vinyl',
+        price: 35000,
+        type: 'color',
+        color: undefined,
+        category: 'Upholstery Options',
+      },
+    ],
+  },
+  {
+    title: 'Additional Rail Options',
+    items: [
+      {
+        id: 50,
+        name: 'Custom RAL Color',
+        price: 630500,
+        icon: 'image-outline',
+        category: 'Additional Rail Options',
+      },
+    ],
+  },
 ];
 
-export default function ElanTemplate({route, navigation}: ContactsNavProps) {
+export default function EliteCRE2110Template({
+  route,
+  navigation,
+}: ContactsNavProps) {
   const {parent = '', itemTitle = ''} = route.params || {};
 
   const {product, items} = useSelector((state: any) => state.cart);
@@ -173,41 +286,69 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
           />
         }
       />
-      <View style={styles.mainContent}>
+      <ScrollView style={styles.mainContent}>
         {ElanCatalogs.map((catalog: any, index: number) => (
           <View style={styles.block} key={index}>
             <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
               {catalog.title}
             </AppText>
-            {catalog.items.map((item: LineItemType, id: number) => (
-              <>
-                {item.type === 'switch' ? (
-                  <LineItemWithSwitch
-                    key={id}
-                    item={item}
-                    qty={
-                      items[
-                        items.findIndex((it: LineItemType) => it.id === item.id)
-                      ]?.quantity || 0
-                    }
-                    setQty={(num) => updateQty(item, num)}
-                  />
-                ) : (
-                  <LineItem
-                    key={id}
-                    active={
-                      items.findIndex((it: LineItemType) => it.id === item.id) >
-                      -1
-                    }
-                    item={item}
-                    setActive={() => chooseItem(item)}
-                  />
-                )}
-              </>
-            ))}
+            <View style={[styles.rowLayout, styles.alignLeft]}>
+              {catalog.items.map((item: LineItemType, id: number) => (
+                <>
+                  {item.type === 'switch' && (
+                    <>
+                      <View style={styles.divider} />
+                      <LineItemWithSwitch
+                        key={id}
+                        item={item}
+                        qty={
+                          items[
+                            items.findIndex(
+                              (it: LineItemType) => it.id === item.id,
+                            )
+                          ]?.quantity || 0
+                        }
+                        setQty={(num) => updateQty(item, num)}
+                      />
+                    </>
+                  )}
+                  {item.type === 'image' && (
+                    <LineItemWithImage
+                      key={id}
+                      active={
+                        items.findIndex(
+                          (it: LineItemType) => it.id === item.id,
+                        ) > -1
+                      }
+                      item={item}
+                      setActive={() => chooseItem(item)}
+                    />
+                  )}
+                  {item.type === 'color' && (
+                    <UpholsteryOption
+                      key={id}
+                      item={item}
+                      setActive={() => chooseItem(item)}
+                    />
+                  )}
+                  {item.type === undefined && (
+                    <LineItem
+                      key={id}
+                      active={
+                        items.findIndex(
+                          (it: LineItemType) => it.id === item.id,
+                        ) > -1
+                      }
+                      item={item}
+                      setActive={() => chooseItem(item)}
+                    />
+                  )}
+                </>
+              ))}
+            </View>
           </View>
         ))}
-      </View>
+      </ScrollView>
       <View style={styles.bottomBtnView}>
         <AppGradButton
           containerStyle={styles.createBtnContainer}
@@ -237,6 +378,11 @@ const getStyles = (themeStyle: StyleType) => ({
     maxWidth: 230,
     height: themeStyle.scale(24),
   },
+  divider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: themeStyle.lightBorderColor,
+  },
   rowLayout: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -244,9 +390,13 @@ const getStyles = (themeStyle: StyleType) => ({
     justifyContent: 'space-between',
     marginTop: themeStyle.scale(10),
   },
+  alignLeft: {
+    justifyContent: 'flex-start',
+  },
   mainContent: {
-    paddingVertical: themeStyle.scale(50),
+    paddingVertical: themeStyle.scale(30),
     paddingHorizontal: themeStyle.scale(20),
+    marginBottom: 50,
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),
@@ -303,7 +453,6 @@ const getStyles = (themeStyle: StyleType) => ({
     paddingBottom: 40,
   },
   bottomBtnView: {
-    alignSelf: 'flex-end',
     position: 'absolute',
     bottom: 0,
     flexDirection: 'row',

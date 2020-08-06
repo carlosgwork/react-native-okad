@@ -59,13 +59,17 @@ export default function LineItemWithSwitch({item, qty, setQty}: Props) {
           <TouchableOpacity
             style={[styles.sizeCtrlIcon, styles.minusCtrlIcon]}
             onPress={() => setQty(qty > 1 ? qty - 1 : 0)}>
-            <Icon name={'remove-outline'} color={'#855C9C'} size={34} />
+            <Icon
+              name={'remove-outline'}
+              color={qty ? '#855C9C' : '#855C9C80'}
+              size={30}
+            />
           </TouchableOpacity>
           <View style={styles.ctrlDivider} />
           <TouchableOpacity
             style={styles.sizeCtrlIcon}
             onPress={() => setQty(qty + 1)}>
-            <Icon name={'add-outline'} color={'#855C9C'} size={34} />
+            <Icon name={'add-outline'} color={'#855C9C'} size={30} />
           </TouchableOpacity>
         </View>
       </View>
@@ -79,7 +83,6 @@ const getStyles = (themeStyle: StyleType) => ({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 10,
   },
   rectWithSwitch: {
     borderRadius: 8,
@@ -89,7 +92,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
   },
   sizeCtrl: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderWidth: 1,
     borderColor: themeStyle.textLightPurple,
     borderRadius: 8,
@@ -98,13 +101,13 @@ const getStyles = (themeStyle: StyleType) => ({
     marginLeft: 20,
   },
   sizeCtrlIcon: {
-    paddingHorizontal: 20,
-    height: 28,
+    paddingHorizontal: 16,
+    height: 24,
     marginTop: -10,
   },
   ctrlDivider: {
     width: 1,
-    height: 24,
+    height: 22,
     backgroundColor: themeStyle.lightBorderColor,
   },
   sizeCircleContainer: {

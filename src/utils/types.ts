@@ -129,6 +129,7 @@ export type LineItemType = {
   type?: string;
   category?: string;
   quantity?: number;
+  color?: string;
 };
 
 export type ProductItemProps = {

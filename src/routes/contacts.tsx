@@ -6,6 +6,7 @@ import NewAgreement from '@root/views/Contacts/NewAgreement';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
 import BrunoCustomStairlift from '@root/views/Agreements/Templates/BrunoCustomStairlift';
 import ElanTemplate from '@root/views/Agreements/Templates/BrunoStraightStairlift/Elan';
+import EliteCRE2110Template from '@root/views/Agreements/Templates/BrunoCustomStairlift/EliteCRE2110';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -24,6 +25,10 @@ function ContactsStackNavigation() {
         component={BrunoCustomStairlift}
       />
       <Stack.Screen name="ElanTemplate" component={ElanTemplate} />
+      <Stack.Screen
+        name="EliteCRE2110Template"
+        component={EliteCRE2110Template}
+      />
     </Stack.Navigator>
   );
 }

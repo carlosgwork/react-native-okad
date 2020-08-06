@@ -33,10 +33,13 @@ export default function BrunoCustomStairlift({
   const _renderItem = ({item, index}: ProductItemProps) => {
     const selectProduct = () => {
       setAction('cart', {product: item});
-      navigation.navigate('ElanTemplate' as keyof ContactsStackParamList, {
-        itemTitle: item.name,
-        parent: 'Bruno Custom Stairlift',
-      });
+      navigation.navigate(
+        'EliteCRE2110Template' as keyof ContactsStackParamList,
+        {
+          itemTitle: item.name,
+          parent: 'Bruno Custom Stairlift',
+        },
+      );
     };
 
     return (

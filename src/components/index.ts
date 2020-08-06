@@ -13,3 +13,5 @@ export {default as NavBackBtn} from './NavBackBtn';
 export {default as IndoorOutdoorSwitch} from './IndoorOutdoorSwitch';
 export {default as LineItemWithSwitch} from './LineItemWithSwitch';
 export {default as LineItem} from './LineItem';
+export {default as LineItemWithImage} from './LineItemWithImage';
+export {default as UpholsteryOption} from './UpholsteryOption';
