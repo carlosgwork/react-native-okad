@@ -127,8 +127,10 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
         );
       }
       newItems.push(item);
-      setAction('cart', {items: newItems});
+    } else {
+      newItems.splice(itemIndex, 1);
     }
+    setAction('cart', {items: newItems});
   };
 
   // Calculate Total Price

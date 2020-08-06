@@ -248,8 +248,10 @@ export default function EliteCRE2110Template({
         );
       }
       newItems.push(item);
-      setAction('cart', {items: newItems});
+    } else {
+      newItems.splice(itemIndex, 1);
     }
+    setAction('cart', {items: newItems});
   };
 
   // Calculate Total Price
