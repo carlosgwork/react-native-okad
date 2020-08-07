@@ -1,11 +1,11 @@
 import React from 'react';
-import {TouchableOpacity, View, Image} from 'react-native';
+import {View, Image} from 'react-native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
-import {AppHeader, NavBackBtn, AppText} from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppHeader, NavBackBtn} from '@root/components';
+import {ContactsNavProps} from '@root/routes/types';
 
 export default function ContactDetails({route, navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
@@ -15,20 +15,9 @@ export default function ContactDetails({route, navigation}: ContactsNavProps) {
     <View style={styles.container}>
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={parent}
-            onClick={() => navigation.navigate(AppRouteEnum.MainContacts, {})}
-          />
+          <NavBackBtn title={parent} onClick={() => navigation.pop()} />
         }
-        rightContent={
-          <TouchableOpacity
-            style={styles.switchText}
-            onPress={() => navigation.pop()}>
-            <AppText size={16} font={'anSemiBold'} color={'textLightPurple'}>
-              Cancel
-            </AppText>
-          </TouchableOpacity>
-        }
+        rightContent={null}
         pageTitle={itemTitle}
         toolbarCenterContent={null}
         toolbarRightContent={

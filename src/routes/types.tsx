@@ -36,6 +36,11 @@ export type ContactsStackParamList = {
     itemTitle: string;
     itemId: number;
   }>;
+  [AppRouteEnum.NewAgreement]: Partial<{
+    parent: string;
+    itemTitle: string;
+    itemId: number;
+  }>;
 };
 
 type SettingsStackParamList = {};

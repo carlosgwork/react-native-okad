@@ -283,7 +283,10 @@ export default function EliteCRE2110Template({
         rightContent={
           <TouchableOpacity
             style={styles.switchText}
-            onPress={() => navigation.pop()}>
+            onPress={() => {
+              navigation.pop();
+              navigation.pop();
+            }}>
             <AppText size={16} font={'anSemiBold'} color={'textLightPurple'}>
               Cancel
             </AppText>

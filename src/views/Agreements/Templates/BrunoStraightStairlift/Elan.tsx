@@ -94,7 +94,6 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
   const {parent = '', itemTitle = ''} = route.params || {};
 
   const {product, items} = useSelector((state: any) => state.cart);
-
   const {styles} = useStyles(getStyles);
   const updateQty = (item: LineItemType, qty: number) => {
     const itemIndex = items.findIndex((it: LineItemType) => it.id === item.id);
@@ -151,7 +150,10 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
         rightContent={
           <TouchableOpacity
             style={styles.switchText}
-            onPress={() => navigation.pop()}>
+            onPress={() => {
+              navigation.pop();
+              navigation.pop();
+            }}>
             <AppText size={16} font={'anSemiBold'} color={'textLightPurple'}>
               Cancel
             </AppText>

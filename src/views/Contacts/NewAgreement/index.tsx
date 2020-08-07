@@ -5,7 +5,12 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText, NavBackBtn} from '@root/components';
 import TemplateTile from './TemplateTile';
-import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
+import {
+  ContactsNavProps,
+  ContactsStackParamList,
+  AppRouteEnum,
+} from '@root/routes/types';
+import {setAction} from '@root/redux/actions';
 
 const Templates = [
   {
@@ -26,6 +31,8 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
   const {styles} = useStyles(getStyles);
   const {itemId, parent = '', itemTitle = ''} = route.params || {};
   const navigateTemplate = (index: number) => {
+    // Init Cart state
+    setAction('cart', {product: {}, items: []});
     const templateName = Templates[index].name as keyof ContactsStackParamList;
     navigation.navigate(templateName, {
       parent: 'NewAgreement',
@@ -37,14 +44,20 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
       <AppHeader
         leftContent={
           <NavBackBtn
-            title={itemId ? itemTitle : parent}
+            title={parent ? parent : itemTitle}
             onClick={() => navigation.pop()}
           />
         }
         rightContent={
           <TouchableOpacity
             style={styles.switchText}
-            onPress={() => navigation.pop()}>
+            onPress={() => {
+              navigation.pop();
+              navigation.navigate(AppRouteEnum.ContactDetails, {
+                itemId,
+                itemTitle,
+              });
+            }}>
             <AppText size={16} font={'anSemiBold'} color={'textLightPurple'}>
               Cancel
             </AppText>
