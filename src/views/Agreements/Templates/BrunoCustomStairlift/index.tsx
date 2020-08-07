@@ -12,7 +12,11 @@ import {
   NavBackBtn,
   IndoorOutdoorSwitch,
 } from '@root/components';
-import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
+import {
+  ContactsNavProps,
+  ContactsStackParamList,
+  AppRouteEnum,
+} from '@root/routes/types';
 
 import {EliteCRE2110} from '@assets/assets';
 import {setAction} from '@root/redux/actions';
@@ -24,9 +28,9 @@ const {width: viewportWidth} = Dimensions.get('window');
 export default function BrunoCustomStairlift({
   route,
   navigation,
-}: ContactsNavProps) {
+}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
-  const {itemId, parent = '', itemTitle = ''} = route.params || {};
+  const {contact, templateId, parent = '', itemTitle = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
@@ -38,6 +42,8 @@ export default function BrunoCustomStairlift({
         {
           itemTitle: item.name,
           parent: 'Bruno Custom Stairlift',
+          contact,
+          templateId,
         },
       );
     };
@@ -116,7 +122,7 @@ export default function BrunoCustomStairlift({
       <AppHeader
         leftContent={
           <NavBackBtn
-            title={itemId ? itemTitle : parent}
+            title={contact ? itemTitle : parent}
             onClick={() => navigation.pop()}
           />
         }

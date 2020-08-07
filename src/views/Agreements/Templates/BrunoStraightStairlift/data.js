@@ -38,7 +38,7 @@ export const ELAN_PRODUCTS = {
       created: '2020-07-31T23:26:50.479677+00:00',
       description:
         '300 lb. weight capacity\nModern styling\nPadded seat and backrest\nFolding seat, footrest and armrests\nColor-matched upholstery\nPrice includes installation & training',
-      id: 1,
+      id: 103,
       installation_fee: 45000,
       name: 'Elan (Reconditioned)',
       price: 270000,
@@ -53,7 +53,7 @@ export const ELAN_PRODUCTS = {
       created: '2020-07-31T23:26:50.479677+00:00',
       description:
         '300 lb. weight capacity\nModern styling\nPadded seat and backrest\nFolding seat, footrest and armrests\nColor-matched upholstery\nPrice includes installation & training',
-      id: 1,
+      id: 102,
       installation_fee: 45000,
       name: 'Elite (Reconditioned)',
       price: 430000,

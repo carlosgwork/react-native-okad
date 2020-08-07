@@ -1,8 +1,9 @@
 import React from 'react';
-import {View, Image, TouchableOpacity} from 'react-native';
+import {View, Image, TouchableOpacity, Alert} from 'react-native';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
+import {useMutation} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -14,24 +15,37 @@ import {
   LineItem,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps} from '@root/routes/types';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {LineItemType} from '@root/utils/types';
+import {CREATE_AGREEMENT} from '../../graphql';
 
 const ElanCatalogs = [
   {
     title: 'Seat',
     items: [
       {
-        id: 1,
-        name: 'Manual Swivel Seat',
-        price: 72900,
-        category: 'seat',
-      },
-      {
-        id: 2,
+        id: 7,
+        cost: 36740,
+        category: 'Stairlifts',
+        description: 'For SRE-3050',
         name: 'Power-Assisted Swivel Seat',
         price: 72900,
-        category: 'seat',
+        sku: 'SRE-30528',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'seat',
+      },
+      {
+        id: 11,
+        cost: 36740,
+        category: 'Stairlifts',
+        description: 'For SRE-2010',
+        name: 'Power-Assisted Swivel Seat',
+        price: 79000,
+        sku: 'SRE-21153',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'seat',
       },
     ],
   },
@@ -39,16 +53,28 @@ const ElanCatalogs = [
     title: 'Footrest',
     items: [
       {
-        id: 3,
-        name: 'Manual Folding Footrest',
-        price: 0,
-        category: 'Footrest',
+        id: 6,
+        cost: 29260,
+        category: 'Stairlifts',
+        description: 'For SRE-3050',
+        name: 'Automatic Folding Footrest',
+        price: 50000,
+        sku: 'SRE-30525',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Footrest',
       },
       {
-        id: 4,
-        name: 'Power Folding Footrest',
+        id: 12,
+        cost: 23320,
+        category: 'Stairlifts',
+        description: 'For SRE-2010',
+        name: 'Automatic Folding Footrest',
         price: 50000,
-        category: 'Footrest',
+        sku: 'SRE-21143',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Footrest',
       },
     ],
   },
@@ -56,23 +82,52 @@ const ElanCatalogs = [
     title: 'Rail',
     items: [
       {
-        id: 5,
-        name: 'Fixed Rail',
-        price: 0,
-        icon: 'image-outline',
-        category: 'Rail',
-      },
-      {
-        id: 6,
-        name: 'Manual Folding Rail',
-        price: 70000,
-        category: 'Rail',
-      },
-      {
-        id: 7,
+        id: 4,
+        cost: 73040,
+        category: 'Stairlifts',
+        description: 'For SRE-3050',
         name: 'Power Folding Rail',
         price: 140000,
-        category: 'Rail',
+        sku: 'SRE-30529',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Rail',
+      },
+      {
+        id: 5,
+        cost: 36740,
+        category: 'Stairlifts',
+        description: 'For SRE-3050',
+        name: 'Manual Folding Rail',
+        price: 70000,
+        sku: 'SRE-30530',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Rail',
+      },
+      {
+        id: 9,
+        cost: 36740,
+        category: 'Stairlifts',
+        description: 'For SRE-2010',
+        name: 'Manual Folding Rail',
+        price: 70000,
+        sku: 'SRE-30379',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Rail',
+      },
+      {
+        id: 10,
+        cost: 73040,
+        category: 'Stairlifts',
+        description: 'For SRE-2010',
+        name: 'Power Folding Rail',
+        price: 140000,
+        sku: 'SRE-30372',
+        taxable: true,
+        vendor_id: 1,
+        subcategory: 'Rail',
       },
     ],
   },
@@ -80,21 +135,41 @@ const ElanCatalogs = [
     title: 'Additional Rail Options',
     items: [
       {
-        id: 8,
+        id: 3,
+        cost: 13420,
+        category: 'Stairlifts',
+        description: 'For SRE-3050',
         name: "20' Rail Installation Kit",
         price: 25500,
-        icon: undefined,
+        sku: 'SRE-K-3065',
+        taxable: true,
+        vendor_id: 1,
         type: 'switch',
       },
     ],
   },
 ];
 
-export default function ElanTemplate({route, navigation}: ContactsNavProps) {
-  const {parent = '', itemTitle = ''} = route.params || {};
+export default function ElanTemplate({
+  route,
+  navigation,
+}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+  const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
 
-  const {product, items} = useSelector((state: any) => state.cart);
+  const {items} = useSelector((state: any) => state.cart);
   const {styles} = useStyles(getStyles);
+  const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
+    onCompleted() {
+      Alert.alert('New Quote was successfully created.');
+      navigation.popToTop();
+      navigation.navigate(AppRouteEnum.ContactDetails, {
+        parent: 'Contacts',
+        itemId: contact.id,
+        itemTitle: `${contact.name_first} ${contact.name_last}`,
+      });
+    },
+  });
+
   const updateQty = (item: LineItemType, qty: number) => {
     const itemIndex = items.findIndex((it: LineItemType) => it.id === item.id);
     if (itemIndex < 0) {
@@ -116,12 +191,12 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
     );
     if (itemIndex < 0) {
       let itemIndex2 = newItems.findIndex(
-        (it: LineItemType) => it.category === item.category,
+        (it: LineItemType) => it.subcategory === item.subcategory,
       );
       while (itemIndex2 > -1) {
         newItems.splice(itemIndex2, 1);
         itemIndex2 = newItems.findIndex(
-          (it: LineItemType) => it.category === item.category,
+          (it: LineItemType) => it.subcategory === item.subcategory,
         );
       }
       newItems.push(item);
@@ -131,8 +206,29 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
     setAction('cart', {items: newItems});
   };
 
+  const createQuote = () => {
+    // Create an agreement
+    const lineItems = items.map((item: LineItemType) => ({
+      catalog_item_id: item.id,
+      current_cost: item.cost,
+      price: item.price,
+      qty: item.quantity ? item.quantity : 1,
+      taxable: item.taxable,
+      discount: 0,
+    }));
+    inset_agreement({
+      variables: {
+        billing_address_id: contact.address_id,
+        agreement_template_id: templateId,
+        contact_id: contact.id,
+        shipping_address_id: contact.address_id,
+        line_items: lineItems,
+      },
+    });
+  };
+
   // Calculate Total Price
-  let totalPrice = product.price;
+  let totalPrice = 0;
   items.map((item: LineItemType) => {
     if (item.quantity !== undefined) {
       totalPrice += item.price * item.quantity;
@@ -212,7 +308,7 @@ export default function ElanTemplate({route, navigation}: ContactsNavProps) {
             totalPrice / 100 / 60,
           ).format('0,0.00')}/month`}
           leftIconContent={<></>}
-          onPress={() => {}}
+          onPress={createQuote}
         />
       </View>
     </View>

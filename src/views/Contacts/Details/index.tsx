@@ -5,9 +5,12 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
 import {AppHeader, NavBackBtn} from '@root/components';
-import {ContactsNavProps} from '@root/routes/types';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 
-export default function ContactDetails({route, navigation}: ContactsNavProps) {
+export default function ContactDetails({
+  route,
+  navigation,
+}: ContactsNavProps<AppRouteEnum.ContactDetails>) {
   const {styles} = useStyles(getStyles);
   const {parent = 'Contacts', itemTitle = ''} = route.params || {};
 

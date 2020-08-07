@@ -13,11 +13,16 @@ import {
   IndoorOutdoorSwitch,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, ContactsStackParamList} from '@root/routes/types';
+import {
+  ContactsNavProps,
+  ContactsStackParamList,
+  AppRouteEnum,
+} from '@root/routes/types';
 
 import {ElanImage, EliteImage} from '@assets/assets';
 import {setAction} from '@root/redux/actions';
 import {ProductItemProps} from '@root/utils/types';
+
 import {ELAN_PRODUCTS} from './data';
 
 const {width: viewportWidth} = Dimensions.get('window');
@@ -25,18 +30,20 @@ const {width: viewportWidth} = Dimensions.get('window');
 export default function BrunoStraightStairlift({
   route,
   navigation,
-}: ContactsNavProps) {
+}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
-  const {itemId, parent = '', itemTitle = ''} = route.params || {};
+  const {contact, templateId, parent = '', itemTitle = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
   const _renderItem = ({item, index}: ProductItemProps) => {
     const selectProduct = () => {
-      setAction('cart', {product: item});
+      setAction('cart', {items: [item]});
       navigation.navigate('ElanTemplate' as keyof ContactsStackParamList, {
         itemTitle: item.name,
         parent: 'Bruno Straight Stairlift',
+        contact,
+        templateId,
       });
     };
 
@@ -131,7 +138,7 @@ export default function BrunoStraightStairlift({
       <AppHeader
         leftContent={
           <NavBackBtn
-            title={itemId ? itemTitle : parent}
+            title={contact ? itemTitle : parent}
             onClick={() => navigation.pop()}
           />
         }

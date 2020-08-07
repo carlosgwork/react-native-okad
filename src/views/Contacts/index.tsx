@@ -93,7 +93,7 @@ const cellContent = (
           style={styles.cellLayout}
           onPress={() =>
             navigation.navigate(AppRouteEnum.ContactDetails, {
-              itemId: row.id,
+              contact: row,
               itemTitle: `${row.name_first} ${row.name_last}`,
             })
           }>
@@ -149,7 +149,7 @@ const cellContent = (
           onPress={() =>
             navigation.navigate('NewAgreement', {
               parent: 'Contacts',
-              itemId: row.id,
+              contact: row,
               itemTitle: `${row.name_first} ${row.name_last}`,
             })
           }
@@ -175,7 +175,9 @@ const cellContent = (
   }
 };
 
-export default function Contacts({navigation}: ContactsNavProps) {
+export default function Contacts({
+  navigation,
+}: ContactsNavProps<AppRouteEnum.MainContacts>) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 

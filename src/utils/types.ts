@@ -58,6 +58,7 @@ export type Contact = {
   count?: number;
   phone_home?: string;
   phone_office?: string;
+  address_id: number;
   address: Address;
   agreements?: Agreement[];
   company?: string;
@@ -125,12 +126,15 @@ export type TouchElementProps = {
 export type LineItemType = {
   id: number;
   name: string;
+  cost: number;
   price: number;
   icon?: string;
   type?: string;
   category?: string;
   quantity?: number;
   color?: string;
+  taxable: boolean;
+  subcategory: string;
 };
 
 export type ProductItemProps = {

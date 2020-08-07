@@ -27,15 +27,20 @@ const Templates = [
   },
 ];
 
-export default function NewAgreement({route, navigation}: ContactsNavProps) {
+export default function NewAgreement({
+  route,
+  navigation,
+}: ContactsNavProps<AppRouteEnum.NewAgreement>) {
   const {styles} = useStyles(getStyles);
-  const {itemId, parent = '', itemTitle = ''} = route.params || {};
+  const {contact, parent = '', itemTitle = ''} = route.params || {};
   const navigateTemplate = (index: number) => {
     // Init Cart state
     setAction('cart', {product: {}, items: []});
     const templateName = Templates[index].name as keyof ContactsStackParamList;
     navigation.navigate(templateName, {
       parent: 'NewAgreement',
+      templateId: 1,
+      contact: contact,
     });
   };
 
@@ -54,7 +59,7 @@ export default function NewAgreement({route, navigation}: ContactsNavProps) {
             onPress={() => {
               navigation.pop();
               navigation.navigate(AppRouteEnum.ContactDetails, {
-                itemId,
+                itemId: contact.id,
                 itemTitle,
               });
             }}>

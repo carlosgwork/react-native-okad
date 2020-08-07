@@ -1,7 +1,6 @@
-import {LineItemType, Catalog} from '@root/utils/types';
+import {LineItemType} from '@root/utils/types';
 
 export type CartState = {
-  product: Catalog;
   items: LineItemType[];
   error: string;
 };
@@ -9,7 +8,6 @@ export type CartState = {
 export const initialCart: {
   [_: string]: any;
 } = {
-  product: {},
   items: [],
   error: undefined,
 };
@@ -48,7 +46,6 @@ export const cart = (
 export type CartAction = {
   payload?: Partial<{
     key: string | undefined;
-    product: Catalog;
     items: LineItemType[];
     error: string;
   }>;

@@ -5,7 +5,7 @@ import Geolocation, {
   GeolocationResponse,
 } from '@react-native-community/geolocation';
 import phone from 'phone';
-import {ContactsNavProps} from '@root/routes/types';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {useMutation} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -16,7 +16,9 @@ import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';
 import {CREATE_CONTACT} from '../graphql';
 
-export default function NewContact({navigation}: ContactsNavProps) {
+export default function NewContact({
+  navigation,
+}: ContactsNavProps<AppRouteEnum.NewContactModal>) {
   const {styles} = useStyles(getStyles);
   const [insert_contacts] = useMutation(CREATE_CONTACT, {
     onCompleted() {

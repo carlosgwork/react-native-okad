@@ -1,5 +1,6 @@
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
+import {Contact} from '@root/utils/types';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
@@ -11,7 +12,15 @@ export enum AppRouteEnum {
   ElanTemplate = 'ElanTemplate',
   EliteCRE2110Template = 'EliteCRE2110Template',
   SETTINGS = 'SETTINGS',
+  TEMPLATES = 'Templates',
 }
+
+type TemplatesParamsType = {
+  parent: string;
+  itemTitle: string;
+  contact: Contact;
+  templateId: number;
+};
 
 export type ContactsStackParamList = {
   [AppRouteEnum.NewContactModal]: Partial<{
@@ -19,38 +28,28 @@ export type ContactsStackParamList = {
     itemTitle: string;
     parent: string;
   }>;
-  [AppRouteEnum.BrunoStraightStairlift]: Partial<{
-    parent: string;
-  }>;
-  [AppRouteEnum.ElanTemplate]: Partial<{
-    parent: string;
-    itemTitle: string;
-  }>;
-  [AppRouteEnum.EliteCRE2110Template]: Partial<{
-    parent: string;
-    itemTitle: string;
-  }>;
+  [AppRouteEnum.TEMPLATES]: TemplatesParamsType;
   [AppRouteEnum.MainContacts]: {};
   [AppRouteEnum.ContactDetails]: Partial<{
     parent: string;
     itemTitle: string;
     itemId: number;
   }>;
-  [AppRouteEnum.NewAgreement]: Partial<{
-    parent: string;
-    itemTitle: string;
-    itemId: number;
-  }>;
+  [AppRouteEnum.NewAgreement]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+  };
 };
 
 type SettingsStackParamList = {};
 
 type AppStackParamList = ContactsStackParamList & SettingsStackParamList;
 
-export type ContactsNavProps = {
+export type ContactsNavProps<T extends keyof AppStackParamList> = {
   navigation: StackNavigationProp<
     AppStackParamList,
     AppRouteEnum.NewContactModal
   >;
-  route: RouteProp<AppStackParamList, AppRouteEnum.NewContactModal>;
+  route: RouteProp<AppStackParamList, T>;
 };
