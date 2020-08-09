@@ -20,8 +20,8 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* osakaTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* osakaTests.m */; };
-		7102640524D35D58007CFCEA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 7102640424D35D58007CFCEA /* GoogleService-Info.plist */; };
 		711282CA24BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 711282C924BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf */; };
+		711AEB6724DF20F6007341BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 711AEB6624DF20F6007341BE /* GoogleService-Info.plist */; };
 		82C0D75629E5C9D08BE3334D /* libPods-osaka.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 029416373D7B9ECA081963ED /* libPods-osaka.a */; };
 		D47D0F7F2C44563D730A07A8 /* libPods-osaka-osakaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CD53BED67222C1AF6DC09C6 /* libPods-osaka-osakaTests.a */; };
 		D506A7A2F7F2448B604F85DE /* libPods-osaka-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 733CEC7CBFFBA03A832E5CC6 /* libPods-osaka-tvOSTests.a */; };
@@ -84,9 +84,9 @@
 		5F06DFBAE3784A44991AA83D /* Octicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
 		61670CA5C38D4228B0DFA468 /* Fontisto.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Fontisto.ttf; path = ../assets/fonts/Fontisto.ttf; sourceTree = "<group>"; };
 		63198BD429F64DE4A88A5E20 /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
-		7102640424D35D58007CFCEA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../Users/toptal/Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		711282C924BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "AvenirNextLTPro-Demi.otf"; path = "../assets/fonts/AvenirNextLTPro-Demi.otf"; sourceTree = "<group>"; };
 		7114FBE06AE44D64A243D55B /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
+		711AEB6624DF20F6007341BE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		714E495624C7CF3C00C5B341 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Foundation.ttf; path = ../assets/fonts/Foundation.ttf; sourceTree = "<group>"; };
 		714E495724C7CF3C00C5B341 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Entypo.ttf; path = ../assets/fonts/Entypo.ttf; sourceTree = "<group>"; };
 		714E495824C7CF3C00C5B341 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = FontAwesome.ttf; path = ../assets/fonts/FontAwesome.ttf; sourceTree = "<group>"; };
@@ -187,7 +187,7 @@
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				7102640424D35D58007CFCEA /* GoogleService-Info.plist */,
+				711AEB6624DF20F6007341BE /* GoogleService-Info.plist */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -463,7 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				04C4E5CD249805C3003CCB37 /* SF Pro Icons Regular.ttf in Resources */,
-				7102640524D35D58007CFCEA /* GoogleService-Info.plist in Resources */,
+				711AEB6724DF20F6007341BE /* GoogleService-Info.plist in Resources */,
 				04D60575249768C600E0A425 /* AvenirNextLTPro-Regular.otf in Resources */,
 				04D60576249768C600E0A425 /* AvenirNextLTPro-It.otf in Resources */,
 				711282CA24BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf in Resources */,
