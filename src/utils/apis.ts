@@ -1,7 +1,8 @@
 import {encode as btoa} from 'base-64';
 import queryString from 'query-string';
-import {GeolocationParams} from '@utils/types';
+import {GeolocationParams, Address} from '@utils/types';
 import {API_USER, API_PASS} from '@utils/constants';
+import {Alert} from 'react-native';
 
 const BasicAuthHeader = {
   'Content-Type': 'application/json',
@@ -33,4 +34,5 @@ export const fetchAddressFromLocation = async (
     })
     .catch((error) => {
       console.error('Error:', error);
+      Alert.alert(error);
     });

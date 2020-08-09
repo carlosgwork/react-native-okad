@@ -17,6 +17,7 @@ const defaultColors = {
   textBlack1: '#3D3D3D',
   textBlack2: '#55465F',
   textPurple: '#5D396E',
+  textBlue: '#5E79DC',
   textWhite: '#FFF',
   textGray: '#979797',
   textLightPurple: '#855C9C',

@@ -4,6 +4,7 @@ import Main from '@root/views/Contacts';
 import NewContact from '@root/views/Contacts/New';
 import ContactDetails from '@root/views/Contacts/Details';
 import NewAgreement from '@root/views/Contacts/NewAgreement';
+import AgreementDetails from '@root/views/Agreements/Details';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
 import BrunoCustomStairlift from '@root/views/Agreements/Templates/BrunoCustomStairlift';
 import ElanTemplate from '@root/views/Agreements/Templates/BrunoStraightStairlift/Elan';
@@ -18,6 +19,7 @@ function ContactsStackNavigation() {
       <Stack.Screen name="MainContacts" component={Main} />
       <Stack.Screen name="ContactDetails" component={ContactDetails} />
       <Stack.Screen name="NewAgreement" component={NewAgreement} />
+      <Stack.Screen name="AgreementDetails" component={AgreementDetails} />
       <Stack.Screen
         name="BrunoStraightStairlift"
         component={BrunoStraightStairlift}

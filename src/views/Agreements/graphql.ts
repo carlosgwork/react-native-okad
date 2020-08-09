@@ -21,6 +21,39 @@ export const CREATE_AGREEMENT = gql`
     ) {
       returning {
         id
+        address {
+          city
+          county
+          id
+          line1
+          line2
+          us_state
+          postal_code
+        }
+        addressByShippingAddressId {
+          city
+          county
+          id
+          line2
+          line1
+          us_state
+          postal_code
+        }
+        contact_id
+        line_items {
+          agreement_id
+          catalog_item_id
+          current_cost
+          discount
+          price
+          qty
+          id
+        }
+        number
+        revision
+        sales_tax_rate
+        shipping_address_id
+        signature
       }
     }
   }

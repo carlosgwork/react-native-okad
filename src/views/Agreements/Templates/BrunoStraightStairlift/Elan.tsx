@@ -16,7 +16,7 @@ import {
   AppGradButton,
 } from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {LineItemType} from '@root/utils/types';
+import {LineItemType, Agreement} from '@root/utils/types';
 import {CREATE_AGREEMENT} from '../../graphql';
 
 const ElanCatalogs = [
@@ -159,12 +159,14 @@ export default function ElanTemplate({
   const {items} = useSelector((state: any) => state.cart);
   const {styles} = useStyles(getStyles);
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
-    onCompleted() {
+    onCompleted(data) {
+      const agreement: Agreement = data.insert_agreements.returning[0];
       Alert.alert('New Quote was successfully created.');
       navigation.popToTop();
-      navigation.navigate(AppRouteEnum.ContactDetails, {
+      navigation.navigate(AppRouteEnum.AgreementDetails, {
         parent: 'Contacts',
-        itemId: contact.id,
+        agreement,
+        contact: contact,
         itemTitle: `${contact.name_first} ${contact.name_last}`,
       });
     },
@@ -266,7 +268,7 @@ export default function ElanTemplate({
       />
       <View style={styles.mainContent}>
         {ElanCatalogs.map((catalog: any, index: number) => (
-          <View style={styles.block} key={index}>
+          <View style={styles.block} key={`catalog-${index}`}>
             <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
               {catalog.title}
             </AppText>

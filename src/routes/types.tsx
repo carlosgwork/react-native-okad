@@ -1,6 +1,6 @@
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
-import {Contact} from '@root/utils/types';
+import {Contact, Agreement} from '@root/utils/types';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
@@ -13,6 +13,7 @@ export enum AppRouteEnum {
   EliteCRE2110Template = 'EliteCRE2110Template',
   SETTINGS = 'SETTINGS',
   TEMPLATES = 'Templates',
+  AgreementDetails = 'AgreementDetails',
 }
 
 type TemplatesParamsType = {
@@ -39,6 +40,12 @@ export type ContactsStackParamList = {
     parent?: string;
     itemTitle?: string;
     contact: Contact;
+  };
+  [AppRouteEnum.AgreementDetails]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+    agreement: Agreement;
   };
 };
 
