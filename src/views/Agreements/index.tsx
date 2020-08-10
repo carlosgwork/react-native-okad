@@ -50,10 +50,6 @@ export const FETCH_AGREEMENTS = gql`
       last_modified
       id
       public_id
-      addressByBillingAddressId {
-        city
-        us_state
-      }
       contact {
         name_last
         name_first

@@ -61,3 +61,59 @@ export const CREATE_AGREEMENT = gql`
     }
   }
 `;
+
+export const UPDATE_AGREEMENT = gql`
+  mutation UpdateAgreement($_set: agreements_set_input, $id: Int) {
+    update_agreements(where: {id: {_eq: $id}}, _set: $_set) {
+      returning {
+        id
+        address {
+          city
+          county
+          id
+          line1
+          line2
+          us_state
+          postal_code
+        }
+        addressByShippingAddressId {
+          city
+          county
+          id
+          line2
+          line1
+          us_state
+          postal_code
+        }
+        contact_id
+        line_items {
+          agreement_id
+          catalog_item_id
+          current_cost
+          discount
+          price
+          qty
+          id
+          catalog_item {
+            name
+          }
+        }
+        number
+        revision
+        sales_tax_rate
+        shipping_address_id
+        signature
+      }
+    }
+  }
+`;
+
+export const UPDATE_LINE_ITEMS = gql`
+  mutation UpdateLineItems($_set: line_items_set_input, $id: Int) {
+    update_line_items(where: {id: {_eq: $id}}, _set: $_set) {
+      returning {
+        id
+      }
+    }
+  }
+`;

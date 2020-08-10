@@ -5,7 +5,9 @@ import {
   Switch,
   TouchableOpacity,
   ListRenderItemInfo,
+  Alert,
 } from 'react-native';
+import {useMutation} from '@apollo/client';
 import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -19,6 +21,7 @@ import {useStyles} from '@global/Hooks';
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {AgreementLineItemType, Agreement} from '@root/utils/types';
+import {UPDATE_AGREEMENT, UPDATE_LINE_ITEMS} from '../graphql';
 
 export default function AgreementDetails({
   route,
@@ -56,6 +59,19 @@ export default function AgreementDetails({
     setTotalCost(cost);
   }, [activeAgreement.line_items]);
 
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
+    onCompleted() {
+      // const updatedAgreement: Agreement = data.update_agreements.returning[0];
+      Alert.alert('New Quote was successfully updated.');
+    },
+  });
+  const [update_line_items] = useMutation(UPDATE_LINE_ITEMS, {
+    onCompleted() {
+      // const updatedAgreement: Agreement = data.update_agreements.returning[0];
+      Alert.alert('New Line was successfully updated.');
+    },
+  });
+
   const deleteRow = (rowKey: number) => {
     const newData = [...listData];
     const prevIndex = listData.findIndex(
@@ -91,6 +107,38 @@ export default function AgreementDetails({
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.revision = newAgreement.revision + 1;
     updateActiveAgreement(newAgreement);
+  };
+
+  const continueClicked = () => {
+    activeAgreement.line_items?.map((item) => {
+      const lineItem = {
+        qty: item.qty,
+        last_modified: new Date(),
+        discount: item.discount,
+      };
+      update_line_items({
+        variables: {
+          _set: lineItem,
+          id: item.id,
+        },
+      });
+    });
+    const updatingAgreement = {
+      agreement_template_id: activeAgreement.agreement_template_id,
+      billing_address_id: activeAgreement.billing_address_id,
+      contact_id: activeAgreement.contact_id,
+      last_modified: new Date(),
+      number: activeAgreement.number,
+      revision: activeAgreement.revision,
+      sales_tax_rate: activeAgreement.sales_tax_rate,
+      shipping_address_id: activeAgreement.shipping_address_id,
+    };
+    update_agreement({
+      variables: {
+        _set: updatingAgreement,
+        id: activeAgreement.id,
+      },
+    });
   };
 
   const renderItem = (
@@ -468,7 +516,7 @@ export default function AgreementDetails({
           <View style={[styles.rowLayout, styles.totalRow]}>
             <TouchableOpacity
               style={[styles.rowLayout, styles.ctaBtn]}
-              onPress={() => {}}>
+              onPress={continueClicked}>
               <AppText
                 style={styles.continueBtn}
                 color={'textLightPurple'}
