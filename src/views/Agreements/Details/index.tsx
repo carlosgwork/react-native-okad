@@ -63,6 +63,10 @@ export default function AgreementDetails({
     onCompleted() {
       // const updatedAgreement: Agreement = data.update_agreements.returning[0];
       Alert.alert('New Quote was successfully updated.');
+      navigation.navigate(AppRouteEnum.AgreementSummary, {
+        itemTitle: `Quote DHQ${numeral(agreement.id).format('0000')}`,
+        agreement: activeAgreement,
+      });
     },
   });
   const [update_line_items] = useMutation(UPDATE_LINE_ITEMS, {
@@ -245,7 +249,7 @@ export default function AgreementDetails({
             />
           </View>
         }
-        pageTitle={`Quote DHQ${agreement.id}`}
+        pageTitle={`Quote DHQ${numeral(agreement.id).format('0000')}`}
         toolbarCenterContent={null}
         toolbarRightContent={
           showDetails ? (

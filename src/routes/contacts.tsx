@@ -5,11 +5,11 @@ import NewContact from '@root/views/Contacts/New';
 import ContactDetails from '@root/views/Contacts/Details';
 import NewAgreement from '@root/views/Contacts/NewAgreement';
 import AgreementDetails from '@root/views/Agreements/Details';
+import AgreementSummary from '@root/views/Agreements/Details/summary';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
 import BrunoCustomStairlift from '@root/views/Agreements/Templates/BrunoCustomStairlift';
 import ElanTemplate from '@root/views/Agreements/Templates/BrunoStraightStairlift/Elan';
 import EliteCRE2110Template from '@root/views/Agreements/Templates/BrunoCustomStairlift/EliteCRE2110';
-
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
 
@@ -20,6 +20,7 @@ function ContactsStackNavigation() {
       <Stack.Screen name="ContactDetails" component={ContactDetails} />
       <Stack.Screen name="NewAgreement" component={NewAgreement} />
       <Stack.Screen name="AgreementDetails" component={AgreementDetails} />
+      <Stack.Screen name="AgreementSummary" component={AgreementSummary} />
       <Stack.Screen
         name="BrunoStraightStairlift"
         component={BrunoStraightStairlift}

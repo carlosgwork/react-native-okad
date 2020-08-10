@@ -20,11 +20,13 @@ function AppText(props: Props) {
     size = 16,
     children,
     style,
+    numberOfLines,
     ...otherProps
   } = props;
 
   return (
     <Text
+      numberOfLines={numberOfLines}
       style={[{...themeStyle.getTextStyle({color, font, size})}, style]}
       {...otherProps}>
       {children}

@@ -14,6 +14,7 @@ export enum AppRouteEnum {
   SETTINGS = 'SETTINGS',
   TEMPLATES = 'Templates',
   AgreementDetails = 'AgreementDetails',
+  AgreementSummary = 'AgreementSummary',
 }
 
 type TemplatesParamsType = {
@@ -45,6 +46,11 @@ export type ContactsStackParamList = {
     parent?: string;
     itemTitle?: string;
     contact: Contact;
+    agreement: Agreement;
+  };
+  [AppRouteEnum.AgreementSummary]: {
+    parent?: string;
+    itemTitle?: string;
     agreement: Agreement;
   };
 };
