@@ -35,7 +35,8 @@ export type Agreement = {
   events: AgreementEvent;
   contact?: Contact;
   address?: Address;
-  addressByBillingAddressId?: Address;
+  addressByShippingAddressId?: Address;
+  line_items?: AgreementLineItemType[];
 };
 
 export type AgreementEvent = {
@@ -131,10 +132,22 @@ export type LineItemType = {
   icon?: string;
   type?: string;
   category?: string;
-  quantity?: number;
+  qty?: number;
   color?: string;
   taxable: boolean;
   subcategory: string;
+};
+
+export type AgreementLineItemType = {
+  id: number;
+  name: string;
+  agreement_id: number;
+  catalog_item_id: number;
+  current_cost: number;
+  discount: number;
+  price: number;
+  qty: number;
+  catalog_item: any;
 };
 
 export type ProductItemProps = {

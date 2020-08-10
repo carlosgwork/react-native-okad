@@ -48,6 +48,9 @@ export const CREATE_AGREEMENT = gql`
           price
           qty
           id
+          catalog_item {
+            name
+          }
         }
         number
         revision

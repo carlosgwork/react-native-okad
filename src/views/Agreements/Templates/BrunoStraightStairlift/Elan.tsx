@@ -179,7 +179,7 @@ export default function ElanTemplate({
     }
     const newItems = items.map((it: LineItemType) => {
       if (it.id === item.id) {
-        it.quantity = qty;
+        it.qty = qty;
         return it;
       }
       return it;
@@ -214,7 +214,7 @@ export default function ElanTemplate({
       catalog_item_id: item.id,
       current_cost: item.cost,
       price: item.price,
-      qty: item.quantity ? item.quantity : 1,
+      qty: item.qty ? item.qty : 1,
       taxable: item.taxable,
       discount: 0,
     }));
@@ -232,8 +232,8 @@ export default function ElanTemplate({
   // Calculate Total Price
   let totalPrice = 0;
   items.map((item: LineItemType) => {
-    if (item.quantity !== undefined) {
-      totalPrice += item.price * item.quantity;
+    if (item.qty !== undefined) {
+      totalPrice += item.price * item.qty;
     } else {
       totalPrice += item.price;
     }

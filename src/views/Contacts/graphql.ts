@@ -10,6 +10,7 @@ export const FETCH_CONTACTS = gql`
       phone_home
       phone_mobile
       phone_office
+      address_id
       address {
         county
         city

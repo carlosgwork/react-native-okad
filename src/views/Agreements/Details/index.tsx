@@ -1,13 +1,24 @@
-import React, {useState} from 'react';
-import {View, Text, Switch, ScrollView} from 'react-native';
-import {SwipeListView, SwipeRow} from 'react-native-swipe-list-view';
+import React, {useState, useEffect} from 'react';
+import {
+  View,
+  Text,
+  Switch,
+  TouchableOpacity,
+  ListRenderItemInfo,
+} from 'react-native';
+import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
+import LinearGradient from 'react-native-linear-gradient';
+import Icon from 'react-native-vector-icons/Ionicons';
+import numeral from 'numeral';
+import Dialog from 'react-native-dialog';
+import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
-import {AppHeader, NavBackBtn, AppText} from '@root/components';
+import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {AgreementLineItemType, Agreement} from '@root/utils/types';
 
 export default function AgreementDetails({
   route,
@@ -15,42 +26,148 @@ export default function AgreementDetails({
 }: ContactsNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
   const {parent = 'Contacts', contact, agreement} = route.params || {};
+  const [activeAgreement, updateActiveAgreement] = useState<Agreement>(
+    agreement,
+  );
   const [showDetails, setShowDetails] = useState<boolean>(false);
 
-  const [listData, setListData] = useState(
-    Array(20)
-      .fill('')
-      .map((_, i) => ({key: `${i}`, text: `item #${i}`})),
+  const [listData, setListData] = useState<AgreementLineItemType[]>(
+    activeAgreement.line_items || [],
   );
 
-  const deleteRow = (rowMap, rowKey) => {
-    closeRow(rowMap, rowKey);
+  const [showDiscount, setShowDiscount] = useState<boolean>(false);
+  const [activeRow, setActiveRow] = useState<number>(-1);
+  const [discount, setDiscount] = useState<string>('');
+  const [showSalesTax, setShowSalesTax] = useState<boolean>(false);
+  const [salesTax, setSalesTax] = useState<string>('');
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [totalCost, setTotalCost] = useState<number>(0);
+
+  useEffect(() => {
+    let total = 0;
+    activeAgreement.line_items?.map((item) => {
+      total += item.price * item.qty - item.discount;
+    });
+    setTotalPrice(total);
+    let cost = 0;
+    activeAgreement.line_items?.map((item) => {
+      cost += item.current_cost * item.qty;
+    });
+    setTotalCost(cost);
+  }, [activeAgreement.line_items]);
+
+  const deleteRow = (rowKey: number) => {
     const newData = [...listData];
-    const prevIndex = listData.findIndex((item) => item.key === rowKey);
+    const prevIndex = listData.findIndex(
+      (item: AgreementLineItemType) => item.id === rowKey,
+    );
     newData.splice(prevIndex, 1);
     setListData(newData);
+    const newAgreement = Object.assign({}, activeAgreement);
+    newAgreement.line_items = newData;
+    updateActiveAgreement(newAgreement);
   };
 
-  const renderItem = (data, rowMap) => (
+  const applyDiscount = () => {
+    const newData = [...listData];
+    const prevIndex = listData.findIndex(
+      (item: AgreementLineItemType) => item.id === activeRow,
+    );
+    listData[prevIndex].discount = parseInt(discount, 10) * 100;
+    setListData(newData);
+    setDiscount('');
+    const newAgreement = Object.assign({}, activeAgreement);
+    newAgreement.line_items = newData;
+    updateActiveAgreement(newAgreement);
+  };
+
+  const applySalesTax = () => {
+    const newAgreement = Object.assign({}, activeAgreement);
+    newAgreement.sales_tax_rate = parseFloat(salesTax);
+    updateActiveAgreement(newAgreement);
+  };
+
+  const updateAgreementRevision = () => {
+    const newAgreement = Object.assign({}, activeAgreement);
+    newAgreement.revision = newAgreement.revision + 1;
+    updateActiveAgreement(newAgreement);
+  };
+
+  const renderItem = (
+    rowData: ListRenderItemInfo<AgreementLineItemType>,
+    _: RowMap<AgreementLineItemType>,
+  ): Element => (
     <SwipeRow
-      disableLeftSwipe={true}
-      leftOpenValue={20 + Math.random() * 150}
-      rightOpenValue={-150}>
+      disableLeftSwipe={false}
+      disableRightSwipe={false}
+      leftOpenValue={0}
+      key={`swipe-row-${rowData.item.id}`}
+      rightOpenValue={-195}>
       <View style={styles.rowBack}>
         <TouchableOpacity
+          style={[styles.backRightBtn, styles.backRightBtnLeft]}
+          onPress={() => {
+            setActiveRow(rowData.item.id);
+            setShowDiscount(true);
+          }}>
+          <LinearGradient
+            style={styles.gradientBtn}
+            start={{x: 0.1, y: 0.8}}
+            end={{x: 0.6, y: 1.0}}
+            locations={[0, 1]}
+            colors={['#7CB6C7', '#528DA4']}>
+            <AppText color={'white'} size={16} font={'anSemiBold'}>
+              Discount
+            </AppText>
+          </LinearGradient>
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[styles.backRightBtn, styles.backRightBtnRight]}
-          onPress={() => deleteRow(rowMap, data.item.key)}>
-          <Text style={styles.backTextWhite}>Delete</Text>
+          onPress={() => deleteRow(rowData.item.id)}>
+          <LinearGradient
+            style={styles.gradientBtn}
+            start={{x: 0.1, y: 0.9}}
+            end={{x: 1.0, y: 0.4}}
+            locations={[0, 1]}
+            colors={['#C05252', '#A33333']}>
+            <AppText color={'white'} size={16} font={'anSemiBold'}>
+              Delete
+            </AppText>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity
-        onPress={() => console.log('You touched me')}
-        style={styles.rowFront}
-        underlayColor={'#AAA'}>
-        <View>
-          <Text>I am {data.item.text} in a SwipeListView</Text>
+      <View style={[styles.rowLayout, styles.rowFront]}>
+        <View style={styles.qtyCell}>
+          <AppText color={'lightPurple'} size={16} font={'anSemiBold'}>
+            {`${rowData.item.qty}`}
+          </AppText>
         </View>
-      </TouchableOpacity>
+        <View style={styles.descCell}>
+          <AppText color={'textBlack1'} size={16} font={'anRegular'}>
+            {rowData.item.catalog_item.name}
+          </AppText>
+        </View>
+        <View style={styles.priceCell}>
+          <AppText color={'textBlack1'} size={16} font={'anRegular'}>
+            {`$${numeral(rowData.item.price / 100).format('0,0.00')}`}
+          </AppText>
+        </View>
+        <View style={styles.discountCell}>
+          <AppText color={'textBlack1'} size={16} font={'anRegular'}>
+            {rowData.item.discount
+              ? `$${numeral(rowData.item.discount / 100).format('0,0.00')}`
+              : ''}
+          </AppText>
+        </View>
+        <View style={styles.subTotalCell}>
+          <AppText color={'textBlack1'} size={16} font={'anRegular'}>
+            {`$${numeral(
+              (rowData.item.qty * rowData.item.price - rowData.item.discount) /
+                100,
+            ).format('0,0.00')}`}
+          </AppText>
+        </View>
+      </View>
     </SwipeRow>
   );
 
@@ -60,13 +177,14 @@ export default function AgreementDetails({
         leftContent={
           <NavBackBtn
             title={parent}
-            onClick={() =>
+            onClick={() => {
+              navigation.pop();
               navigation.navigate(AppRouteEnum.ContactDetails, {
                 parent: 'Contacts',
                 itemTitle: `${contact.name_first} ${contact.name_last}`,
                 itemId: contact.id,
-              })
-            }
+              });
+            }}
           />
         }
         rightContent={
@@ -88,7 +206,7 @@ export default function AgreementDetails({
                 STATUS:
               </AppText>
               <AppText size={14} color={'textBlue'} font={'anSemiBold'}>
-                Open
+                &nbsp;OPEN
               </AppText>
             </View>
           ) : (
@@ -96,7 +214,7 @@ export default function AgreementDetails({
           )
         }
       />
-      <ScrollView>
+      <View style={styles.mainLayout}>
         <View style={[styles.rowLayout, styles.block]}>
           <View style={styles.flexRow}>
             <View style={styles.addressView}>
@@ -113,20 +231,33 @@ export default function AgreementDetails({
                   </AppText>
                 </TouchableOpacity>
               </View>
-              <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
-                Song Bao
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {activeAgreement.address?.line1}
               </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                1234 Main St
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {activeAgreement.address?.line2}
               </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                Parcomia CA 91331
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state}`}
               </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                (818) 473-2903
-              </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                song.bao@email.com
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {activeAgreement.address?.postal_code}
               </AppText>
             </View>
             <View style={styles.addressView}>
@@ -143,20 +274,35 @@ export default function AgreementDetails({
                   </AppText>
                 </TouchableOpacity>
               </View>
-              <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
-                Song Bao
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {activeAgreement.addressByShippingAddressId?.line1}
               </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                1234 Main St
+              {activeAgreement.addressByShippingAddressId?.line2 && (
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={16}
+                  font={'anRegular'}>
+                  {activeAgreement.addressByShippingAddressId?.line2}
+                </AppText>
+              )}
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {`${activeAgreement.addressByShippingAddressId?.city}, ${activeAgreement.addressByShippingAddressId?.us_state}`}
               </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                Parcomia CA 91331
-              </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                (818) 473-2903
-              </AppText>
-              <AppText color={'textBlack2'} size={16} font={'anRegular'}>
-                song.bao@email.com
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                font={'anRegular'}>
+                {activeAgreement.addressByShippingAddressId?.postal_code}
               </AppText>
             </View>
           </View>
@@ -169,19 +315,31 @@ export default function AgreementDetails({
                   </AppText>
                 </View>
                 <View style={styles.rowLayout}>
-                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                  <AppText
+                    style={styles.lineHeight15}
+                    color={'textBlack2'}
+                    size={14}
+                    font={'anRegular'}>
                     Created
                   </AppText>
-                  <AppText color={'textBlack2'} size={14} font={'anSemiBold'}>
-                    2/14/2020, 12:18 PM
+                  <AppText
+                    style={styles.lineHeight15}
+                    color={'textBlack2'}
+                    size={14}
+                    font={'anRegular'}>
+                    {moment(activeAgreement.created).format(
+                      'M/DD/YYYY, HH:mm A',
+                    )}
                   </AppText>
                 </View>
-                <View style={styles.rowLayout}>
+                <View style={[styles.lineHeight15, styles.rowLayout]}>
                   <AppText color={'textBlack2'} size={14} font={'anRegular'}>
                     First View
                   </AppText>
-                  <AppText color={'textBlack2'} size={14} font={'anSemiBold'}>
-                    2/14/2020, 12:18 PM
+                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                    {moment(activeAgreement.created).format(
+                      'M/DD/YYYY, HH:mm A',
+                    )}
                   </AppText>
                 </View>
               </>
@@ -189,9 +347,208 @@ export default function AgreementDetails({
           </View>
         </View>
         <View style={styles.block}>
-          <SwipeListView data={listData} renderItem={renderItem} />
+          <View style={[styles.rowLayout, styles.tableHeader]}>
+            <View style={styles.qtyCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                QTY
+              </AppText>
+            </View>
+            <View style={styles.descCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                DESCRIPTION
+              </AppText>
+            </View>
+            <View style={styles.priceCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                PRICE
+              </AppText>
+            </View>
+            <View style={styles.discountCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                DISCOUNT
+              </AppText>
+            </View>
+            <View style={styles.subTotalCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                SUBTOTAL
+              </AppText>
+            </View>
+          </View>
+          <SwipeListView data={listData} renderItem={renderItem as any} />
         </View>
-      </ScrollView>
+        <View style={styles.block}>
+          <View style={[styles.rowLayout, styles.totalRow]}>
+            <View style={styles.priceCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                SUBTOTAL
+              </AppText>
+            </View>
+            <View style={styles.priceCell}>
+              <View>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  SALES TAX
+                </AppText>
+              </View>
+              <TouchableOpacity onPress={() => setShowSalesTax(true)}>
+                <AppText color={'lightPurple'} size={12} font={'anSemiBold'}>
+                  Edit
+                </AppText>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.totalCell}>
+              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                TOTAL
+              </AppText>
+            </View>
+          </View>
+          <View style={[styles.rowLayout, styles.totalRow]}>
+            <View style={styles.priceCell}>
+              <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                {`$${numeral(totalPrice / 100).format('0,0.00')}`}
+              </AppText>
+            </View>
+            <View style={[styles.priceCell, styles.editDiscountCell]}>
+              <View>
+                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                  {`$${numeral(
+                    (totalPrice * activeAgreement.sales_tax_rate) / 100 / 100,
+                  ).format('0,0.00')}`}
+                </AppText>
+              </View>
+              <View>
+                <AppText color={'textBlack2'} size={18} font={'anRegular'}>
+                  {` @ ${activeAgreement.sales_tax_rate}%`}
+                </AppText>
+              </View>
+            </View>
+            <View style={styles.totalCell}>
+              <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
+                {`$${numeral(
+                  (totalPrice * (100 - activeAgreement.sales_tax_rate)) /
+                    100 /
+                    100,
+                ).format('0,0.00')}`}
+              </AppText>
+            </View>
+          </View>
+        </View>
+        {showDetails && (
+          <View style={styles.block}>
+            <View style={[styles.rowLayout, styles.totalRow]}>
+              <View style={styles.priceCell}>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  TOTAL COST
+                </AppText>
+              </View>
+              <View style={styles.priceCell}>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  MARGIN
+                </AppText>
+              </View>
+              <View style={styles.priceCell} />
+            </View>
+            <View style={[styles.rowLayout, styles.totalRow]}>
+              <View style={styles.priceCell}>
+                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                  {`$${numeral(totalCost / 100).format('0,0.00')}`}
+                </AppText>
+              </View>
+              <View style={styles.priceCell}>
+                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                  {`${Math.round(
+                    ((totalPrice - totalCost) / totalPrice) * 100,
+                  )}%`}
+                </AppText>
+              </View>
+              <View style={styles.priceCell} />
+            </View>
+          </View>
+        )}
+        <View style={styles.block}>
+          <View style={[styles.rowLayout, styles.totalRow]}>
+            <TouchableOpacity
+              style={[styles.rowLayout, styles.ctaBtn]}
+              onPress={() => {}}>
+              <AppText
+                style={styles.continueBtn}
+                color={'textLightPurple'}
+                size={14}
+                font={'anSemiBold'}>
+                CONTINUE
+              </AppText>
+              <Icon
+                color={'#855C9C'}
+                name={'arrow-forward-outline'}
+                size={20}
+                style={styles.marginLeft5}
+              />
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={[styles.block, styles.revisionBtnView]}>
+          <AppGradButton
+            containerStyle={styles.revisionBtnContainer}
+            btnStyle={styles.revisionBtn}
+            textStyle={styles.revisionBtnText}
+            title={'CREATE REVISION'}
+            leftIconContent={<></>}
+            onPress={updateAgreementRevision}
+          />
+        </View>
+      </View>
+      <Dialog.Container key="set-discount-dialog" visible={showDiscount}>
+        <Dialog.Title>Set Discount</Dialog.Title>
+        <Dialog.Input
+          keyboardType="numeric"
+          value={discount}
+          onChangeText={(text: string) => {
+            const value = text.replace(/[^0-9]/g, '');
+            setDiscount(value);
+          }}
+        />
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setDiscount('');
+            setShowDiscount(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ok"
+          onPress={() => {
+            setShowDiscount(false);
+            applyDiscount();
+          }}
+        />
+      </Dialog.Container>
+      <Dialog.Container key="set-sales-tax-dialog" visible={showSalesTax}>
+        <Dialog.Title>Set Sales Tax</Dialog.Title>
+        <Dialog.Description>
+          Set percentage value for Sales Tax
+        </Dialog.Description>
+        <Dialog.Input
+          keyboardType="numeric"
+          value={salesTax}
+          onChangeText={(text: string) => {
+            const value = text.replace(/[^0-9.]/g, '');
+            setSalesTax(value);
+          }}
+        />
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setSalesTax('');
+            setShowSalesTax(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ok"
+          onPress={() => {
+            setShowSalesTax(false);
+            applySalesTax();
+          }}
+        />
+      </Dialog.Container>
     </View>
   );
 }
@@ -226,31 +583,40 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   addressView: {
     marginRight: 40,
+    alignSelf: 'flex-start',
+  },
+  lineHeight15: {
+    height: 24,
+  },
+  metaView: {
+    width: 250,
+    alignSelf: 'flex-start',
   },
   block: {
     paddingTop: 40,
     paddingHorizontal: 20,
   },
-  tableRow: {
-    flexDirection: 'row',
-    flex: 1,
-    backgroundColor: 'red',
+  tableHeader: {
+    paddingBottom: 10,
   },
   rowFront: {
-    alignItems: 'center',
-    backgroundColor: '#CCC',
-    borderBottomColor: 'black',
-    borderBottomWidth: 1,
-    justifyContent: 'center',
     height: 50,
+    borderBottomColor: themeStyle.lightBorderColor,
+    borderBottomWidth: 1,
+    backgroundColor: themeStyle.backgroundWhite,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   rowBack: {
+    height: 50,
     alignItems: 'center',
-    backgroundColor: '#DDD',
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingLeft: 15,
+    borderBottomColor: themeStyle.lightBorderColor,
+    borderBottomWidth: 1,
   },
   backRightBtn: {
     alignItems: 'center',
@@ -261,11 +627,76 @@ const getStyles = (themeStyle: StyleType) => ({
     width: 75,
   },
   backRightBtnLeft: {
-    backgroundColor: 'blue',
     right: 75,
+    width: 100,
   },
   backRightBtnRight: {
-    backgroundColor: 'red',
     right: 0,
+  },
+  qtyCell: {
+    width: 50,
+  },
+  descCell: {
+    flex: 1,
+  },
+  priceCell: {
+    width: 180,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  discountCell: {
+    width: 100,
+  },
+  subTotalCell: {
+    width: 100,
+    alignItems: 'flex-end',
+  },
+  gradientBtn: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  totalCell: {
+    width: 180,
+    alignItems: 'flex-end',
+  },
+  editDiscountCell: {
+    justifyContent: 'flex-start',
+  },
+  totalRow: {
+    justifyContent: 'flex-end',
+    paddingVertical: 8,
+  },
+  ctaBtn: {
+    alignItems: 'center',
+  },
+  continueBtn: {
+    letterSpacing: 3.5,
+  },
+  revisionBtnText: {
+    color: themeStyle.textWhite,
+  },
+  revisionBtnView: {
+    position: 'absolute',
+    bottom: 20,
+    alignItems: 'center',
+    width: '100%',
+  },
+  revisionBtnContainer: {
+    width: 300,
+  },
+  revisionBtn: {
+    paddingLeft: 50,
+  },
+  mainLayout: {
+    position: 'relative',
+    flex: 1,
+  },
+  switchView: {
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    paddingBottom: 10,
   },
 });

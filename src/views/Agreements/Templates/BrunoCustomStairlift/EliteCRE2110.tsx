@@ -224,7 +224,7 @@ export default function EliteCRE2110Template({
     }
     const newItems = items.map((it: LineItemType) => {
       if (it.id === item.id) {
-        it.quantity = qty;
+        it.qty = qty;
         return it;
       }
       return it;
@@ -267,8 +267,8 @@ export default function EliteCRE2110Template({
   // Calculate Total Price
   let totalPrice = product.price;
   items.map((item: LineItemType) => {
-    if (item.quantity !== undefined) {
-      totalPrice += item.price * item.quantity;
+    if (item.qty !== undefined) {
+      totalPrice += item.price * item.qty;
     } else {
       totalPrice += item.price;
     }
@@ -321,7 +321,7 @@ export default function EliteCRE2110Template({
                             items.findIndex(
                               (it: LineItemType) => it.id === item.id,
                             )
-                          ]?.quantity || 0
+                          ]?.qty || 0
                         }
                         setQty={(num) => updateQty(item, num)}
                       />
