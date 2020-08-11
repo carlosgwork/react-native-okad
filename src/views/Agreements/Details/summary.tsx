@@ -1,13 +1,20 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, ScrollView, Text} from 'react-native';
+import {View, Image, ScrollView, Text, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
+import SignatureCapture from 'react-native-signature-capture';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
-import {AppHeader, NavBackBtn, AppText} from '@root/components';
+import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {AgreementLineItemType} from '@root/utils/types';
+import {SignBg} from '@root/assets/assets';
+
+type SignCaptureType = {
+  current: any;
+  resetImage: () => {};
+};
 
 export default function AgreementSummary({
   route,
@@ -16,6 +23,7 @@ export default function AgreementSummary({
   const {styles} = useStyles(getStyles);
   const {parent = 'Summary', itemTitle, agreement} = route.params || {};
   const [totalPrice, setTotalPrice] = useState<number>(0);
+  const signRef = React.useRef<SignCaptureType>(null);
 
   useEffect(() => {
     let total = 0;
@@ -24,6 +32,10 @@ export default function AgreementSummary({
     });
     setTotalPrice(total);
   }, [agreement.line_items]);
+
+  const resetSign = () => {
+    signRef.current?.resetImage();
+  };
 
   return (
     <View style={styles.container}>
@@ -181,7 +193,7 @@ export default function AgreementSummary({
           <View style={styles.subblock}>
             <Text style={styles.lineHeight15}>
               {
-                '1. All sales are final.\n2. Quote valid for 30 days.\n3. Permits are not included.\n4. Price does not include modification to handrails.\n5. Price does not include installation of an electrical outlet.\n6. Stairlift must be installed within 10 days of delivery or storage fee of $45 per day will apply.\n7. Customer must communicate if there is radiant or similar type flooring.\n8. Installation will require drilling through the flooring which will leave holes once removed\n'
+                '1. All sales are final.\n2. Quote valid for 30 days.\n3. Permits are not included.\n4. Price does not include modification to handrails.\n5. Price does not include installation of an electrical outlet.\n6. Stairlift must be installed within 10 days of delivery or storage fee of $45 per day will apply.\n7. Customer must communicate if there is radiant or similar type flooring.\n8. Installation will require drilling through the flooring which will leave holes once removed'
               }
             </Text>
           </View>
@@ -257,6 +269,40 @@ export default function AgreementSummary({
               the stair lift.
             </Text>
           </View>
+        </View>
+        <View style={styles.block}>
+          <View style={[styles.subblock, styles.signView]}>
+            <SignatureCapture
+              ref={signRef}
+              onSaveEvent={() => {}}
+              showBorder={false}
+              style={styles.signature}
+              showNativeButtons={false}
+              backgroundColor={'transparent'}
+              showTitleLabel={false}
+              viewMode={'portrait'}
+            />
+            <Image
+              source={SignBg}
+              style={styles.signBg}
+              pointerEvents={'none'}
+            />
+            <TouchableOpacity style={styles.resetBtnStyle} onPress={resetSign}>
+              <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
+                Clear
+              </AppText>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View style={styles.bottomBtnView}>
+          <AppGradButton
+            containerStyle={styles.createBtnContainer}
+            textStyle={styles.createBtnText}
+            btnStyle={styles.createBtn}
+            title={'ACCEPT QUOTE'}
+            leftIconContent={<></>}
+            onPress={() => {}}
+          />
         </View>
       </ScrollView>
     </View>
@@ -341,5 +387,47 @@ const getStyles = (themeStyle: StyleType) => ({
     fontSize: 16,
     lineHeight: 26,
     color: themeStyle.textBlack2,
+  },
+  signature: {
+    width: '100%',
+    borderColor: '#000033',
+    borderWidth: 1,
+    borderType: 'solid',
+    height: 200,
+    backgroundColor: 'red',
+  },
+  signBg: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: 200,
+    resizeMode: 'stretch',
+    zIndex: 0,
+  },
+  signView: {
+    position: 'relative',
+    justifyContent: 'flex-end',
+    paddingBottom: 150,
+  },
+  resetBtnStyle: {
+    paddingVertical: 10,
+  },
+  bottomBtnView: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+  },
+  createBtnContainer: {
+    width: '100%',
+    borderRadius: 0,
+  },
+  createBtn: {
+    borderTopLeftRadius: 0,
+    paddingVertical: 10,
+    borderTopRightRadius: 0,
+    borderRadius: 0,
+  },
+  createBtnText: {
+    textTransform: 'uppercase',
   },
 });

@@ -8,3 +8,4 @@ export const BurnoEliteCreImg180Turn = require('./images/bruno-elite-cre/180deg-
 export const BurnoEliteCreImgIL = require('./images/bruno-elite-cre/intermediate-landing.png');
 export const BurnoEliteCreImgRadius = require('./images/bruno-elite-cre/radius.png');
 export const BurnoEliteCreImgStraight = require('./images/bruno-elite-cre/straight-overrun.png');
+export const SignBg = require('./images/sign-bg.png');

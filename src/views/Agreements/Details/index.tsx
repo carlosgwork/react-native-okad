@@ -64,7 +64,7 @@ export default function AgreementDetails({
       // const updatedAgreement: Agreement = data.update_agreements.returning[0];
       Alert.alert('New Quote was successfully updated.');
       navigation.navigate(AppRouteEnum.AgreementSummary, {
-        itemTitle: `Quote DHQ${numeral(agreement.id).format('0000')}`,
+        itemTitle: `Quote DH${numeral(agreement.id).format('00000')}`,
         agreement: activeAgreement,
       });
     },

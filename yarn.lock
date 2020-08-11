@@ -1487,6 +1487,14 @@
     "@types/react-native" "*"
     react-native-modal ">=9.0.0"
 
+"@types/react-native-signature-capture@^0.4.1":
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/@types/react-native-signature-capture/-/react-native-signature-capture-0.4.1.tgz#04e6e07cbef69a3a3339e5f01ee868639f0bc81e"
+  integrity sha512-BCOwwvXVXYWlzWd4KMrKJku+MNLCXmOro54jbwAiy0jVkWsQankrC8m006jg5kNw7DT8LIAcWTWSZbcG1wNN4w==
+  dependencies:
+    "@types/react" "*"
+    "@types/react-native" "*"
+
 "@types/react-native-snap-carousel@^3.8.2":
   version "3.8.2"
   resolved "https://registry.yarnpkg.com/@types/react-native-snap-carousel/-/react-native-snap-carousel-3.8.2.tgz#31fb91530198183c658db0d23935ca79850419f5"
@@ -6346,6 +6354,13 @@ react-native-sensitive-info@^5.5.5:
   resolved "https://registry.yarnpkg.com/react-native-sensitive-info/-/react-native-sensitive-info-5.5.5.tgz#0559aaff6bd59b6a14d92035c032b46bd007b55f"
   integrity sha512-ShRqvHTZnY4VYNEF+5pCBUu/2wslojY445FdA9nuH9nkVqOQRXxIGYqTRYXJ42mDLTt+KnW5hcvuAjpVVokafQ==
 
+react-native-signature-capture@^0.4.10:
+  version "0.4.10"
+  resolved "https://registry.yarnpkg.com/react-native-signature-capture/-/react-native-signature-capture-0.4.10.tgz#ee355a7ca3e8341d50304572258607b9876a34a6"
+  integrity sha512-4VbZ6wJVLUdai3WfSiTR2YacTxVuDamBrYl7lxbCrsqa0QyBSiupc5Yz5/Qg7GOuD72jhVXpWJvwJQSmMRy4dQ==
+  dependencies:
+    prop-types "^15.5.10"
+
 react-native-snap-carousel@^4.0.0-beta.5:
   version "4.0.0-beta.5"
   resolved "https://registry.yarnpkg.com/react-native-snap-carousel/-/react-native-snap-carousel-4.0.0-beta.5.tgz#b9d0520ad480cf6f6b2c7611b27958b6cdafb4fa"
@@ -6363,6 +6378,13 @@ react-native-swipe-list-view@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-3.2.3.tgz#2b4aa361f26b6e55efe38a829ce122dff6c00292"
   integrity sha512-f0B92eZiO0mCk7ZFtn8tbLz4lb+mR8xzcfjFqCVSDeXnuNw7GenUMsccGnclIOhnxnip5BHvUHavlD41peGqig==
+
+react-native-transparent-signature-capture@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/react-native-transparent-signature-capture/-/react-native-transparent-signature-capture-0.0.1.tgz#70a6a201390dbc59d8c64bd2703d0b7bc055541a"
+  integrity sha512-tMD21eSWZilEBfpS/pnR97rTtwv1Umxl7eoquV5G40//XSkzJ6dO71SApZKxaJzj+zBkCKMNwb2UGCXhEpCYRw==
+  dependencies:
+    prop-types "^15.5.10"
 
 react-native-vector-icons@^7.0.0:
   version "7.0.0"

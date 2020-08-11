@@ -11,7 +11,7 @@ const BasicAuthHeader = {
 
 export const fetchAddressFromLocation = async (
   params: GeolocationParams,
-): Address =>
+): Promise<any> =>
   fetch(
     `https://gamburd-kyoto.herokuapp.com/v1/addresses/_by-coords?${queryString.stringify(
       params,
@@ -26,6 +26,7 @@ export const fetchAddressFromLocation = async (
       const {city, line_1, state, zip} = result.data;
       const addr: Address = {
         city: city,
+        id: -1,
         line1: line_1,
         us_state: state,
         postal_code: zip,
