@@ -1,19 +1,24 @@
 import React, {useState, useEffect} from 'react';
 import {View, Image, ScrollView, Text, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
-import SignatureCapture from 'react-native-signature-capture';
+import SignatureCapture, {
+  SaveEventParams,
+} from 'react-native-signature-capture';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
+import {UPDATE_AGREEMENT} from '../graphql';
 
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {AgreementLineItemType} from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
+import {useMutation} from '@apollo/client';
 
 type SignCaptureType = {
   current: any;
-  resetImage: () => {};
+  resetImage: () => void;
+  saveImage: () => void;
 };
 
 export default function AgreementSummary({
@@ -25,6 +30,16 @@ export default function AgreementSummary({
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const signRef = React.useRef<SignCaptureType>(null);
 
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
+    onCompleted() {
+      navigation.pop();
+    },
+  });
+
+  const updateAgreement = () => {
+    signRef.current?.saveImage();
+  };
+
   useEffect(() => {
     let total = 0;
     agreement.line_items?.map((item) => {
@@ -35,6 +50,19 @@ export default function AgreementSummary({
 
   const resetSign = () => {
     signRef.current?.resetImage();
+  };
+
+  const onSignatureSaved = (result: SaveEventParams) => {
+    const updatingAgreement = {
+      signature: result.encoded,
+      last_modified: new Date(),
+    };
+    update_agreement({
+      variables: {
+        _set: updatingAgreement,
+        id: agreement.id,
+      },
+    });
   };
 
   return (
@@ -273,20 +301,17 @@ export default function AgreementSummary({
         <View style={styles.block}>
           <View style={[styles.subblock, styles.signView]}>
             <SignatureCapture
-              ref={signRef}
-              onSaveEvent={() => {}}
+              ref={signRef as any}
+              onSaveEvent={onSignatureSaved}
               showBorder={false}
               style={styles.signature}
               showNativeButtons={false}
-              backgroundColor={'transparent'}
               showTitleLabel={false}
               viewMode={'portrait'}
             />
-            <Image
-              source={SignBg}
-              style={styles.signBg}
-              pointerEvents={'none'}
-            />
+            <View pointerEvents="none" style={styles.signBg}>
+              <Image source={SignBg} style={styles.signBg} />
+            </View>
             <TouchableOpacity style={styles.resetBtnStyle} onPress={resetSign}>
               <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
                 Clear
@@ -301,7 +326,7 @@ export default function AgreementSummary({
             btnStyle={styles.createBtn}
             title={'ACCEPT QUOTE'}
             leftIconContent={<></>}
-            onPress={() => {}}
+            onPress={updateAgreement}
           />
         </View>
       </ScrollView>

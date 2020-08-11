@@ -30,13 +30,14 @@ export type Agreement = {
   revision: number;
   sales_tax_rate: number;
   shipping_address_id?: number;
-  signature?: number;
+  signature?: string;
   user_id?: number;
   events: AgreementEvent;
   contact?: Contact;
   address?: Address;
   addressByShippingAddressId?: Address;
   line_items?: AgreementLineItemType[];
+  agreement_events?: AgreementEvent[] | AgreementEvent;
 };
 
 export type AgreementEvent = {

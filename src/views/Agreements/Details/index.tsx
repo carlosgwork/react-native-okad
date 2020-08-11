@@ -20,7 +20,11 @@ import {useStyles} from '@global/Hooks';
 
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {AgreementLineItemType, Agreement} from '@root/utils/types';
+import {
+  AgreementLineItemType,
+  Agreement,
+  AgreementEvent,
+} from '@root/utils/types';
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEMS} from '../graphql';
 
 export default function AgreementDetails({
@@ -258,7 +262,12 @@ export default function AgreementDetails({
                 STATUS:
               </AppText>
               <AppText size={14} color={'textBlue'} font={'anSemiBold'}>
-                &nbsp;OPEN
+                {` ${
+                  (activeAgreement.agreement_events as AgreementEvent[])[0]
+                    ?.type !== 'accepted'
+                    ? 'OPEN'
+                    : 'CLOSED'
+                }`}
               </AppText>
             </View>
           ) : (

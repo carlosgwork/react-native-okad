@@ -6379,13 +6379,6 @@ react-native-swipe-list-view@^3.2.3:
   resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-3.2.3.tgz#2b4aa361f26b6e55efe38a829ce122dff6c00292"
   integrity sha512-f0B92eZiO0mCk7ZFtn8tbLz4lb+mR8xzcfjFqCVSDeXnuNw7GenUMsccGnclIOhnxnip5BHvUHavlD41peGqig==
 
-react-native-transparent-signature-capture@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/react-native-transparent-signature-capture/-/react-native-transparent-signature-capture-0.0.1.tgz#70a6a201390dbc59d8c64bd2703d0b7bc055541a"
-  integrity sha512-tMD21eSWZilEBfpS/pnR97rTtwv1Umxl7eoquV5G40//XSkzJ6dO71SApZKxaJzj+zBkCKMNwb2UGCXhEpCYRw==
-  dependencies:
-    prop-types "^15.5.10"
-
 react-native-vector-icons@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/react-native-vector-icons/-/react-native-vector-icons-7.0.0.tgz#5b92ed363c867645daad48c559e1f99efcfbb813"

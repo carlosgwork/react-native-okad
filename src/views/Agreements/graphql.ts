@@ -17,10 +17,15 @@ export const CREATE_AGREEMENT = gql`
         number: ""
         shipping_address_id: $shipping_address_id
         line_items: {data: $line_items}
+        agreement_events: {data: {type: "texted"}}
       }
     ) {
       returning {
         id
+        agreement_events {
+          type
+          id
+        }
         address {
           city
           county
