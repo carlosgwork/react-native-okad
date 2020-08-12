@@ -80,7 +80,20 @@ export type TableSortOps = {
 };
 
 export type UserType = {
-  name: string;
+  lastAgreementNumber: number;
+  deleted: boolean;
+  default_sales_tax_rate: number;
+  created: Date;
+  email: string;
+  google_id?: string;
+  id: number;
+  last_modified?: Date;
+  name_first: string;
+  name_last: string;
+  organization_id: number;
+  prefix: string;
+  public_id?: string;
+  pres?: any;
 };
 
 export type ReduxState = {

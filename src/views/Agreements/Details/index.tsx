@@ -5,7 +5,6 @@ import {
   Switch,
   TouchableOpacity,
   ListRenderItemInfo,
-  Alert,
 } from 'react-native';
 import {useMutation} from '@apollo/client';
 import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
@@ -25,13 +24,16 @@ import {
   Agreement,
   AgreementEvent,
 } from '@root/utils/types';
-import {UPDATE_AGREEMENT, UPDATE_LINE_ITEMS} from '../graphql';
+import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
+import {useSelector} from 'react-redux';
 
 export default function AgreementDetails({
   route,
   navigation,
 }: ContactsNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
+  const {prefix} = useSelector((state: any) => state.user);
+
   const {parent = 'Contacts', contact, agreement} = route.params || {};
   const [activeAgreement, updateActiveAgreement] = useState<Agreement>(
     agreement,
@@ -50,6 +52,10 @@ export default function AgreementDetails({
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
 
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT);
+  const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
+  const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+
   useEffect(() => {
     let total = 0;
     activeAgreement.line_items?.map((item) => {
@@ -63,28 +69,12 @@ export default function AgreementDetails({
     setTotalCost(cost);
   }, [activeAgreement.line_items]);
 
-  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
-    onCompleted() {
-      // const updatedAgreement: Agreement = data.update_agreements.returning[0];
-      Alert.alert('New Quote was successfully updated.');
-      navigation.navigate(AppRouteEnum.AgreementSummary, {
-        itemTitle: `Quote DH${numeral(agreement.id).format('00000')}`,
-        agreement: activeAgreement,
-      });
-    },
-  });
-  const [update_line_items] = useMutation(UPDATE_LINE_ITEMS, {
-    onCompleted() {
-      // const updatedAgreement: Agreement = data.update_agreements.returning[0];
-      Alert.alert('New Line was successfully updated.');
-    },
-  });
-
   const deleteRow = (rowKey: number) => {
     const newData = [...listData];
     const prevIndex = listData.findIndex(
       (item: AgreementLineItemType) => item.id === rowKey,
     );
+    removeLineItem(newData[prevIndex]);
     newData.splice(prevIndex, 1);
     setListData(newData);
     const newAgreement = Object.assign({}, activeAgreement);
@@ -97,55 +87,74 @@ export default function AgreementDetails({
     const prevIndex = listData.findIndex(
       (item: AgreementLineItemType) => item.id === activeRow,
     );
-    listData[prevIndex].discount = parseInt(discount, 10) * 100;
+    newData[prevIndex].discount = parseInt(discount, 10) * 100;
     setListData(newData);
     setDiscount('');
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.line_items = newData;
     updateActiveAgreement(newAgreement);
+    updateLineItem(newData[prevIndex]);
   };
 
   const applySalesTax = () => {
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.sales_tax_rate = parseFloat(salesTax);
     updateActiveAgreement(newAgreement);
+    updateAgreement(newAgreement);
   };
 
   const updateAgreementRevision = () => {
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.revision = newAgreement.revision + 1;
     updateActiveAgreement(newAgreement);
+    updateAgreement(newAgreement);
   };
 
-  const continueClicked = () => {
-    activeAgreement.line_items?.map((item) => {
-      const lineItem = {
-        qty: item.qty,
-        last_modified: new Date(),
-        discount: item.discount,
-      };
-      update_line_items({
-        variables: {
-          _set: lineItem,
-          id: item.id,
-        },
-      });
-    });
+  const updateAgreement = (data: Agreement) => {
     const updatingAgreement = {
-      agreement_template_id: activeAgreement.agreement_template_id,
-      billing_address_id: activeAgreement.billing_address_id,
-      contact_id: activeAgreement.contact_id,
+      agreement_template_id: data.agreement_template_id,
+      billing_address_id: data.billing_address_id,
+      contact_id: data.contact_id,
       last_modified: new Date(),
-      number: activeAgreement.number,
-      revision: activeAgreement.revision,
-      sales_tax_rate: activeAgreement.sales_tax_rate,
-      shipping_address_id: activeAgreement.shipping_address_id,
+      number: data.number,
+      revision: data.revision,
+      sales_tax_rate: data.sales_tax_rate,
+      shipping_address_id: data.shipping_address_id,
     };
     update_agreement({
       variables: {
         _set: updatingAgreement,
         id: activeAgreement.id,
       },
+    });
+  };
+
+  const updateLineItem = (item: AgreementLineItemType) => {
+    const lineItem = {
+      qty: item.qty,
+      last_modified: new Date(),
+      discount: item.discount,
+    };
+    update_line_items({
+      variables: {
+        _set: lineItem,
+        id: item.id,
+      },
+    });
+  };
+
+  const removeLineItem = (item: AgreementLineItemType) => {
+    delete_line_items({
+      variables: {
+        id: item.id,
+      },
+    });
+  };
+
+  const continueClicked = () => {
+    navigation.navigate(AppRouteEnum.AgreementSummary, {
+      itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
+      agreement: activeAgreement,
     });
   };
 
@@ -253,7 +262,9 @@ export default function AgreementDetails({
             />
           </View>
         }
-        pageTitle={`Quote DHQ${numeral(agreement.id).format('0000')}`}
+        pageTitle={`Quote ${prefix}${numeral(agreement.number).format(
+          '00000',
+        )}`}
         toolbarCenterContent={null}
         toolbarRightContent={
           showDetails ? (

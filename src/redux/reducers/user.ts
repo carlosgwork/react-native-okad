@@ -2,7 +2,20 @@ import * as types from '@redux/actions/types';
 import {UserType} from '../../utils/types';
 
 export const initialUser: UserType = {
-  name: '',
+  lastAgreementNumber: 0,
+  deleted: false,
+  default_sales_tax_rate: 0,
+  created: new Date(),
+  email: '',
+  google_id: undefined,
+  id: -1,
+  last_modified: undefined,
+  name_first: '',
+  name_last: '',
+  organization_id: -1,
+  prefix: '',
+  public_id: undefined,
+  pres: undefined,
 };
 
 export const user = (state: UserType = initialUser, action: UserAction) => {

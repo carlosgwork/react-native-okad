@@ -299,25 +299,37 @@ export default function AgreementSummary({
           </View>
         </View>
         <View style={styles.block}>
-          <View style={[styles.subblock, styles.signView]}>
-            <SignatureCapture
-              ref={signRef as any}
-              onSaveEvent={onSignatureSaved}
-              showBorder={false}
-              style={styles.signature}
-              showNativeButtons={false}
-              showTitleLabel={false}
-              viewMode={'portrait'}
-            />
-            <View pointerEvents="none" style={styles.signBg}>
-              <Image source={SignBg} style={styles.signBg} />
+          {!agreement.signature && (
+            <View style={[styles.subblock, styles.signView]}>
+              <SignatureCapture
+                ref={signRef as any}
+                onSaveEvent={onSignatureSaved}
+                showBorder={false}
+                style={styles.signature}
+                showNativeButtons={false}
+                showTitleLabel={false}
+                viewMode={'portrait'}
+              />
+              <View pointerEvents="none" style={styles.signBg}>
+                <Image source={SignBg} style={styles.signBg} />
+              </View>
+              <TouchableOpacity
+                style={styles.resetBtnStyle}
+                onPress={resetSign}>
+                <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
+                  Clear
+                </AppText>
+              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.resetBtnStyle} onPress={resetSign}>
-              <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
-                Clear
-              </AppText>
-            </TouchableOpacity>
-          </View>
+          )}
+          {agreement.signature && (
+            <View style={[styles.subblock, styles.signView]}>
+              <Image
+                source={{uri: `data:image/png;base64, ${agreement.signature}`}}
+                style={styles.signBg}
+              />
+            </View>
+          )}
         </View>
         <View style={styles.bottomBtnView}>
           <AppGradButton

@@ -7,17 +7,21 @@ export const CREATE_AGREEMENT = gql`
     $contact_id: Int
     $shipping_address_id: Int
     $line_items: [line_items_insert_input!]!
+    $user_id: Int
+    $sales_tax_rate: numeric
+    $number: citext!
   ) {
     insert_agreements(
       objects: {
         billing_address_id: $billing_address_id
         agreement_template_id: $agreement_template_id
         contact_id: $contact_id
-        sales_tax_rate: 0
-        number: ""
+        sales_tax_rate: $sales_tax_rate
+        number: $number
         shipping_address_id: $shipping_address_id
         line_items: {data: $line_items}
         agreement_events: {data: {type: "texted"}}
+        user_id: $user_id
       }
     ) {
       returning {
@@ -62,6 +66,18 @@ export const CREATE_AGREEMENT = gql`
         sales_tax_rate
         shipping_address_id
         signature
+        user {
+          prefix
+          pres
+          public_id
+          name_last
+          name_first
+          google_id
+          email
+          default_sales_tax_rate
+          organization_id
+        }
+        user_id
       }
     }
   }
@@ -113,12 +129,35 @@ export const UPDATE_AGREEMENT = gql`
   }
 `;
 
-export const UPDATE_LINE_ITEMS = gql`
-  mutation UpdateLineItems($_set: line_items_set_input, $id: Int) {
+export const UPDATE_LINE_ITEM = gql`
+  mutation UpdateLineItem($_set: line_items_set_input, $id: Int) {
     update_line_items(where: {id: {_eq: $id}}, _set: $_set) {
       returning {
         id
       }
+    }
+  }
+`;
+
+export const REMOVE_LINE_ITEM = gql`
+  mutation RemoveLineItem($id: Int) {
+    delete_line_items(where: {id: {_eq: $id}}) {
+      returning {
+        id
+      }
+    }
+  }
+`;
+
+export const GET_LAST_AGREEMENT_OF_USER = gql`
+  query GetLastAgreementOfCurrentUser($user_id: Int) {
+    agreements(
+      limit: 1
+      where: {user_id: {_eq: $user_id}}
+      order_by: {id: desc}
+    ) {
+      id
+      number
     }
   }
 `;

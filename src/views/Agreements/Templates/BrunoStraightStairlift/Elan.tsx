@@ -156,10 +156,17 @@ export default function ElanTemplate({
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
 
-  const {items} = useSelector((state: any) => state.cart);
+  const {userInfo, items} = useSelector((state: any) => ({
+    userInfo: state.user,
+    items: state.cart.items,
+  }));
   const {styles} = useStyles(getStyles);
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted(data) {
+      // Update agreement number of current usr
+      setAction('user', {
+        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
+      });
       const agreement: Agreement = data.insert_agreements.returning[0];
       Alert.alert('New Quote was successfully created.');
       navigation.popToTop();
@@ -225,6 +232,8 @@ export default function ElanTemplate({
         contact_id: contact.id,
         shipping_address_id: contact.address_id,
         line_items: lineItems,
+        sales_tax_rate: userInfo.default_sales_tax_rate,
+        number: `${userInfo.lastAgreementNumber + 1}`,
       },
     });
   };
