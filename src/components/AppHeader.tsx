@@ -62,7 +62,8 @@ const getStyles = (themeStyle: StyleType) => ({
   toolbar: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: themeStyle.scale(20),
+    marginLeft: themeStyle.scale(15),
+    paddingRight: themeStyle.scale(15),
     paddingVertical: themeStyle.scale(10),
     borderBottomWidth: 1,
     borderColor: themeStyle.gray1,
@@ -85,7 +86,7 @@ const getStyles = (themeStyle: StyleType) => ({
     ...themeStyle.getTextStyle({
       color: 'textPurple',
       font: 'anSemiBold',
-      size: 40,
+      size: 34,
     }),
   },
 

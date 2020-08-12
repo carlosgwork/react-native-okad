@@ -124,6 +124,12 @@ const textSizes: {
     lineHeight: scale(30),
     height: scale(30),
   },
+  [34]: {
+    fontSize: scale(34),
+    letterSpacing: 0,
+    lineHeight: scale(46),
+    height: scale(46),
+  },
   [40]: {
     fontSize: scale(40),
     letterSpacing: 0,

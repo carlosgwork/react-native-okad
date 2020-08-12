@@ -74,15 +74,15 @@ const getStyles = (themeStyle: StyleType) => ({
   divider: {
     flexDirection: 'row',
     height: 1,
-    backgroundColor: themeStyle.gray1,
-    marginLeft: themeStyle.scale(50),
+    backgroundColor: themeStyle.lightBorderColor,
+    marginLeft: themeStyle.scale(15),
   },
   rowOdd: {},
   rowEven: {
     backgroundColor: themeStyle.backgroundGray1,
   },
   cell: {
-    paddingVertical: themeStyle.scale(10),
+    paddingVertical: themeStyle.scale(5),
   },
   text: {
     ...themeStyle.getTextStyle({

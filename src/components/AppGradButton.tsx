@@ -69,7 +69,7 @@ const getStyles = (themeStyle: StyleType) => ({
     ...themeStyle.getTextStyle({
       color: 'textWhite',
       font: 'anRegular',
-      size: 16,
+      size: 14,
     }),
     letterSpacing: 2,
     fontWeight: '500',
@@ -78,7 +78,7 @@ const getStyles = (themeStyle: StyleType) => ({
   textContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 32,
+    minHeight: 28,
     paddingRight: 20,
   },
 });

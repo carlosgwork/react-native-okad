@@ -99,8 +99,8 @@ const cellContent = (
           }>
           <AppText
             style={styles.noSpacing}
-            color={'textPurple'}
-            size={20}
+            color={'textLightPurple'}
+            size={16}
             font={'anSemiBold'}>
             <>
               {row.name_first} {row.name_last}
@@ -111,7 +111,7 @@ const cellContent = (
     case 'location':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {`${row.address.city}, ${row.address.us_state}`}
           </AppText>
         </View>
@@ -121,7 +121,7 @@ const cellContent = (
         row.phone_mobile || row.phone_home || row.phone_office || '';
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {phoneFormat(phone_number)}
           </AppText>
         </View>
@@ -135,8 +135,8 @@ const cellContent = (
             leftIconContent={<></>}>
             <AppText
               style={styles.noSpacing}
-              color={'textPurple'}
-              size={20}
+              color={'textLightPurple'}
+              size={16}
               font={'anSemiBold'}>
               {count > 1 ? `${count} agreements` : `${count} agreement`}
             </AppText>
@@ -155,16 +155,16 @@ const cellContent = (
           }
           leftIconContent={
             <Icon
-              color={themeStyle.textPurple}
+              color={themeStyle.textLightPurple}
               name={'pluscircleo'}
               type={'antdesign'}
-              size={20}
+              size={18}
             />
           }>
           <AppText
             style={styles.noSpacing}
-            color={'textPurple'}
-            size={20}
+            color={'textLightPurple'}
+            size={16}
             font={'anSemiBold'}>
             New agreement
           </AppText>
@@ -290,11 +290,10 @@ const getStyles = (themeStyle: StyleType) => ({
     flexDirection: 'row',
   },
   cellLayout: {
-    paddingTop: 5,
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 5,
-    height: 40,
+    height: 38,
   },
   noSpacing: {
     letterSpacing: 0,
