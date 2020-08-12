@@ -23,6 +23,7 @@
 		711282CA24BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 711282C924BE4B0700F4BB37 /* AvenirNextLTPro-Demi.otf */; };
 		711AEB6724DF20F6007341BE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 711AEB6624DF20F6007341BE /* GoogleService-Info.plist */; };
 		82C0D75629E5C9D08BE3334D /* libPods-osaka.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 029416373D7B9ECA081963ED /* libPods-osaka.a */; };
+		B1A69BC6C3C04EEB91ACFACD /* AvenirNextLTPro-Medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = C0099080F6FC467A9E3A72D9 /* AvenirNextLTPro-Medium.otf */; };
 		D47D0F7F2C44563D730A07A8 /* libPods-osaka-osakaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CD53BED67222C1AF6DC09C6 /* libPods-osaka-osakaTests.a */; };
 		D506A7A2F7F2448B604F85DE /* libPods-osaka-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 733CEC7CBFFBA03A832E5CC6 /* libPods-osaka-tvOSTests.a */; };
 		D8DF41CFA83F4F96513BA2D4 /* libPods-osaka-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 863B8689A0CD661064881F4E /* libPods-osaka-tvOS.a */; };
@@ -116,6 +117,7 @@
 		B87C0E5F72D04044B07A04C4 /* Feather.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Feather.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Feather.ttf"; sourceTree = "<group>"; };
 		B95885F2EE164DE9839EABDA /* Pods-osaka-osakaTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osaka-osakaTests.release.xcconfig"; path = "Target Support Files/Pods-osaka-osakaTests/Pods-osaka-osakaTests.release.xcconfig"; sourceTree = "<group>"; };
 		BE363B27BE904B1F0E5DD9C0 /* Pods-osaka-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-osaka-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-osaka-tvOSTests/Pods-osaka-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		C0099080F6FC467A9E3A72D9 /* AvenirNextLTPro-Medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "AvenirNextLTPro-Medium.otf"; path = "../assets/fonts/AvenirNextLTPro-Medium.otf"; sourceTree = "<group>"; };
 		C2D80102589F40DD95520A6F /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = ../assets/fonts/FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
 		D9F6D6EE2B22466497ED4AFC /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		E4E3D840B1F445DF94AEBBC1 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
@@ -300,6 +302,7 @@
 				211483E386E14C4EA7BEF36C /* Octicons.ttf */,
 				EA450E15BFEE4308BA486CB8 /* SimpleLineIcons.ttf */,
 				AF4F614896844C44AA32C8A9 /* Zocial.ttf */,
+				C0099080F6FC467A9E3A72D9 /* AvenirNextLTPro-Medium.otf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -470,6 +473,7 @@
 				04D60577249768C600E0A425 /* AvenirNextLTPro-Bold.otf in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				B1A69BC6C3C04EEB91ACFACD /* AvenirNextLTPro-Medium.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -898,6 +902,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_BITCODE = YES;
 				INFOPLIST_FILE = osaka/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = (

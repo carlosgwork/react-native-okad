@@ -42,6 +42,7 @@ const iPhoneX = Platform.OS === 'ios' && (height === 812 || height === 896);
 const fonts = {
   anBold: 'AvenirNextLTPro-Bold',
   anSemiBold: 'AvenirNextLTPro-Demi',
+  anMedium: 'Metropolis-Medium',
   anItalic: 'AvenirNextLTPro-It',
   anRegular: 'AvenirNextLTPro-Regular',
 };
