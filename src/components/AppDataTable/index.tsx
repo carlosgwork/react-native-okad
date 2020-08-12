@@ -21,7 +21,7 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
   const {headers, sortOp, rows, renderCell, onSortChanged} = props;
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.headerContainer}>
         {headers.map((header, index) => (
           <TableHeader
@@ -32,7 +32,7 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
           />
         ))}
       </View>
-      <View style={styles.rowContainer}>
+      <ScrollView style={styles.rowContainer}>
         {rows.map((row, index) => (
           <React.Fragment key={index}>
             <View
@@ -49,21 +49,24 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
             <View style={styles.divider} />
           </React.Fragment>
         ))}
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 });
 
 const getStyles = (themeStyle: StyleType) => ({
   container: {
     paddingVertical: 0,
+    flex: 1,
   },
   headerContainer: {
     flexDirection: 'row',
     paddingHorizontal: themeStyle.scale(20),
     paddingTop: themeStyle.scale(10),
   },
-  rowContainer: {},
+  rowContainer: {
+    flex: 1,
+  },
   row: {
     flexDirection: 'row',
     paddingHorizontal: themeStyle.scale(20),
