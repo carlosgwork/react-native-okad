@@ -9,23 +9,26 @@ import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {useMutation} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
-import {useStyles} from '@global/Hooks';
-import {AppHeader, AppText, AppGradButton} from '@root/components';
+import {useStyles, useTheme} from '@global/Hooks';
+import {AppHeader, AppText, AppGradButton, CircularLoading} from '@root/components';
 import {Contact, Address} from '@root/utils/types';
 import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';
 import {CREATE_CONTACT} from '../graphql';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 export default function NewContact({
   navigation,
 }: ContactsNavProps<AppRouteEnum.NewContactModal>) {
   const {styles} = useStyles(getStyles);
+  const {themeStyle} = useTheme();
   const [insert_contacts] = useMutation(CREATE_CONTACT, {
     onCompleted() {
       Alert.alert('New contact was successfully created.');
       setTimeout(() => navigation.pop(), 2000);
     },
   });
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
   const [error, setError] = useState<Contact>(emptyContact);
   const [form, setForm] = useState<Contact>(emptyContact);
   const changeForm = (field: keyof Contact, value: string) => {
@@ -65,6 +68,7 @@ export default function NewContact({
     setForm(newForm);
   };
   const getAddressFromCurrentLocation = () => {
+    setLoadingLocation(true);
     Geolocation.getCurrentPosition(
       (position: GeolocationResponse) => {
         const params = {
@@ -74,10 +78,12 @@ export default function NewContact({
         fetchAddressFromLocation(params).then((addr: Address) => {
           const newForm = Object.assign({}, form);
           newForm.address = addr;
+          setLoadingLocation(false);
           setForm(newForm);
         });
       },
       (err) => {
+        setLoadingLocation(false);
         console.log(err);
       },
       {
@@ -97,10 +103,6 @@ export default function NewContact({
     }
     if (!form.name_last) {
       newError.name_last = 'Required';
-      valid = false;
-    }
-    if (!form.company) {
-      newError.company = 'Required';
       valid = false;
     }
     if (form.phone_mobile && phone(form.phone_mobile).length === 0) {
@@ -179,7 +181,7 @@ export default function NewContact({
       <AppHeader
         leftContent={
           <TouchableOpacity onPress={() => navigation.pop()}>
-            <AppText size={16} color={'lightPurple'} font="anMedium">
+            <AppText size={16} color={'textLightPurple'} font="anMedium">
               Cancel
             </AppText>
           </TouchableOpacity>
@@ -188,9 +190,16 @@ export default function NewContact({
         pageTitle={'New contact'}
         toolbarCenterContent={null}
         toolbarRightContent={
-          <TouchableOpacity onPress={getAddressFromCurrentLocation}>
-            <AppText size={14} color={'lightPurple'} font="anMedium">
-              Use my current location
+          <TouchableOpacity
+            onPress={getAddressFromCurrentLocation}
+            style={styles.rowLayout}>
+            <Icon
+              name={'navigate'}
+              color={themeStyle.textLightPurple}
+              size={16}
+            />
+            <AppText size={14} color={'textLightPurple'} font="anMedium">
+              &nbsp;Use my current location
             </AppText>
           </TouchableOpacity>
         }
@@ -202,7 +211,8 @@ export default function NewContact({
               placeholder="Mr."
               label="Title"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('title', val)}
               value={form.title}
             />
@@ -211,11 +221,13 @@ export default function NewContact({
             <Input
               placeholder="John"
               label="First Name"
+              placeholderTextColor={themeStyle.lightBorderColor}
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('name_first', val)}
               value={form.name_first}
               errorMessage={error.name_first}
+              autoFocus
             />
           </View>
           <View style={styles.col7}>
@@ -223,7 +235,8 @@ export default function NewContact({
               placeholder="Doe"
               label="Last Name"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('name_last', val)}
               value={form.name_last}
               errorMessage={error.name_last}
@@ -235,10 +248,10 @@ export default function NewContact({
             <Input
               label="Company"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('company', val)}
               value={form.company}
-              errorMessage={error.company}
             />
           </View>
         </View>
@@ -248,7 +261,8 @@ export default function NewContact({
               label="Address"
               placeholder="123 Maple Ln"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeAddress('line1', val)}
               value={form.address.line1}
               errorMessage={error.address.line1}
@@ -257,7 +271,8 @@ export default function NewContact({
           <View style={styles.col16}>
             <Input
               placeholder="Apt4"
-              inputStyle={styles.input}
+              inputContainerStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
               labelStyle={styles.labelStyle}
               onChangeText={(val) => changeAddress('line2', val)}
               value={form.address.line2}
@@ -267,7 +282,8 @@ export default function NewContact({
             <Input
               placeholder="Los Angeles"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeAddress('city', val)}
               value={form.address.city}
               errorMessage={error.address.city}
@@ -277,7 +293,8 @@ export default function NewContact({
             <Input
               placeholder="CA"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeAddress('us_state', val)}
               value={form.address.us_state}
               maxLength={2}
@@ -288,7 +305,8 @@ export default function NewContact({
             <Input
               placeholder="90210"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              inputContainerStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
               onChangeText={(val) => changeAddress('postal_code', val)}
               value={form.address.postal_code}
               keyboardType="phone-pad"
@@ -302,7 +320,8 @@ export default function NewContact({
               placeholder="(888) 991-3991"
               label="PHONE (MOBILE)"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('phone_mobile', val)}
               value={form.phone_mobile}
               textContentType="telephoneNumber"
@@ -317,7 +336,8 @@ export default function NewContact({
               placeholder="(888) 991-3992"
               label="PHONE (OFFICE)"
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              placeholderTextColor={themeStyle.lightBorderColor}
+              inputContainerStyle={styles.input}
               onChangeText={(val) => changeForm('phone_office', val)}
               value={form.phone_office}
               textContentType="telephoneNumber"
@@ -333,14 +353,17 @@ export default function NewContact({
             <Input
               label="Email"
               placeholder="john.doe@gmail.com"
+              placeholderTextColor={themeStyle.lightBorderColor}
               labelStyle={styles.labelStyle}
-              inputStyle={styles.input}
+              inputContainerStyle={styles.input}
+              autoCapitalize="none"
               onChangeText={(val) => changeForm('email', val)}
               value={form.email}
               errorMessage={error.email}
             />
           </View>
         </View>
+        <CircularLoading loading={loadingLocation} />
       </View>
       <View style={styles.bottomBtnView}>
         <AppGradButton
@@ -392,8 +415,15 @@ const getStyles = (themeStyle: StyleType) => ({
     width: '66%',
   },
   input: {
-    paddingVertical: themeStyle.scale(15),
-    fontSize: 18,
+    paddingVertical: themeStyle.scale(5),
+    borderBottomWidth: 1,
+    borderBottomColor: themeStyle.lightBorderColor,
+    ...themeStyle.getTextStyle({
+      color: 'textBlack1',
+      font: 'anMedium',
+      size: 18,
+    }),
+    height: 'auto',
   },
   labelStyle: {
     textTransform: 'uppercase',
@@ -413,10 +443,20 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   createBtn: {
     borderTopLeftRadius: 0,
-    paddingVertical: 10,
+    paddingVertical: 12,
     borderTopRightRadius: 0,
   },
   createBtnText: {
     textTransform: 'uppercase',
+    ...themeStyle.getTextStyle({
+      color: 'white',
+      font: 'anSemiBold',
+      size: 16,
+    }),
+    letterSpacing: 2.9,
+  },
+  rowLayout: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });

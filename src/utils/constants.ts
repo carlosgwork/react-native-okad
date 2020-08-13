@@ -31,4 +31,6 @@ export const emptyContact: Contact = {
     line2: '',
     id: 0,
   },
+  id: -1,
+  address_id: -1,
 };

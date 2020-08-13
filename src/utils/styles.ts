@@ -199,6 +199,7 @@ export type TextSizes =
   | 24
   | 26
   | 30
+  | 34
   | 40;
 
 export type TextStyleInputs = {

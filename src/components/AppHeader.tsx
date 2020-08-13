@@ -82,6 +82,7 @@ const getStyles = (themeStyle: StyleType) => ({
   toolbarRight: {
     marginLeft: themeStyle.scale(30),
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
 
   pageTitle: {
