@@ -179,7 +179,7 @@ export default function NewContact({
       <AppHeader
         leftContent={
           <TouchableOpacity onPress={() => navigation.pop()}>
-            <AppText size={14} color={'lightPurple'} font="anSemiBold">
+            <AppText size={16} color={'lightPurple'} font="anMedium">
               Cancel
             </AppText>
           </TouchableOpacity>
@@ -189,7 +189,7 @@ export default function NewContact({
         toolbarCenterContent={null}
         toolbarRightContent={
           <TouchableOpacity onPress={getAddressFromCurrentLocation}>
-            <AppText size={14} color={'lightPurple'} font="anSemiBold">
+            <AppText size={14} color={'lightPurple'} font="anMedium">
               Use my current location
             </AppText>
           </TouchableOpacity>
@@ -358,19 +358,8 @@ export default function NewContact({
 
 const getStyles = (themeStyle: StyleType) => ({
   container: {
-    marginTop: '5%',
-    height: '95%',
+    flex: 1,
     backgroundColor: themeStyle.backgroundWhite,
-    borderRadius: themeStyle.scale(20),
-    shadowColor: themeStyle.black,
-    shadowOffset: {
-      width: 0,
-      height: -1,
-    },
-    shadowOpacity: 0.6,
-    shadowRadius: 12.35,
-    elevation: 19,
-    flexDirection: 'column',
   },
   mainContent: {
     paddingVertical: themeStyle.scale(10),

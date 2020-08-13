@@ -6,7 +6,6 @@ import Splash from '@root/views/Splash';
 import Login from '@root/views/Login';
 
 import {useBackHandler} from '@global/Hooks';
-import {setAction} from '@redux/actions';
 
 import {MainTabRoutes} from './main';
 
@@ -51,11 +50,7 @@ export default function Routes() {
   return (
     <NavigationContainer
       onStateChange={async (state) => {
-        const previousScreen = routeNameRef.current;
         const currentScreen = getActiveRouteName(state as NavigationState);
-        if (previousScreen !== currentScreen) {
-          setAction('screens', {currentScreen, previousScreen});
-        }
         routeNameRef.current = currentScreen;
       }}>
       <Stack.Navigator initialRouteName="Splash" headerMode="none">

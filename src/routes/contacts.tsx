@@ -1,5 +1,6 @@
 import React from 'react';
-import {createStackNavigator} from '@react-navigation/stack';
+import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
+
 import Main from '@root/views/Contacts';
 import NewContact from '@root/views/Contacts/New';
 import ContactDetails from '@root/views/Contacts/Details';
@@ -38,9 +39,25 @@ function ContactsStackNavigation() {
   );
 }
 
-export default function RootStackScreen() {
+type NavigationProps = {
+  navigation: any;
+  route: any;
+};
+
+export default function RootStackScreen({navigation, route}: NavigationProps) {
+  navigation.setOptions({
+    tabBarVisible: route.state ? (route.state.index > 0 ? false : true) : null,
+  });
   return (
-    <RootStack.Navigator mode="modal" headerMode="none">
+    <RootStack.Navigator
+      mode="modal"
+      headerMode="none"
+      screenOptions={{
+        headerShown: false,
+        cardStyle: {backgroundColor: 'transparent'},
+        cardOverlayEnabled: true,
+        ...TransitionPresets.ModalPresentationIOS,
+      }}>
       <RootStack.Screen
         name="Main"
         component={ContactsStackNavigation}
