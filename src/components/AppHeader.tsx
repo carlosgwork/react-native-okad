@@ -13,6 +13,7 @@ type Props = {
   toolbarCenterContent?: React.ReactElement | any;
   toolbarRightContent?: React.ReactElement | any;
   pageTitle: string;
+  sameSize?: boolean;
 };
 
 export default React.memo<Props>(function AppHeader(props: Props) {
@@ -32,6 +33,7 @@ export default React.memo<Props>(function AppHeader(props: Props) {
     toolbarLeftContent = defaultToolbarLeft,
     toolbarCenterContent = defaultToolbarCenter,
     toolbarRightContent = defaultToolbarRight,
+    sameSize = false,
   } = props;
 
   return (
@@ -41,11 +43,20 @@ export default React.memo<Props>(function AppHeader(props: Props) {
         rightComponent={<View style={styles.topContainer}>{rightContent}</View>}
         containerStyle={styles.headerTopContainer}
       />
-      <View style={styles.toolbar}>
-        <View style={styles.toolbarLeft}>{toolbarLeftContent}</View>
-        <View style={styles.toolbarCenter}>{toolbarCenterContent}</View>
-        <View style={styles.toolbarRight}>{toolbarRightContent}</View>
-      </View>
+      {!sameSize && (
+        <View style={styles.toolbar}>
+          <View style={styles.toolbarLeft}>{toolbarLeftContent}</View>
+          <View style={styles.toolbarCenter}>{toolbarCenterContent}</View>
+          <View style={styles.toolbarRight}>{toolbarRightContent}</View>
+        </View>
+      )}
+      {sameSize && (
+        <View style={styles.toolbar}>
+          <View style={styles.toolbarCenter}>{toolbarLeftContent}</View>
+          <View style={styles.toolbarCenter}>{toolbarCenterContent}</View>
+          <View style={styles.toolbarCenter}>{toolbarRightContent}</View>
+        </View>
+      )}
     </View>
   );
 });
@@ -56,8 +67,8 @@ const getStyles = (themeStyle: StyleType) => ({
     borderBottomWidth: 0,
     marginHorizontal: 0,
     paddingHorizontal: themeStyle.scale(15),
-    paddingTop: themeStyle.scale(10),
-    height: 44,
+    paddingTop: themeStyle.scale(20),
+    height: 64,
     borderTopLeftRadius: themeStyle.scale(20),
     borderTopRightRadius: themeStyle.scale(20),
   },
@@ -66,7 +77,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
     marginLeft: themeStyle.scale(15),
     paddingRight: themeStyle.scale(15),
-    paddingVertical: themeStyle.scale(10),
+    paddingVertical: themeStyle.scale(5),
     borderBottomWidth: 1,
     borderColor: themeStyle.gray1,
   },
