@@ -95,6 +95,7 @@ const cellContent = (
             navigation.navigate(AppRouteEnum.ContactDetails, {
               contact: row,
               itemTitle: `${row.name_first} ${row.name_last}`,
+              itemId: row.id,
             })
           }>
           <AppText

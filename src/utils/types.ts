@@ -16,6 +16,8 @@ export type Address = {
   line1: string;
   line2?: string;
   postal_code: string;
+  lat?: number;
+  long?: number;
 };
 
 export type Agreement = {
@@ -38,6 +40,8 @@ export type Agreement = {
   addressByShippingAddressId?: Address;
   line_items?: AgreementLineItemType[];
   agreement_events?: AgreementEvent[] | AgreementEvent;
+  user?: UserType;
+  amount?: number;
 };
 
 export type AgreementEvent = {
@@ -65,6 +69,7 @@ export type Contact = {
   agreements?: Agreement[];
   company?: string;
   title?: string;
+  user?: UserType;
 };
 
 export type TableHeaderType = {
