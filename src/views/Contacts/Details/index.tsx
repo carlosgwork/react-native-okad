@@ -4,7 +4,7 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import MapView from 'react-native-maps';
 import {Icon} from 'react-native-elements';
 import moment from 'moment';
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
 import numeral from 'numeral';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -21,6 +21,7 @@ import {
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
+import {FETCH_CONTACT_DETAILS} from '../graphql';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'NUMBER', value: 'number', sortable: true, style: {width: 200}},
@@ -83,48 +84,6 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return <></>;
   }
 };
-
-export const FETCH_CONTACT_DETAILS = gql`
-  query QueryContactDetails($id: Int) {
-    contacts(where: {id: {_eq: $id}}) {
-      address_id
-      address {
-        city
-        lat
-        id
-        county
-        line1
-        line2
-        postal_code
-        us_state
-      }
-      company
-      agreements {
-        id
-        number
-        line_items {
-          discount
-          price
-          qty
-        }
-        sales_tax_rate
-        created
-        agreement_template_id
-        user {
-          email
-          id
-          prefix
-        }
-      }
-      name_first
-      name_last
-      phone_home
-      phone_mobile
-      phone_office
-      email
-    }
-  }
-`;
 
 export default function ContactDetails({
   route,
