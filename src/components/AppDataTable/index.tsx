@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ScrollView, View} from 'react-native';
+import {ScrollView, View, NativeScrollEvent} from 'react-native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -13,12 +13,13 @@ type Props = {
   rows: any[];
   renderCell: (header: TableHeaderType, row: any) => React.ReactElement;
   onSortChanged?: (sortOp: TableSortOps) => any;
+  onScroll?: ({nativeEvent}: {nativeEvent: NativeScrollEvent}) => void;
 };
 
 export default React.memo<Props>(function AppDataTable(props: Props) {
   const {styles} = useStyles(getStyles);
 
-  const {headers, sortOp, rows, renderCell, onSortChanged} = props;
+  const {headers, sortOp, rows, renderCell, onSortChanged, onScroll} = props;
 
   return (
     <View style={styles.container}>
@@ -32,7 +33,10 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
           />
         ))}
       </View>
-      <ScrollView style={styles.rowContainer}>
+      <ScrollView
+        style={styles.rowContainer}
+        onScroll={onScroll}
+        scrollEventThrottle={300}>
         {rows.map((row, index) => (
           <React.Fragment key={index}>
             <View
@@ -63,6 +67,7 @@ const getStyles = (themeStyle: StyleType) => ({
     flexDirection: 'row',
     paddingHorizontal: themeStyle.scale(20),
     paddingTop: themeStyle.scale(10),
+    paddingBottom: themeStyle.scale(5),
   },
   rowContainer: {
     flex: 1,

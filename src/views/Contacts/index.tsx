@@ -259,15 +259,17 @@ export default function Contacts({
           <AppSearchInput value={searchText} onChange={onFilterContact} />
         }
       />
-      <AppDataTable
-        headers={HEADERS}
-        key={visibleContacts.length || contactsSortOps}
-        sortOp={contactsSortOps}
-        renderCell={renderCell}
-        rows={visibleContacts}
-        onSortChanged={onSortChanged}
-      />
-      <CircularLoading loading={loading} />
+      <View style={styles.mainContent}>
+        <AppDataTable
+          headers={HEADERS}
+          key={visibleContacts.length || contactsSortOps}
+          sortOp={contactsSortOps}
+          renderCell={renderCell}
+          rows={visibleContacts}
+          onSortChanged={onSortChanged}
+        />
+        <CircularLoading loading={loading} />
+      </View>
     </View>
   );
 }
@@ -303,5 +305,9 @@ const getStyles = (themeStyle: StyleType) => ({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 250,
+  },
+  mainContent: {
+    marginTop: 10,
+    flex: 1,
   },
 });

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
+import {View, Text, NativeScrollEvent} from 'react-native';
 import {gql, useQuery} from '@apollo/client';
 
 import {useSelector} from 'react-redux';
@@ -28,13 +28,13 @@ const HEADERS: TableHeaderType[] = [
     label: 'Shipping Address',
     value: 'shipping_address',
     sortable: true,
-    style: {flex: 1},
+    style: {width: 250},
   },
   {
     label: 'Template Id',
     value: 'agreement_template_id',
     sortable: true,
-    style: {width: 120},
+    style: {flex: 1},
   },
   {label: 'Created', value: 'created', sortable: true, style: {width: 150}},
 ];
@@ -151,10 +151,7 @@ export default function Agreements() {
           <AppSearchInput value={searchText} onChange={onFilterAgreement} />
         }
       />
-      <ScrollView
-        onScroll={onContainerScroll}
-        scrollEventThrottle={300}
-        style={styles.container}>
+      <View style={styles.mainContent}>
         <AppDataTable
           headers={HEADERS}
           key={visibleAgreements.length || agreementsSortOps}
@@ -162,9 +159,10 @@ export default function Agreements() {
           renderCell={renderCell}
           rows={visibleAgreements}
           onSortChanged={onSortChanged}
+          onScroll={onContainerScroll}
         />
         <CircularLoading loading={loading} />
-      </ScrollView>
+      </View>
     </View>
   );
 }
@@ -222,8 +220,8 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
         <AppTextButton style={styles.cellLayout} onPress={() => {}}>
           <AppText
             style={styles.noSpacing}
-            color={'textPurple'}
-            size={20}
+            color={'textLightPurple'}
+            size={16}
             font={'anSemiBold'}>
             <>
               {row.contact?.name_first || ''} {row.contact?.name_last || ''}
@@ -234,7 +232,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
     case 'shipping_address':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {`${row.address?.city || ''}${row.address?.city ? ', ' : ''}${
               row.address?.us_state || ''
             }`}
@@ -244,7 +242,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
     case 'created':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {moment(row.created).format('MMM DD, YYYY')}
           </AppText>
         </View>
@@ -252,7 +250,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
     case 'agreement_template_id':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {`${row.agreement_template_id}`}
           </AppText>
         </View>
@@ -260,7 +258,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
     case 'id':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {`${row.id}`}
           </AppText>
         </View>
@@ -289,11 +287,10 @@ const getStyles = (themeStyle: StyleType) => ({
     flexDirection: 'row',
   },
   cellLayout: {
-    paddingTop: 5,
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 5,
-    height: 40,
+    height: 38,
   },
   noSpacing: {
     letterSpacing: 0,
@@ -302,5 +299,9 @@ const getStyles = (themeStyle: StyleType) => ({
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 250,
+  },
+  mainContent: {
+    marginTop: 10,
+    flex: 1,
   },
 });
