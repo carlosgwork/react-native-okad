@@ -2,6 +2,8 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import numeral from 'numeral';
+import Icon from 'react-native-vector-icons/Entypo';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -17,12 +19,12 @@ import {AppTextButton, AppText, AppDataTable} from '@root/components';
 import {emptyCatalog} from '@root/utils/constants';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Sku', value: 'sku', sortable: true, style: {width: 180}},
+  {label: 'Sku', value: 'sku', sortable: true, style: {width: 150}},
   {label: 'Name', value: 'name', sortable: true, style: {flex: 1}},
   {label: 'Cost', value: 'cost', sortable: true, style: {width: 150}},
   {label: 'Price', value: 'price', sortable: true, style: {width: 150}},
   {label: 'Taxable', value: 'taxable', sortable: false, style: {width: 100}},
-  {label: '', value: 'actions', sortable: false, style: {width: 50}},
+  {label: '', value: 'actions', sortable: false, style: {width: 15}},
 ];
 
 const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | '') => {
@@ -51,8 +53,8 @@ const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
         <AppTextButton style={styles.cellLayout} onPress={() => {}}>
           <AppText
             style={styles.noSpacing}
-            color={'textPurple'}
-            size={20}
+            color={'textBlack2'}
+            size={16}
             font={'anSemiBold'}>
             {row.sku}
           </AppText>
@@ -61,7 +63,7 @@ const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
     case 'name':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
+          <AppText style={styles.noSpacing} size={16}>
             {row.name}
           </AppText>
         </View>
@@ -69,25 +71,32 @@ const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
     case 'cost':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
-            {row.cost ? numeral(row.cost).format('$0,0.00') : ''}
+          <AppText style={styles.noSpacing} size={16}>
+            {row.cost ? numeral(row.cost / 100).format('$0,0.00') : ''}
           </AppText>
         </View>
       );
     case 'price':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
-            {row.price ? numeral(row.price).format('$0,0.00') : ''}
+          <AppText style={styles.noSpacing} size={16}>
+            {row.price ? numeral(row.price / 100).format('$0,0.00') : ''}
           </AppText>
         </View>
       );
     case 'taxable':
       return (
         <View style={styles.cellLayout}>
-          <AppText style={styles.noSpacing} size={20}>
-            {row.taxable ? 'TRUE' : ''}
-          </AppText>
+          {row.taxable && (
+            <IonIcon name={'checkmark-sharp'} color={'#55465F'} size={22} />
+          )}
+          {!row.taxable && <></>}
+        </View>
+      );
+    case 'actions':
+      return (
+        <View style={styles.cellLayout}>
+          <Icon name={'chevron-thin-right'} color={'#855C9C'} size={20} />
         </View>
       );
     default:
@@ -160,28 +169,27 @@ const getStyles = (themeStyle: StyleType) => ({
     paddingBottom: 20,
   },
   cellLayout: {
-    paddingTop: 5,
+    paddingVertical: 5,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingBottom: 5,
-    height: 40,
+    height: 38,
   },
   noSpacing: {
     letterSpacing: 0,
   },
   vendorName: {
-    marginVertical: 10,
-    paddingVertical: 15,
-    marginLeft: themeStyle.scale(20),
+    marginVertical: 3,
+    paddingVertical: 16,
+    marginLeft: themeStyle.scale(15),
     borderBottomWidth: 1,
-    borderBottomColor: themeStyle.gray1,
+    borderBottomColor: themeStyle.lightBorderColor,
   },
   vendorNameText: {
     ...themeStyle.getTextStyle({
-      color: 'textBlack',
-      font: 'anSemiBold',
-      size: 18,
+      color: 'textBlack1',
+      font: 'anMedium',
+      size: 16,
     }),
   },
 });

@@ -138,23 +138,25 @@ export default function Catalogs() {
           <AppSearchInput value={searchText} onChange={onFilterCatalog} />
         }
       />
-      <ScrollView
-        onScroll={onContainerScroll}
-        scrollEventThrottle={300}
-        style={styles.container}>
-        {filteredVendors.map((item, index) => (
-          <VendorRow
-            key={index}
-            vendorName={item.name}
-            catalogs={item.catalog_items}
-            catalogSortOps={vendorsSortOps[index].sortOps}
-            sortChanged={(sortOps: TableSortOps) =>
-              onSortChanged(sortOps, index)
-            }
-          />
-        ))}
-        <CircularLoading loading={loading || !vendorsSortOps.length} />
-      </ScrollView>
+      <View style={styles.mainContent}>
+        <ScrollView
+          onScroll={onContainerScroll}
+          scrollEventThrottle={300}
+          style={styles.container}>
+          {filteredVendors.map((item, index) => (
+            <VendorRow
+              key={index}
+              vendorName={item.name}
+              catalogs={item.catalog_items}
+              catalogSortOps={vendorsSortOps[index].sortOps}
+              sortChanged={(sortOps: TableSortOps) =>
+                onSortChanged(sortOps, index)
+              }
+            />
+          ))}
+          <CircularLoading loading={loading || !vendorsSortOps.length} />
+        </ScrollView>
+      </View>
     </View>
   );
 }
@@ -171,13 +173,6 @@ const getStyles = (themeStyle: StyleType) => ({
       size: 18,
     }),
   },
-  cellLayout: {
-    paddingTop: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingBottom: 5,
-    height: 40,
-  },
   noSpacing: {
     letterSpacing: 0,
   },
@@ -189,5 +184,9 @@ const getStyles = (themeStyle: StyleType) => ({
   loader: {
     marginTop: 25,
     marginBottom: 25,
+  },
+  mainContent: {
+    flex: 1,
+    marginTop: 10,
   },
 });
