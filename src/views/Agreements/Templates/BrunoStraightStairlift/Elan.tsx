@@ -156,10 +156,13 @@ export default function ElanTemplate({
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
 
-  const {userInfo, items} = useSelector((state: any) => ({
-    userInfo: state.user,
-    items: state.cart.items,
-  }));
+  const {userInfo, items: cartItems, agreements} = useSelector(
+    (state: any) => ({
+      userInfo: state.user,
+      items: state.cart.items,
+      agreements: state.agreements,
+    }),
+  );
   const {styles} = useStyles(getStyles);
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted(data) {
@@ -168,6 +171,8 @@ export default function ElanTemplate({
         lastAgreementNumber: userInfo.lastAgreementNumber + 1,
       });
       const agreement: Agreement = data.insert_agreements.returning[0];
+      const newAgreements = agreements.agreements.push(agreement);
+      setAction('agreements', {agreements: newAgreements});
       Alert.alert('New Quote was successfully created.');
       navigation.popToTop();
       navigation.navigate(AppRouteEnum.AgreementDetails, {
@@ -180,11 +185,13 @@ export default function ElanTemplate({
   });
 
   const updateQty = (item: LineItemType, qty: number) => {
-    const itemIndex = items.findIndex((it: LineItemType) => it.id === item.id);
+    const itemIndex = cartItems.findIndex(
+      (it: LineItemType) => it.id === item.id,
+    );
     if (itemIndex < 0) {
-      items.push(item);
+      cartItems.push(item);
     }
-    const newItems = items.map((it: LineItemType) => {
+    const newItems = cartItems.map((it: LineItemType) => {
       if (it.id === item.id) {
         it.qty = qty;
         return it;
@@ -194,7 +201,7 @@ export default function ElanTemplate({
     setAction('cart', {items: newItems});
   };
   const chooseItem = (item: LineItemType) => {
-    const newItems = items.slice();
+    const newItems = cartItems.slice();
     const itemIndex = newItems.findIndex(
       (it: LineItemType) => it.id === item.id,
     );
@@ -217,7 +224,7 @@ export default function ElanTemplate({
 
   const createQuote = () => {
     // Create an agreement
-    const lineItems = items.map((item: LineItemType) => ({
+    const lineItems = cartItems.map((item: LineItemType) => ({
       catalog_item_id: item.id,
       current_cost: item.cost,
       price: item.price,
@@ -240,7 +247,7 @@ export default function ElanTemplate({
 
   // Calculate Total Price
   let totalPrice = 0;
-  items.map((item: LineItemType) => {
+  cartItems.map((item: LineItemType) => {
     if (item.qty !== undefined) {
       totalPrice += item.price * item.qty;
     } else {
@@ -288,8 +295,10 @@ export default function ElanTemplate({
                     key={id}
                     item={item}
                     qty={
-                      items[
-                        items.findIndex((it: LineItemType) => it.id === item.id)
+                      cartItems[
+                        cartItems.findIndex(
+                          (it: LineItemType) => it.id === item.id,
+                        )
                       ]?.quantity || 0
                     }
                     setQty={(num) => updateQty(item, num)}
@@ -298,8 +307,9 @@ export default function ElanTemplate({
                   <LineItem
                     key={id}
                     active={
-                      items.findIndex((it: LineItemType) => it.id === item.id) >
-                      -1
+                      cartItems.findIndex(
+                        (it: LineItemType) => it.id === item.id,
+                      ) > -1
                     }
                     item={item}
                     setActive={() => chooseItem(item)}
