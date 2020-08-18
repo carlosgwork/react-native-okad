@@ -65,3 +65,6 @@ buck-out/
 
 # Unit Testing
 __snapshots__
+
+# CircleCI
+process.yml
