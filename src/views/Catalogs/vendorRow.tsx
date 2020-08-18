@@ -29,9 +29,9 @@ const HEADERS: TableHeaderType[] = [
 
 const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | '') => {
   if (!sortBy) {
-    return arr;
+    return arr.slice();
   }
-  return arr.sort((a: Catalog, b: Catalog) => {
+  return arr.slice().sort((a: Catalog, b: Catalog) => {
     const cmpA = a[sortBy];
     const cmpB = b[sortBy];
     let comparison = 0;
