@@ -9,3 +9,7 @@ export const BurnoEliteCreImgIL = require('./images/bruno-elite-cre/intermediate
 export const BurnoEliteCreImgRadius = require('./images/bruno-elite-cre/radius.png');
 export const BurnoEliteCreImgStraight = require('./images/bruno-elite-cre/straight-overrun.png');
 export const SignBg = require('./images/sign-bg.png');
+
+export const MsgIcon = require('./images/icons/msg.png');
+export const CallIcon = require('./images/icons/call.png');
+export const EnvelopIcon = require('./images/icons/envelop-icon.png');

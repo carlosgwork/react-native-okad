@@ -40,12 +40,15 @@ export function MainTabRoutes() {
         },
       })}
       tabBarOptions={{
-        activeTintColor: themeStyle.purple,
+        activeTintColor: themeStyle.textLightPurple,
         inactiveTintColor: themeStyle.gray,
         labelStyle: {
           fontSize: 16,
           letterSpacing: 0.5,
           paddingVertical: 5,
+        },
+        style: {
+          backgroundColor: 'rgb(249, 249, 249)',
         },
       }}>
       <MainTab.Screen name="Home" component={Home} />

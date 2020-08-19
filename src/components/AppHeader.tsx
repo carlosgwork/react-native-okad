@@ -22,7 +22,9 @@ export default React.memo<Props>(function AppHeader(props: Props) {
   const defaultLeft = <View />;
   const defaultRight = <View />;
   const defaultToolbarLeft = props.pageTitle ? (
-    <Text style={styles.pageTitle}>{props.pageTitle}</Text>
+    <Text numberOfLines={1} style={styles.pageTitle}>
+      {props.pageTitle}
+    </Text>
   ) : null;
   const defaultToolbarCenter = <View />;
   const defaultToolbarRight = <View />;
@@ -52,9 +54,9 @@ export default React.memo<Props>(function AppHeader(props: Props) {
       )}
       {sameSize && (
         <View style={styles.toolbar}>
-          <View style={styles.toolbarCenter}>{toolbarLeftContent}</View>
-          <View style={styles.toolbarCenter}>{toolbarCenterContent}</View>
-          <View style={styles.toolbarCenter}>{toolbarRightContent}</View>
+          <View style={styles.toolbarSameLeft}>{toolbarLeftContent}</View>
+          <View style={styles.toolbarSameCenter}>{toolbarCenterContent}</View>
+          <View style={styles.toolbarSameRight}>{toolbarRightContent}</View>
         </View>
       )}
     </View>
@@ -95,10 +97,20 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'flex-end',
     justifyContent: 'center',
   },
-
+  toolbarSameLeft: {
+    flex: 1,
+    marginRight: 20,
+  },
+  toolbarSameCenter: {
+    width: '30%',
+  },
+  toolbarSameRight: {
+    marginLeft: 20,
+    flex: 1,
+  },
   pageTitle: {
     ...themeStyle.getTextStyle({
-      color: 'textPurple',
+      color: 'textBlack2',
       font: 'anSemiBold',
       size: 34,
     }),

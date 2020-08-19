@@ -1,6 +1,6 @@
 import React from 'react';
-import {Icon} from 'react-native-elements';
 import {TouchableOpacity} from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import AppText from './AppText';
 import {useStyles, useTheme} from '@global/Hooks';
 
@@ -16,12 +16,12 @@ export default function NavBackBtn({title, onClick}: Props) {
   return (
     <TouchableOpacity style={styles.flexLayout} onPress={onClick}>
       <Icon
-        color={themeStyle.lightPurple}
-        name={'chevron-back-outline'}
-        type={'ionicon'}
-        size={30}
+        color={themeStyle.textLightPurple}
+        style={styles.iconStyle}
+        name={'chevron-left'}
+        size={34}
       />
-      <AppText size={16} color={'lightPurple'} font="anSemiBold">
+      <AppText size={16} color={'textLightPurple'} font="anMedium">
         {title}
       </AppText>
     </TouchableOpacity>
@@ -35,5 +35,9 @@ const getStyles = () => ({
     flexWrap: 'nowrap',
     height: 40,
     marginLeft: -10,
+  },
+  iconStyle: {
+    marginRight: -5,
+    marginTop: 2,
   },
 });

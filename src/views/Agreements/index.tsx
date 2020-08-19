@@ -140,6 +140,8 @@ export default function Agreements() {
     );
   }
 
+  console.log('-------- agreements: ', agreements);
+
   return (
     <View style={styles.container}>
       <AppHeader

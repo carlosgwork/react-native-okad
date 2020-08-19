@@ -42,7 +42,7 @@ export default React.memo<Props>(function TableHeader(props: Props) {
       <AppText
         color={'textBlack2'}
         font={'anSemiBold'}
-        size={14}
+        size={12}
         style={styles.text}>
         {header.label}
       </AppText>
@@ -51,7 +51,7 @@ export default React.memo<Props>(function TableHeader(props: Props) {
           name={sortOp.sortOrder === 'ASC' ? 'caret-down' : 'caret-up'}
           type="ionicon"
           color={themeStyle.textBlack2}
-          size={16}
+          size={12}
         />
       )}
     </Container>
@@ -65,7 +65,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
   },
   text: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(5),
     textTransform: 'uppercase',
   },
 });

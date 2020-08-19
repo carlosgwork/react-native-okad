@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, Linking} from 'react-native';
-import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
+import {View, TouchableOpacity, Linking, Image} from 'react-native';
 import MapView from 'react-native-maps';
 import {Icon} from 'react-native-elements';
 import moment from 'moment';
@@ -22,6 +21,7 @@ import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
 import {FETCH_CONTACT_DETAILS} from '../graphql';
+import {MsgIcon, CallIcon, EnvelopIcon} from '@root/assets/assets';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'NUMBER', value: 'number', sortable: true, style: {width: 200}},
@@ -47,12 +47,10 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
         <AppTextButton style={styles.cellLayout} onPress={() => {}}>
           <AppText
             style={styles.noSpacing}
-            color={'textPurple'}
+            color={'textLightPurple'}
             size={16}
             font={'anSemiBold'}>
-            {`Quote ${row.user?.prefix || ''}${numeral(row.number).format(
-              '00000',
-            )}`}
+            {`${row.user?.prefix || ''}${numeral(row.number).format('00000')}`}
           </AppText>
         </AppTextButton>
       );
@@ -68,7 +66,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {moment(row.created).format('MMM DD, YYYY')}
+            {moment(row.created).format('M/DD/YYYY')}
           </AppText>
         </View>
       );
@@ -76,7 +74,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {`${row.agreement_template_id}`}
+            {'Bruno Straight Stairlift'}
           </AppText>
         </View>
       );
@@ -140,14 +138,7 @@ export default function ContactDetails({
         toolbarCenterContent={
           <View style={[styles.rowLayout, styles.topBarCenterView]}>
             <TouchableOpacity style={styles.rowLayout}>
-              <View style={styles.iconBtn}>
-                <FontAwesome5Icon
-                  solid
-                  name="comment"
-                  size={15}
-                  color={'white'}
-                />
-              </View>
+              <Image source={MsgIcon} style={styles.iconBtn} />
               <AppText color={'textLightPurple'} size={14} font={'anSemiBold'}>
                 Message
               </AppText>
@@ -159,14 +150,7 @@ export default function ContactDetails({
                   `tel:${contactData.phone_mobile || contactData.phone_office}`,
                 )
               }>
-              <View style={styles.iconBtn}>
-                <FontAwesome5Icon
-                  solid
-                  name="phone-alt"
-                  size={15}
-                  color={'white'}
-                />
-              </View>
+              <Image source={CallIcon} style={styles.iconBtn} />
               <AppText color={'textLightPurple'} size={14} font={'anSemiBold'}>
                 Call
               </AppText>
@@ -174,14 +158,7 @@ export default function ContactDetails({
             <TouchableOpacity
               style={styles.rowLayout}
               onPress={() => Linking.openURL(`mailto:${contactData.email}`)}>
-              <View style={styles.iconBtn}>
-                <FontAwesome5Icon
-                  solid
-                  name="envelope"
-                  size={15}
-                  color={'white'}
-                />
-              </View>
+              <Image source={EnvelopIcon} style={styles.iconBtn} />
               <AppText color={'textLightPurple'} size={14} font={'anSemiBold'}>
                 Email
               </AppText>
@@ -208,26 +185,26 @@ export default function ContactDetails({
           </View>
         }
       />
-      <View style={styles.mainContent}>
-        <View style={styles.mapView}>
-          <MapView
-            initialRegion={{
-              latitude: contactData.address?.lat || 37.78825,
-              longitude: contactData.address?.long || -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
-            style={styles.map}
+      <View style={styles.mapView}>
+        <MapView
+          initialRegion={{
+            latitude: contactData.address?.lat || 37.78825,
+            longitude: contactData.address?.long || -122.4324,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          style={styles.map}
+        />
+        <View style={styles.ctaBtn}>
+          <AppGradButton
+            btnStyle={styles.ctaInnerBtn}
+            textStyle={styles.ctaInnerBtnText}
+            title={'DIRECTIONS'}
+            onPress={() => {}}
           />
-          <View style={styles.ctaBtn}>
-            <AppGradButton
-              btnStyle={styles.ctaInnerBtn}
-              textStyle={styles.ctaInnerBtnText}
-              title={'DIRECTIONS'}
-              onPress={() => {}}
-            />
-          </View>
         </View>
+      </View>
+      <View style={styles.mainContent}>
         <View style={[styles.rowLayout, styles.datalistTitleView]}>
           <AppText size={20} color={'textBlack2'} font={'anSemiBold'}>
             Agreements
@@ -319,7 +296,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(10),
-    paddingHorizontal: themeStyle.scale(15),
+    paddingLeft: themeStyle.scale(15),
     flex: 1,
   },
   rowLayout: {
@@ -337,12 +314,8 @@ const getStyles = (themeStyle: StyleType) => ({
     height: 19,
   },
   iconBtn: {
-    backgroundColor: themeStyle.textLightPurple,
-    borderRadius: 15,
     width: 30,
     height: 30,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginRight: 5,
   },
   cellLayout: {
@@ -356,9 +329,10 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   agreementsBtn: {
     justifyContent: 'flex-end',
+    marginRight: 15,
   },
   mapView: {
-    height: 400,
+    height: 300,
   },
   datalistTitleView: {
     justifyContent: 'space-between',
