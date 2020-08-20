@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {View, TouchableOpacity, Linking, Image} from 'react-native';
 import MapView from 'react-native-maps';
@@ -94,7 +95,10 @@ export default function ContactDetails({
     sortBy: 'number',
     sortOrder: 'ASC',
   });
-  const {contacts} = useSelector((state: any) => state.contacts);
+  const {contacts, agreements} = useSelector((state: any) => ({
+    contacts: state.contacts.contacts,
+    agreements: state.agreements.agreements,
+  }));
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
 
   useEffect(() => {
@@ -104,18 +108,31 @@ export default function ContactDetails({
     );
     const newData = contacts[itemIndex];
     setContactData(newData);
-    const agreements: Agreement[] = [];
+    const temp: Agreement[] = [];
     newData.agreements?.forEach((ag: Agreement) => {
       const newAg = Object.assign({}, ag);
       let amount = 0;
       newAg.line_items?.map((item: any) => {
         amount += item.qty * item.price - item.discount;
       });
-      amount = (amount * (100 - ag.sales_tax_rate)) / 100;
+      amount = (amount * (100 + ag.sales_tax_rate)) / 100;
       newAg.amount = amount;
-      agreements.push(newAg);
+      temp.push(newAg);
     });
-    setVisibleAgreements(agreements);
+    newData.offlineAgreements?.forEach((ag: number) => {
+      const agIndex = agreements.findIndex(
+        (agreement: Agreement) => agreement.id === ag,
+      );
+      const newAg = Object.assign({}, agreements[agIndex]);
+      let amount = 0;
+      newAg.line_items?.map((item: any) => {
+        amount += item.qty * item.price - item.discount;
+      });
+      amount = (amount * (100 + newAg.sales_tax_rate)) / 100;
+      newAg.amount = amount;
+      temp.push(newAg);
+    });
+    setVisibleAgreements(temp);
   }, [contacts, itemId]);
 
   const renderCell = (header: TableHeaderType, row: Agreement) =>

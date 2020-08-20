@@ -162,8 +162,10 @@ export default function ElanTemplate({
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
   const [isOnline, setIsOnline] = useState<boolean>(true);
-  NetInfo.fetch().then((state) => {
-    setIsOnline(!!state.isInternetReachable);
+  NetInfo.addEventListener((state) => {
+    if (isOnline !== !!state.isInternetReachable) {
+      setIsOnline(!!state.isInternetReachable);
+    }
   });
 
   const {
@@ -184,13 +186,13 @@ export default function ElanTemplate({
     onCompleted(data) {
       // Update agreement number of current usr
       const agreement: Agreement = data.insert_agreements.returning[0];
-      agreements.agreements.push(agreement);
+      agreements.agreements.unshift(agreement);
       const newAgreements = agreements.agreements.slice();
       setAction('agreements', {agreements: newAgreements});
       const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
       const newContacts = contactsInStore.map((ct: Contact) => {
         if (ct.id === contact.id) {
-          (ct.agreements as Number[]).push(agreement.id);
+          ct.agreements?.push(agreement);
         }
         return ct;
       });
@@ -244,18 +246,16 @@ export default function ElanTemplate({
 
   const createQuote = () => {
     // Create an agreement
-    const lineItems = cartItems.map((item: LineItemType) => ({
-      catalog_item_id: item.id,
-      current_cost: item.cost,
-      price: item.price,
-      qty: item.qty ? item.qty : 1,
-      taxable: item.taxable,
-      discount: 0,
-      catalog_item: {
-        name: item.name,
-      },
-    }));
+    console.log('------ isOnline:', isOnline);
     if (isOnline) {
+      const lineItems = cartItems.map((item: LineItemType) => ({
+        catalog_item_id: item.id,
+        current_cost: item.cost,
+        price: item.price,
+        qty: item.qty ? item.qty : 1,
+        taxable: item.taxable,
+        discount: 0,
+      }));
       inset_agreement({
         variables: {
           billing_address_id: contact.address_id,
@@ -265,11 +265,24 @@ export default function ElanTemplate({
           line_items: lineItems,
           sales_tax_rate: userInfo.default_sales_tax_rate,
           number: `${userInfo.lastAgreementNumber + 1}`,
+          user_id: userInfo.id,
         },
       });
     } else {
+      const lineItems = cartItems.map((item: LineItemType) => ({
+        catalog_item_id: item.id,
+        current_cost: item.cost,
+        price: item.price,
+        qty: item.qty ? item.qty : 1,
+        taxable: item.taxable,
+        discount: 0,
+        catalog_item: {
+          name: item.name,
+        },
+      }));
+
       const newAgreements = agreements.agreements.slice();
-      const lastAgreement = newAgreements.pop();
+      const lastAgreement = newAgreements[0];
       const newMutations = offlineMutations.data;
       newMutations.push({
         type: 'CREATE_AGREEMENT',
@@ -293,13 +306,19 @@ export default function ElanTemplate({
         address: contact.address,
         addressByShippingAddressId: contact.address,
         revision: 0,
+        user_id: userInfo.id,
       };
-      newAgreements.push(agreement);
+      newAgreements.unshift(agreement);
       setAction('agreements', {agreements: newAgreements});
       const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
       const newContacts = contactsInStore.map((ct: Contact) => {
         if (ct.id === contact.id) {
-          ct.agreements?.push(lastAgreement.id + 1);
+          console.log('--------- ct:', ct);
+          if (!ct.offlineAgreements) {
+            ct.offlineAgreements = [];
+          } else {
+            ct.offlineAgreements?.push(lastAgreement.id + 1);
+          }
         }
         return ct;
       });

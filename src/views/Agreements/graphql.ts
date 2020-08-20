@@ -48,6 +48,11 @@ export const CREATE_AGREEMENT = gql`
           us_state
           postal_code
         }
+        contact {
+          name_first
+          name_last
+          id
+        }
         contact_id
         line_items {
           agreement_id
@@ -88,6 +93,10 @@ export const UPDATE_AGREEMENT = gql`
     update_agreements(where: {id: {_eq: $id}}, _set: $_set) {
       returning {
         id
+        agreement_events {
+          type
+          id
+        }
         address {
           city
           county
@@ -105,6 +114,11 @@ export const UPDATE_AGREEMENT = gql`
           line1
           us_state
           postal_code
+        }
+        contact {
+          name_first
+          name_last
+          id
         }
         contact_id
         line_items {
@@ -124,6 +138,18 @@ export const UPDATE_AGREEMENT = gql`
         sales_tax_rate
         shipping_address_id
         signature
+        user {
+          prefix
+          pres
+          public_id
+          name_last
+          name_first
+          google_id
+          email
+          default_sales_tax_rate
+          organization_id
+        }
+        user_id
       }
     }
   }

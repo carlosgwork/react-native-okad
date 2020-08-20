@@ -66,7 +66,8 @@ export type Contact = {
   phone_office?: string;
   address_id: number;
   address: Address;
-  agreements?: Agreement[] | number[];
+  agreements?: Agreement[];
+  offlineAgreements?: number[];
   company?: string;
   title?: string;
   user?: UserType;

@@ -1,7 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, Text, NativeScrollEvent} from 'react-native';
+import {View, NativeScrollEvent} from 'react-native';
 import {gql, useQuery} from '@apollo/client';
+import numeral from 'numeral';
 
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
@@ -18,10 +19,10 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
-  CircularLoading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
+  {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
   {label: 'Contact', value: 'contact', sortable: true, style: {width: 220}},
   {
     label: 'Shipping Address',
@@ -42,21 +43,65 @@ const FETCH_COUNT = 20;
 
 export const FETCH_AGREEMENTS = gql`
   query AgreementQuery($offset: Int!) {
-    agreements(limit: 20, offset: $offset) {
-      created
-      agreement_template_id
-      number
-      last_modified
+    agreements(limit: 20, offset: $offset, order_by: {id: desc}) {
       id
-      public_id
-      contact {
-        name_last
-        name_first
+      agreement_events {
+        type
+        id
       }
       address {
         city
+        county
+        id
+        line1
+        line2
         us_state
+        postal_code
       }
+      addressByShippingAddressId {
+        city
+        county
+        id
+        line2
+        line1
+        us_state
+        postal_code
+      }
+      contact {
+        name_first
+        name_last
+        id
+      }
+      contact_id
+      line_items {
+        agreement_id
+        catalog_item_id
+        current_cost
+        discount
+        price
+        qty
+        id
+        catalog_item {
+          name
+        }
+      }
+      number
+      revision
+      sales_tax_rate
+      shipping_address_id
+      signature
+      user {
+        prefix
+        pres
+        public_id
+        name_last
+        name_first
+        google_id
+        email
+        default_sales_tax_rate
+        organization_id
+      }
+      user_id
     }
   }
 `;
@@ -172,6 +217,14 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
           b.contact?.name_last || ''
         }`.toUpperCase();
         break;
+      case 'name':
+        cmpA = `${a.user?.prefix || ''}${numeral(a.number).format(
+          '00000',
+        )}`.toUpperCase();
+        cmpB = `${b.user?.prefix || ''}${numeral(b.number).format(
+          '00000',
+        )}`.toUpperCase();
+        break;
       case 'shipping_address':
         cmpA = `${a.address?.city || ''}${a.address?.city ? ', ' : ''}${
           a.address?.us_state || ''
@@ -211,14 +264,22 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
     case 'contact':
       return (
         <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+          <AppText style={styles.noSpacing} size={16}>
+            <>
+              {row.contact?.name_first || ''} {row.contact?.name_last || ''}
+            </>
+          </AppText>
+        </AppTextButton>
+      );
+    case 'name':
+      return (
+        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
           <AppText
             style={styles.noSpacing}
             color={'textLightPurple'}
             size={16}
             font={'anSemiBold'}>
-            <>
-              {row.contact?.name_first || ''} {row.contact?.name_last || ''}
-            </>
+            {`${row.user?.prefix || ''}${numeral(row.number).format('00000')}`}
           </AppText>
         </AppTextButton>
       );
