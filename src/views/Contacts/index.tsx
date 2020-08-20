@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState} from 'react';
-import {TouchableOpacity, View, Text} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
@@ -19,7 +19,6 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
-  CircularLoading,
 } from '@root/components';
 import {FETCH_CONTACTS} from './graphql';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
@@ -184,20 +183,24 @@ export default function Contacts({
 
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
-  const {error, loading} = useQuery(FETCH_CONTACTS, {
+  useQuery(FETCH_CONTACTS, {
     onCompleted: (data) => {
-      setSearchText('');
-      const newData = contacts.contacts.concat(data.contacts);
+      const newData = data.contacts;
       setAction('contacts', {
         contacts: newData,
       });
-      setVisibleContacts(newData);
     },
   });
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
     contacts.contacts,
   );
+
+  useEffect(() => {
+    console.log('--------- contacts changed:');
+    setVisibleContacts(contacts.contacts);
+    setSearchText('');
+  }, [contacts]);
 
   const onSortChanged = (sortOp: TableSortOps) => {
     let sorted = sortContact(contacts.contacts, sortOp);
@@ -222,14 +225,6 @@ export default function Contacts({
       cellContent(header, row, styles, themeStyle, navigation),
     [contacts],
   );
-
-  if (error) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>Loading Error</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -268,7 +263,6 @@ export default function Contacts({
           rows={visibleContacts}
           onSortChanged={onSortChanged}
         />
-        <CircularLoading loading={loading} />
       </View>
     </View>
   );

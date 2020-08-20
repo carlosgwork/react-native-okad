@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {firebase} from '@react-native-firebase/auth';
+// import {firebase} from '@react-native-firebase/auth';
 import {setAction} from '@redux/actions';
 import {Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -10,7 +10,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
-  User,
+  // User,
 } from '@react-native-community/google-signin';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';

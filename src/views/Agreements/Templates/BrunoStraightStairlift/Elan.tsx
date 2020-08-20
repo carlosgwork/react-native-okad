@@ -1,5 +1,6 @@
-import React from 'react';
-import {View, Image, TouchableOpacity, Alert} from 'react-native';
+import React, {useState} from 'react';
+import {View, Image, TouchableOpacity} from 'react-native';
+import NetInfo from '@react-native-community/netinfo';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
@@ -16,7 +17,12 @@ import {
   AppGradButton,
 } from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {LineItemType, Agreement} from '@root/utils/types';
+import {
+  LineItemType,
+  Agreement,
+  AgreementEvent,
+  Contact,
+} from '@root/utils/types';
 import {CREATE_AGREEMENT} from '../../graphql';
 
 const ElanCatalogs = [
@@ -155,31 +161,45 @@ export default function ElanTemplate({
   navigation,
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
+  const [isOnline, setIsOnline] = useState<boolean>(true);
+  NetInfo.fetch().then((state) => {
+    setIsOnline(!!state.isInternetReachable);
+  });
 
-  const {userInfo, items: cartItems, agreements} = useSelector(
-    (state: any) => ({
-      userInfo: state.user,
-      items: state.cart.items,
-      agreements: state.agreements,
-    }),
-  );
+  const {
+    userInfo,
+    items: cartItems,
+    agreements,
+    offlineMutations,
+    contacts,
+  } = useSelector((state: any) => ({
+    userInfo: state.user,
+    items: state.cart.items,
+    agreements: state.agreements,
+    offlineMutations: state.offlineMutations,
+    contacts: state.contacts,
+  }));
   const {styles} = useStyles(getStyles);
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted(data) {
       // Update agreement number of current usr
-      setAction('user', {
-        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
-      });
       const agreement: Agreement = data.insert_agreements.returning[0];
-      const newAgreements = agreements.agreements.push(agreement);
+      agreements.agreements.push(agreement);
+      const newAgreements = agreements.agreements.slice();
       setAction('agreements', {agreements: newAgreements});
-      Alert.alert('New Quote was successfully created.');
+      const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
+      const newContacts = contactsInStore.map((ct: Contact) => {
+        if (ct.id === contact.id) {
+          (ct.agreements as Number[]).push(agreement.id);
+        }
+        return ct;
+      });
+      setAction('contacts', {contacts: newContacts});
       navigation.popToTop();
       navigation.navigate(AppRouteEnum.AgreementDetails, {
-        parent: 'Contacts',
         agreement,
         contact: contact,
-        itemTitle: `${contact.name_first} ${contact.name_last}`,
+        parent: `${contact.name_first} ${contact.name_last}`,
       });
     },
   });
@@ -231,17 +251,68 @@ export default function ElanTemplate({
       qty: item.qty ? item.qty : 1,
       taxable: item.taxable,
       discount: 0,
+      catalog_item: {
+        name: item.name,
+      },
     }));
-    inset_agreement({
-      variables: {
+    if (isOnline) {
+      inset_agreement({
+        variables: {
+          billing_address_id: contact.address_id,
+          agreement_template_id: templateId,
+          contact_id: contact.id,
+          shipping_address_id: contact.address_id,
+          line_items: lineItems,
+          sales_tax_rate: userInfo.default_sales_tax_rate,
+          number: `${userInfo.lastAgreementNumber + 1}`,
+        },
+      });
+    } else {
+      const newAgreements = agreements.agreements.slice();
+      const lastAgreement = newAgreements.pop();
+      const newMutations = offlineMutations.data;
+      newMutations.push({
+        type: 'CREATE_AGREEMENT',
+        itemId: lastAgreement.id + 1,
+      });
+      setAction('offlineMutations', {active: true, data: newMutations});
+      const agreement: Agreement = {
         billing_address_id: contact.address_id,
         agreement_template_id: templateId,
         contact_id: contact.id,
+        created: new Date(),
+        id: lastAgreement.id + 1,
+        last_modified: new Date(),
         shipping_address_id: contact.address_id,
         line_items: lineItems,
         sales_tax_rate: userInfo.default_sales_tax_rate,
         number: `${userInfo.lastAgreementNumber + 1}`,
-      },
+        agreement_events: {
+          type: 'texted',
+        } as AgreementEvent,
+        address: contact.address,
+        addressByShippingAddressId: contact.address,
+        revision: 0,
+      };
+      newAgreements.push(agreement);
+      setAction('agreements', {agreements: newAgreements});
+      const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
+      const newContacts = contactsInStore.map((ct: Contact) => {
+        if (ct.id === contact.id) {
+          ct.agreements?.push(lastAgreement.id + 1);
+        }
+        return ct;
+      });
+      setAction('contacts', {contacts: newContacts});
+      navigation.popToTop();
+      navigation.navigate(AppRouteEnum.AgreementDetails, {
+        agreement,
+        contact: contact,
+        parent: `${contact.name_first} ${contact.name_last}`,
+      });
+    }
+    setAction('user', {
+      lastAgreementNumber: userInfo.lastAgreementNumber + 1,
     });
   };
 

@@ -32,7 +32,7 @@ export default function BrunoStraightStairlift({
   navigation,
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
-  const {contact, templateId, parent = '', itemTitle = ''} = route.params || {};
+  const {contact, templateId, parent = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
@@ -137,10 +137,7 @@ export default function BrunoStraightStairlift({
     <View style={styles.container}>
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={contact ? itemTitle : parent}
-            onClick={() => navigation.pop()}
-          />
+          <NavBackBtn title={parent} onClick={() => navigation.pop()} />
         }
         rightContent={
           <TouchableOpacity

@@ -28,13 +28,13 @@ export type Agreement = {
   id: number;
   last_modified: Date;
   number: string;
-  public_id: number;
+  public_id?: number;
   revision: number;
   sales_tax_rate: number;
   shipping_address_id?: number;
   signature?: string;
   user_id?: number;
-  events: AgreementEvent;
+  events?: AgreementEvent;
   contact?: Contact;
   address?: Address;
   addressByShippingAddressId?: Address;
@@ -66,7 +66,7 @@ export type Contact = {
   phone_office?: string;
   address_id: number;
   address: Address;
-  agreements?: Agreement[];
+  agreements?: Agreement[] | number[];
   company?: string;
   title?: string;
   user?: UserType;
@@ -172,4 +172,9 @@ export type AgreementLineItemType = {
 export type ProductItemProps = {
   item: Catalog;
   index: number;
+};
+
+export type OfflineMutationType = {
+  type: string;
+  itemId: number;
 };

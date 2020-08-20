@@ -7,25 +7,11 @@ export const FETCH_CONTACTS = gql`
       email
       name_first
       name_last
+      title
+      company
       phone_home
       phone_mobile
       phone_office
-      address_id
-      address {
-        county
-        city
-        us_state
-      }
-      agreements {
-        id
-      }
-    }
-  }
-`;
-
-export const FETCH_CONTACT_DETAILS = gql`
-  query QueryContactDetails($id: Int) {
-    contacts(where: {id: {_eq: $id}}) {
       address_id
       address {
         city
@@ -37,7 +23,6 @@ export const FETCH_CONTACT_DETAILS = gql`
         postal_code
         us_state
       }
-      company
       agreements {
         id
         number
@@ -55,13 +40,6 @@ export const FETCH_CONTACT_DETAILS = gql`
           prefix
         }
       }
-      id
-      name_first
-      name_last
-      phone_home
-      phone_mobile
-      phone_office
-      email
     }
   }
 `;
@@ -106,20 +84,41 @@ export const CREATE_CONTACT = gql`
       returning {
         id
         email
-        created
-        company
-        address {
-          city
-          line1
-          line2
-          us_state
-          postal_code
-        }
-        phone_mobile
-        phone_office
         name_first
         name_last
         title
+        company
+        phone_home
+        phone_mobile
+        phone_office
+        address_id
+        address {
+          city
+          lat
+          id
+          county
+          line1
+          line2
+          postal_code
+          us_state
+        }
+        agreements {
+          id
+          number
+          line_items {
+            discount
+            price
+            qty
+          }
+          sales_tax_rate
+          created
+          agreement_template_id
+          user {
+            email
+            id
+            prefix
+          }
+        }
       }
     }
   }

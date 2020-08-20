@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, Text, NativeScrollEvent} from 'react-native';
 import {gql, useQuery} from '@apollo/client';
 
@@ -9,8 +9,8 @@ import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-
-import {Agreement, TableHeaderType, TableSortOps} from '@utils/types';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {Agreement, TableHeaderType, TableSortOps} from '@utils/types'; 
 
 import {
   AppHeader,
@@ -22,7 +22,6 @@ import {
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Id', value: 'id', sortable: true, style: {width: 100}},
   {label: 'Contact', value: 'contact', sortable: true, style: {width: 220}},
   {
     label: 'Shipping Address',
@@ -31,7 +30,7 @@ const HEADERS: TableHeaderType[] = [
     style: {width: 250},
   },
   {
-    label: 'Template Id',
+    label: 'Template',
     value: 'agreement_template_id',
     sortable: true,
     style: {flex: 1},
@@ -62,26 +61,32 @@ export const FETCH_AGREEMENTS = gql`
   }
 `;
 
-export default function Agreements() {
+export default function Agreements({
+  navigation,
+}: ContactsNavProps<AppRouteEnum.AgreementsMain>) {
   const {styles} = useStyles(getStyles);
 
   const agreements = useSelector((state: any) => state.agreements);
   const agreementsSortOps = agreements.sortOp;
   const [offset, setOffset] = useState<number>(0);
-  const {error, loading} = useQuery(FETCH_AGREEMENTS, {
+  useQuery(FETCH_AGREEMENTS, {
     variables: {offset},
     onCompleted: (data) => {
       const newData = agreements.agreements.concat(data.agreements);
       setAction('agreements', {
         agreements: newData,
       });
-      setVisibleAgreements(newData);
     },
   });
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>(
     agreements.agreements,
   );
+
+  useEffect(() => {
+    console.log('-------- agreements changed');
+    setVisibleAgreements(agreements.agreements);
+  }, [agreements, navigation]);
 
   const onSortChanged = (sortOp: TableSortOps) => {
     let sorted = sortAgreement(agreements.agreements, sortOp);
@@ -109,9 +114,6 @@ export default function Agreements() {
     nativeEvent: NativeScrollEvent;
   }): void => {
     const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
-    if (loading) {
-      return;
-    }
     if (layoutMeasurement.height > contentSize.height) {
       if (contentOffset.y > 60) {
         setOffset(offset + FETCH_COUNT);
@@ -131,16 +133,6 @@ export default function Agreements() {
       cellContent(header, row, styles),
     [agreements],
   );
-
-  if (error) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>Loading Error</Text>
-      </View>
-    );
-  }
-
-  console.log('-------- agreements: ', agreements);
 
   return (
     <View style={styles.container}>
@@ -163,7 +155,6 @@ export default function Agreements() {
           onSortChanged={onSortChanged}
           onScroll={onContainerScroll}
         />
-        <CircularLoading loading={loading} />
       </View>
     </View>
   );
@@ -253,7 +244,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {`${row.agreement_template_id}`}
+            {'Bruno Straight Stairlift'}
           </AppText>
         </View>
       );

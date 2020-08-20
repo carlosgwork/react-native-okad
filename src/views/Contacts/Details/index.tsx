@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {View, TouchableOpacity, Linking, Image} from 'react-native';
 import MapView from 'react-native-maps';
 import {Icon} from 'react-native-elements';
 import moment from 'moment';
-import {useQuery} from '@apollo/client';
 import numeral from 'numeral';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -20,8 +19,8 @@ import {
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
-import {FETCH_CONTACT_DETAILS} from '../graphql';
 import {MsgIcon, CallIcon, EnvelopIcon} from '@root/assets/assets';
+import {useSelector} from 'react-redux';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'NUMBER', value: 'number', sortable: true, style: {width: 200}},
@@ -95,28 +94,29 @@ export default function ContactDetails({
     sortBy: 'number',
     sortOrder: 'ASC',
   });
-  useQuery(FETCH_CONTACT_DETAILS, {
-    variables: {id: itemId},
-    onCompleted: (data) => {
-      if (data.contacts?.length > 0) {
-        const newData = data.contacts[0];
-        setContactData(newData);
-        const agreements: Agreement[] = [];
-        newData.agreements?.forEach((ag: Agreement) => {
-          const newAg = Object.assign({}, ag);
-          let amount = 0;
-          newAg.line_items?.map((item: any) => {
-            amount += item.qty * item.price - item.discount;
-          });
-          amount = (amount * (100 - ag.sales_tax_rate)) / 100;
-          newAg.amount = amount;
-          agreements.push(newAg);
-        });
-        setVisibleAgreements(agreements);
-      }
-    },
-  });
+  const {contacts} = useSelector((state: any) => state.contacts);
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
+
+  useEffect(() => {
+    console.log('--------- contact details: contacts state changed');
+    const itemIndex = contacts.findIndex(
+      (contact: Contact) => contact.id === itemId,
+    );
+    const newData = contacts[itemIndex];
+    setContactData(newData);
+    const agreements: Agreement[] = [];
+    newData.agreements?.forEach((ag: Agreement) => {
+      const newAg = Object.assign({}, ag);
+      let amount = 0;
+      newAg.line_items?.map((item: any) => {
+        amount += item.qty * item.price - item.discount;
+      });
+      amount = (amount * (100 - ag.sales_tax_rate)) / 100;
+      newAg.amount = amount;
+      agreements.push(newAg);
+    });
+    setVisibleAgreements(agreements);
+  }, [contacts, itemId]);
 
   const renderCell = (header: TableHeaderType, row: Agreement) =>
     cellContent(header, row, styles);
