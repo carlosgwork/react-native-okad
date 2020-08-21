@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import * as React from 'react';
+import React from 'react';
 import {NavigationContainer, NavigationState} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {useSelector} from 'react-redux';
@@ -15,8 +15,10 @@ import {OfflineMutationType, Agreement, LineItemType} from '@root/utils/types';
 import {
   CREATE_AGREEMENT,
   UPDATE_AGREEMENT,
+  UPDATE_LINE_ITEM,
+  REMOVE_LINE_ITEM,
 } from '@root/views/Agreements/graphql';
-import { setAction } from '@root/redux/actions';
+import {setAction} from '@root/redux/actions';
 
 // Gets the current screen from navigation state
 const getActiveRouteName = (state: NavigationState): string | undefined => {
@@ -60,11 +62,17 @@ export default function Routes() {
     agreements: state.agreements.agreements,
     network: state.network,
   }));
+
   const [inset_agreement] = useMutation(CREATE_AGREEMENT);
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
-  const syncData = React.useCallback(() => {
-    if (network.online && offlineMutations.length > 0) {
-      offlineMutations.map((mutation: OfflineMutationType) => {
+  const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
+  const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+
+  React.useEffect(() => {
+    const mutations = offlineMutations.slice();
+    console.log('---------- offlineMutations: ', mutations);
+    if (network.online && mutations.length > 0) {
+      mutations.map((mutation: OfflineMutationType) => {
         const updatedAgreements = agreements.slice();
         const itemIndex = updatedAgreements.findIndex(
           (ag: Agreement) => ag.id === mutation.itemId,
@@ -103,6 +111,7 @@ export default function Routes() {
               revision: data.revision,
               sales_tax_rate: data.sales_tax_rate,
               shipping_address_id: data.shipping_address_id,
+              signature: data.signature,
             };
             update_agreement({
               variables: {
@@ -111,14 +120,41 @@ export default function Routes() {
               },
             });
             break;
+          case 'UPDATE_LINEITEM':
+            const lineItIndex = data.line_items.findIndex(
+              (lineItem: LineItemType) => lineItem.id === mutation.lineItemId,
+            );
+            const updatingLineItem = data.line_items[lineItIndex];
+            const lineItem = {
+              qty: updatingLineItem.qty,
+              last_modified: new Date(),
+              discount: updatingLineItem.discount,
+            };
+            update_line_items({
+              variables: {
+                _set: lineItem,
+                id: data.id,
+              },
+            });
+            break;
+          case 'DELETE_AGREEMENT':
+            const lineItIndex2 = data.line_items.findIndex(
+              (lineItem2: LineItemType) => lineItem2.id === mutation.lineItemId,
+            );
+            const deletingLineItem = data.line_items[lineItIndex2];
+            delete_line_items({
+              variables: {
+                id: deletingLineItem.id,
+              },
+            });
+            break;
           default:
         }
       });
-      setAction('offlineMutations', {active: false, data: []});
+      setAction('offlineMutations', {data: []});
     }
   }, [network]);
 
-  syncData();
   useBackHandler();
   return (
     <NavigationContainer

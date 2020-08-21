@@ -4,14 +4,20 @@ import numeral from 'numeral';
 import SignatureCapture, {
   SaveEventParams,
 } from 'react-native-signature-capture';
-
+import {useSelector} from 'react-redux';
+import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {UPDATE_AGREEMENT} from '../graphql';
 
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {AgreementLineItemType} from '@root/utils/types';
+import {
+  AgreementLineItemType,
+  OfflineMutationType,
+  Agreement,
+  Contact,
+} from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
 import {useMutation} from '@apollo/client';
 
@@ -26,18 +32,25 @@ export default function AgreementSummary({
   navigation,
 }: ContactsNavProps<AppRouteEnum.AgreementSummary>) {
   const {styles} = useStyles(getStyles);
-  const {parent = 'Summary', itemTitle, agreement} = route.params || {};
+  const {parent = 'Summary', itemTitle, agreement, contact} =
+    route.params || {};
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const signRef = React.useRef<SignCaptureType>(null);
 
-  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
-    onCompleted() {
-      navigation.pop();
-    },
-  });
+  const {offlineMutations, agreements, contacts, isOnline} = useSelector(
+    (state: any) => ({
+      offlineMutations: state.offlineMutations,
+      agreements: state.agreements.agreements,
+      contacts: state.contacts.contacts,
+      isOnline: state.network.online,
+    }),
+  );
+
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT);
 
   const updateAgreement = () => {
     signRef.current?.saveImage();
+    navigation.pop();
   };
 
   useEffect(() => {
@@ -53,16 +66,59 @@ export default function AgreementSummary({
   };
 
   const onSignatureSaved = (result: SaveEventParams) => {
-    const updatingAgreement = {
+    const data = {
+      ...agreement,
       signature: result.encoded,
       last_modified: new Date(),
     };
-    update_agreement({
-      variables: {
-        _set: updatingAgreement,
-        id: agreement.id,
-      },
+    const newAgreements = JSON.parse(JSON.stringify(agreements));
+    const agIndex = newAgreements.findIndex(
+      (ag: Agreement) => ag.id === agreement.id,
+    );
+    newAgreements[agIndex] = data;
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        const newCtAgreements = ct.agreements?.slice() || [];
+        const agIndex2 = newCtAgreements.findIndex(
+          (ag2: Agreement) => ag2.id === data.id,
+        );
+        newCtAgreements[agIndex2] = data;
+        ct.agreements = newCtAgreements;
+      }
+      return ct;
     });
+    setAction('contacts', {contacts: newContacts});
+
+    // Check if itemId already exists in offlineMutations list
+    const itemIndex = offlineMutations.data.findIndex(
+      (item: OfflineMutationType) =>
+        (item.type === 'CREATE_AGREEMENT' ||
+          item.type === 'UPDATE_AGREEMENT') &&
+        item.itemId === data.id,
+    );
+    if (itemIndex < 0) {
+      const updatingAgreement = {
+        signature: result.encoded,
+        last_modified: new Date(),
+      };
+      if (isOnline) {
+        update_agreement({
+          variables: {
+            _set: updatingAgreement,
+            id: agreement.id,
+          },
+        });
+      } else {
+        const newMutations = offlineMutations.data;
+        newMutations.push({
+          type: 'UPDATE_AGREEMENT',
+          itemId: agreement.id,
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
   };
 
   return (

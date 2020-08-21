@@ -276,13 +276,13 @@ export default function ElanTemplate({
       }));
 
       const newAgreements = agreements.agreements.slice();
-      const lastAgreement = newAgreements[0];
+      const lastAgreement = newAgreements[0] || {id: 0};
       const newMutations = offlineMutations.data;
       newMutations.push({
         type: 'CREATE_AGREEMENT',
         itemId: lastAgreement.id + 1,
       });
-      setAction('offlineMutations', {active: true, data: newMutations});
+      setAction('offlineMutations', {data: newMutations});
       const agreement: Agreement = {
         billing_address_id: contact.address_id,
         agreement_template_id: templateId,
@@ -324,6 +324,7 @@ export default function ElanTemplate({
     setAction('user', {
       lastAgreementNumber: userInfo.lastAgreementNumber + 1,
     });
+    setAction('cart', {items: []});
   };
 
   // Calculate Total Price
@@ -370,10 +371,10 @@ export default function ElanTemplate({
               {catalog.title}
             </AppText>
             {catalog.items.map((item: LineItemType, id: number) => (
-              <>
+              <React.Fragment key={`catalog-content-${index}-${id}`}>
                 {item.type === 'switch' ? (
                   <LineItemWithSwitch
-                    key={`lineitem-withswitch-${id}`}
+                    key={`lineitem-withswitch-${index}-${id}`}
                     item={item}
                     qty={
                       cartItems[
@@ -386,7 +387,7 @@ export default function ElanTemplate({
                   />
                 ) : (
                   <LineItem
-                    key={`lineitem-${id}`}
+                    key={`lineitem-${index}-${id}`}
                     active={
                       cartItems.findIndex(
                         (it: LineItemType) => it.id === item.id,
@@ -396,7 +397,7 @@ export default function ElanTemplate({
                     setActive={() => chooseItem(item)}
                   />
                 )}
-              </>
+              </React.Fragment>
             ))}
           </View>
         ))}

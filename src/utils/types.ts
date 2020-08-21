@@ -178,4 +178,5 @@ export type ProductItemProps = {
 export type OfflineMutationType = {
   type: string;
   itemId: number;
+  lineItemId?: number;
 };

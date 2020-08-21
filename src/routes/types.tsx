@@ -53,6 +53,7 @@ export type ContactsStackParamList = {
     parent?: string;
     itemTitle?: string;
     agreement: Agreement;
+    contact: Contact;
   };
   [AppRouteEnum.AgreementsMain]: {};
 };

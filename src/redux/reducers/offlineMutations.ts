@@ -24,7 +24,7 @@ export const offlineMutations = (
 ) => {
   const {payload = emptyPayload, type} = action;
   switch (type) {
-    case 'clean_offlineMutation':
+    case 'clean_offlineMutations':
       if (!payload.key) {
         return initialOfflineMutation;
       } else {
@@ -33,7 +33,7 @@ export const offlineMutations = (
           [payload.key]: initialOfflineMutation[payload.key],
         };
       }
-    case 'set_offlineMutation':
+    case 'set_offlineMutations':
       return {
         ...state,
         ...payload,

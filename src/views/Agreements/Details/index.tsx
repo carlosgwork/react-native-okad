@@ -95,6 +95,7 @@ export default function AgreementDetails({
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.line_items = newData;
     updateActiveAgreement(newAgreement);
+    updateAgreementState(newAgreement);
   };
 
   const updateAgreementState = (data: Agreement) => {
@@ -117,23 +118,6 @@ export default function AgreementDetails({
       return ct;
     });
     setAction('contacts', {contacts: newContacts});
-
-    // Check if itemId already exists in offlineMutations list
-    const itemIndex = offlineMutations.data.findIndex(
-      (item: OfflineMutationType) => item.itemId === data.id,
-    );
-    if (itemIndex < 0) {
-      if (isOnline) {
-        updateAgreement(data);
-      } else {
-        const newMutations = offlineMutations.data;
-        newMutations.push({
-          type: 'UPDATE_AGREEMENT',
-          itemId: data.id,
-        });
-        setAction('offlineMutations', {active: true, data: newMutations});
-      }
-    }
   };
 
   const applyDiscount = () => {
@@ -147,6 +131,7 @@ export default function AgreementDetails({
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.line_items = newData;
     updateActiveAgreement(newAgreement);
+    updateAgreementState(newAgreement);
     updateLineItem(newData[prevIndex]);
   };
 
@@ -155,6 +140,7 @@ export default function AgreementDetails({
     newAgreement.sales_tax_rate = parseFloat(salesTax);
     updateActiveAgreement(newAgreement);
     updateAgreementState(newAgreement);
+    runAgreementUpdateQuery(newAgreement);
   };
 
   const updateAgreementRevision = () => {
@@ -162,6 +148,7 @@ export default function AgreementDetails({
     newAgreement.revision = newAgreement.revision + 1;
     updateActiveAgreement(newAgreement);
     updateAgreementState(newAgreement);
+    runAgreementUpdateQuery(newAgreement);
   };
 
   const updateAgreement = (data: Agreement) => {
@@ -183,32 +170,87 @@ export default function AgreementDetails({
     });
   };
 
+  const runAgreementUpdateQuery = (data: Agreement) => {
+    // Check if itemId already exists in offlineMutations list
+    const itemIndex = offlineMutations.data.findIndex(
+      (item: OfflineMutationType) =>
+        (item.type === 'CREATE_AGREEMENT' ||
+          item.type === 'UPDATE_AGREEMENT') &&
+        item.itemId === data.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        updateAgreement(data);
+      } else {
+        const newMutations = offlineMutations.data;
+        newMutations.push({
+          type: 'UPDATE_AGREEMENT',
+          itemId: data.id,
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
+  };
+
   const updateLineItem = (item: AgreementLineItemType) => {
-    const lineItem = {
-      qty: item.qty,
-      last_modified: new Date(),
-      discount: item.discount,
-    };
-    update_line_items({
-      variables: {
-        _set: lineItem,
-        id: item.id,
-      },
-    });
+    const itemIndex = offlineMutations.data.findIndex(
+      (it: OfflineMutationType) =>
+        it.type === 'UPDATE_LINEITEM' && it.itemId === item.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        const lineItem = {
+          qty: item.qty,
+          last_modified: new Date(),
+          discount: item.discount,
+        };
+        update_line_items({
+          variables: {
+            _set: lineItem,
+            id: item.id,
+          },
+        });
+      } else {
+        const newMutations = offlineMutations.data;
+        newMutations.push({
+          type: 'UPDATE_LINEITEM',
+          itemId: agreement.id, // agreement id
+          lineItemId: item.id, // lineItem id
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
   };
 
   const removeLineItem = (item: AgreementLineItemType) => {
-    delete_line_items({
-      variables: {
-        id: item.id,
-      },
-    });
+    const itemIndex = offlineMutations.data.findIndex(
+      (it: OfflineMutationType) =>
+        it.type === 'DELETE_LINEITEM' && it.itemId === item.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        delete_line_items({
+          variables: {
+            id: item.id,
+          },
+        });
+      } else {
+        const newMutations = offlineMutations.data;
+        newMutations.push({
+          type: 'DELETE_LINEITEM',
+          itemId: agreement.id, // agreement id
+          lineItemId: item.id, // lineItem id
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
   };
 
   const continueClicked = () => {
     navigation.navigate(AppRouteEnum.AgreementSummary, {
       itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
       agreement: activeAgreement,
+      contact: contact,
     });
   };
 
@@ -500,7 +542,11 @@ export default function AgreementDetails({
               </AppText>
             </View>
           </View>
-          <SwipeListView data={listData} renderItem={renderItem as any} />
+          <SwipeListView
+            data={listData}
+            keyExtractor={(_, index) => index.toString()}
+            renderItem={renderItem as any}
+          />
         </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.totalRow]}>

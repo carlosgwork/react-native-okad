@@ -14,9 +14,9 @@ export const screens = (
 ) => {
   const {payload = {}, type} = action;
   switch (type) {
-    case 'clean_toast':
+    case 'clean_screens':
       return initialScreens;
-    case 'set_toast':
+    case 'set_screens':
       return {...state, ...payload};
     default:
       return state;
