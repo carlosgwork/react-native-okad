@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
-import NetInfo from '@react-native-community/netinfo';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
@@ -161,25 +160,20 @@ export default function ElanTemplate({
   navigation,
 }: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
-  const [isOnline, setIsOnline] = useState<boolean>(true);
-  NetInfo.addEventListener((state) => {
-    if (isOnline !== !!state.isInternetReachable) {
-      setIsOnline(!!state.isInternetReachable);
-    }
-  });
-
   const {
     userInfo,
     items: cartItems,
     agreements,
     offlineMutations,
     contacts,
+    isOnline,
   } = useSelector((state: any) => ({
     userInfo: state.user,
     items: state.cart.items,
     agreements: state.agreements,
     offlineMutations: state.offlineMutations,
     contacts: state.contacts,
+    isOnline: state.network.online,
   }));
   const {styles} = useStyles(getStyles);
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
@@ -246,7 +240,6 @@ export default function ElanTemplate({
 
   const createQuote = () => {
     // Create an agreement
-    console.log('------ isOnline:', isOnline);
     if (isOnline) {
       const lineItems = cartItems.map((item: LineItemType) => ({
         catalog_item_id: item.id,
@@ -269,7 +262,7 @@ export default function ElanTemplate({
         },
       });
     } else {
-      const lineItems = cartItems.map((item: LineItemType) => ({
+      const lineItems = cartItems.map((item: LineItemType, index: number) => ({
         catalog_item_id: item.id,
         current_cost: item.cost,
         price: item.price,
@@ -279,6 +272,7 @@ export default function ElanTemplate({
         catalog_item: {
           name: item.name,
         },
+        id: index,
       }));
 
       const newAgreements = agreements.agreements.slice();
@@ -307,18 +301,15 @@ export default function ElanTemplate({
         addressByShippingAddressId: contact.address,
         revision: 0,
         user_id: userInfo.id,
+        user: userInfo,
+        contact: contact,
       };
       newAgreements.unshift(agreement);
       setAction('agreements', {agreements: newAgreements});
       const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
       const newContacts = contactsInStore.map((ct: Contact) => {
         if (ct.id === contact.id) {
-          console.log('--------- ct:', ct);
-          if (!ct.offlineAgreements) {
-            ct.offlineAgreements = [];
-          } else {
-            ct.offlineAgreements?.push(lastAgreement.id + 1);
-          }
+          ct.agreements?.push(agreement);
         }
         return ct;
       });
@@ -382,7 +373,7 @@ export default function ElanTemplate({
               <>
                 {item.type === 'switch' ? (
                   <LineItemWithSwitch
-                    key={id}
+                    key={`lineitem-withswitch-${id}`}
                     item={item}
                     qty={
                       cartItems[
@@ -395,7 +386,7 @@ export default function ElanTemplate({
                   />
                 ) : (
                   <LineItem
-                    key={id}
+                    key={`lineitem-${id}`}
                     active={
                       cartItems.findIndex(
                         (it: LineItemType) => it.id === item.id,

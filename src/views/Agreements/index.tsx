@@ -11,7 +11,7 @@ import moment from 'moment';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {Agreement, TableHeaderType, TableSortOps} from '@utils/types'; 
+import {Agreement, TableHeaderType, TableSortOps} from '@utils/types';
 
 import {
   AppHeader,
@@ -22,7 +22,7 @@ import {
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
-  {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
+  {label: 'Name', value: 'name', sortable: true, style: {width: 120}},
   {label: 'Contact', value: 'contact', sortable: true, style: {width: 220}},
   {
     label: 'Shipping Address',

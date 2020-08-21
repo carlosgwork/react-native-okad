@@ -194,7 +194,7 @@ export default function AgreementSummary({
             <View style={styles.totalCell}>
               <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
                 {`$${numeral(
-                  (totalPrice * (100 - agreement.sales_tax_rate)) / 100 / 100,
+                  (totalPrice * (100 + agreement.sales_tax_rate)) / 100 / 100,
                 ).format('0,0.00')}`}
               </AppText>
             </View>

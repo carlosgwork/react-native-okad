@@ -1,6 +1,9 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import {NavigationContainer, NavigationState} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
+import {useSelector} from 'react-redux';
+import {useMutation} from '@apollo/client';
 
 import Splash from '@root/views/Splash';
 import Login from '@root/views/Login';
@@ -8,6 +11,12 @@ import Login from '@root/views/Login';
 import {useBackHandler} from '@global/Hooks';
 
 import {MainTabRoutes} from './main';
+import {OfflineMutationType, Agreement, LineItemType} from '@root/utils/types';
+import {
+  CREATE_AGREEMENT,
+  UPDATE_AGREEMENT,
+} from '@root/views/Agreements/graphql';
+import { setAction } from '@root/redux/actions';
 
 // Gets the current screen from navigation state
 const getActiveRouteName = (state: NavigationState): string | undefined => {
@@ -46,6 +55,70 @@ function AuthRoutes() {
 const Stack = createStackNavigator();
 export default function Routes() {
   const routeNameRef = React.useRef<string>();
+  const {offlineMutations, agreements, network} = useSelector((state: any) => ({
+    offlineMutations: state.offlineMutations.data,
+    agreements: state.agreements.agreements,
+    network: state.network,
+  }));
+  const [inset_agreement] = useMutation(CREATE_AGREEMENT);
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT);
+  const syncData = React.useCallback(() => {
+    if (network.online && offlineMutations.length > 0) {
+      offlineMutations.map((mutation: OfflineMutationType) => {
+        const updatedAgreements = agreements.slice();
+        const itemIndex = updatedAgreements.findIndex(
+          (ag: Agreement) => ag.id === mutation.itemId,
+        );
+        const data = updatedAgreements[itemIndex];
+        switch (mutation.type) {
+          case 'CREATE_AGREEMENT':
+            const lineItems = data.line_items.map((item: any) => ({
+              catalog_item_id: item.catalog_item_id,
+              current_cost: item.current_cost,
+              price: item.price,
+              qty: item.qty,
+              taxable: item.taxable,
+              discount: item.discount,
+            }));
+            inset_agreement({
+              variables: {
+                billing_address_id: data.billing_address_id,
+                agreement_template_id: data.agreement_template_id,
+                contact_id: data.contact_id,
+                shipping_address_id: data.shipping_address_id,
+                line_items: lineItems,
+                sales_tax_rate: data.sales_tax_rate,
+                number: data.number,
+                user_id: data.user_id,
+              },
+            });
+            break;
+          case 'UPDATE_AGREEMENT':
+            const updatingAgreement = {
+              agreement_template_id: data.agreement_template_id,
+              billing_address_id: data.billing_address_id,
+              contact_id: data.contact_id,
+              last_modified: new Date(),
+              number: data.number,
+              revision: data.revision,
+              sales_tax_rate: data.sales_tax_rate,
+              shipping_address_id: data.shipping_address_id,
+            };
+            update_agreement({
+              variables: {
+                _set: updatingAgreement,
+                id: data.id,
+              },
+            });
+            break;
+          default:
+        }
+      });
+      setAction('offlineMutations', {active: false, data: []});
+    }
+  }, [network]);
+
+  syncData();
   useBackHandler();
   return (
     <NavigationContainer

@@ -6,9 +6,11 @@ import Routes from '@routes/index';
 import store from '@redux/store';
 import {ThemeContext} from '@global/Context';
 import getThemeStyle, {Theme} from '@root/utils/styles';
+import NetInfo from '@react-native-community/netinfo';
 
 import {ApolloProvider} from '@apollo/client';
 import makeApolloClient from './apollo';
+import {setAction} from './redux/actions';
 
 export default function App() {
   const [theme, setTheme] = React.useState<Theme>('normal');
@@ -17,6 +19,16 @@ export default function App() {
     [theme],
   );
   const [client, setClient] = React.useState<any>(null);
+  const [isOnline, setIsOnline] = React.useState<boolean>(true);
+
+  NetInfo.addEventListener((state) => {
+    console.log('---- state.isInternetReachable: ', state.isInternetReachable);
+    if (isOnline !== !!state.isInternetReachable) {
+      setIsOnline(!!state.isInternetReachable);
+      setAction('network', {online: !!state.isInternetReachable});
+      console.log('---- now is online: ', !!state.isInternetReachable);
+    }
+  });
   const fetchSession = async () => {
     // fetch session
     const cc = makeApolloClient(

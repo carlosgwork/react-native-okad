@@ -23,16 +23,31 @@ import {
   AgreementLineItemType,
   Agreement,
   AgreementEvent,
+  Contact,
+  OfflineMutationType,
 } from '@root/utils/types';
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
 import {useSelector} from 'react-redux';
+import {setAction} from '@root/redux/actions';
 
 export default function AgreementDetails({
   route,
   navigation,
 }: ContactsNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
-  const {prefix} = useSelector((state: any) => state.user);
+  const {
+    prefix,
+    agreements,
+    contacts,
+    offlineMutations,
+    isOnline,
+  } = useSelector((state: any) => ({
+    prefix: state.user.prefix,
+    agreements: state.agreements.agreements,
+    contacts: state.contacts.contacts,
+    offlineMutations: state.offlineMutations,
+    isOnline: state.network.online,
+  }));
 
   const {parent = 'Contacts', contact, agreement} = route.params || {};
   const [activeAgreement, updateActiveAgreement] = useState<Agreement>(
@@ -82,6 +97,45 @@ export default function AgreementDetails({
     updateActiveAgreement(newAgreement);
   };
 
+  const updateAgreementState = (data: Agreement) => {
+    const newAgreements = JSON.parse(JSON.stringify(agreements));
+    const agIndex = newAgreements.findIndex(
+      (ag: Agreement) => ag.id === data.id,
+    );
+    newAgreements[agIndex] = data;
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        const newCtAgreements = ct.agreements?.slice() || [];
+        const agIndex2 = newCtAgreements.findIndex(
+          (ag2: Agreement) => ag2.id === data.id,
+        );
+        newCtAgreements[agIndex2] = data;
+        ct.agreements = newCtAgreements;
+      }
+      return ct;
+    });
+    setAction('contacts', {contacts: newContacts});
+
+    // Check if itemId already exists in offlineMutations list
+    const itemIndex = offlineMutations.data.findIndex(
+      (item: OfflineMutationType) => item.itemId === data.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        updateAgreement(data);
+      } else {
+        const newMutations = offlineMutations.data;
+        newMutations.push({
+          type: 'UPDATE_AGREEMENT',
+          itemId: data.id,
+        });
+        setAction('offlineMutations', {active: true, data: newMutations});
+      }
+    }
+  };
+
   const applyDiscount = () => {
     const newData = [...listData];
     const prevIndex = listData.findIndex(
@@ -100,14 +154,14 @@ export default function AgreementDetails({
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.sales_tax_rate = parseFloat(salesTax);
     updateActiveAgreement(newAgreement);
-    updateAgreement(newAgreement);
+    updateAgreementState(newAgreement);
   };
 
   const updateAgreementRevision = () => {
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.revision = newAgreement.revision + 1;
     updateActiveAgreement(newAgreement);
-    updateAgreement(newAgreement);
+    updateAgreementState(newAgreement);
   };
 
   const updateAgreement = (data: Agreement) => {
