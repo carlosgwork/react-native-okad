@@ -17,10 +17,12 @@ const currentTheme = {
 const mockItem = {
   id: 8,
   name: 'Foot of Length',
-  price_total: 100,
-  price_monthly: 12.15,
+  price: 10000,
   icon: undefined,
   type: 'switch',
+  cost: 5000,
+  taxable: true,
+  subcategory: 'seat',
 };
 
 describe('LineItemWithSwitch Component', () => {
@@ -28,7 +30,7 @@ describe('LineItemWithSwitch Component', () => {
     const mockCallback = jest.fn();
     const tree = renderer.create(
       <ThemeContext.Provider value={currentTheme}>
-        <LineItemWithSwitch item={mockItem} size={2} setSize={mockCallback} />
+        <LineItemWithSwitch item={mockItem} qty={2} setQty={mockCallback} />
       </ThemeContext.Provider>,
     );
     expect(tree.toJSON()).toMatchSnapshot();
@@ -41,26 +43,26 @@ describe('LineItemWithSwitch Component', () => {
     const mockCallback = jest.fn();
     const wrapper = shallow(
       <ThemeContext.Provider value={currentTheme}>
-        <LineItemWithSwitch item={mockItem} size={2} setSize={mockCallback} />
+        <LineItemWithSwitch item={mockItem} qty={2} setQty={mockCallback} />
       </ThemeContext.Provider>,
     ).dive();
     expect(wrapper.find('Memo(AppText)').contains(mockItem.name)).toBeTruthy();
   });
 
-  it('should call the setSize callback', () => {
+  it('should call the setQty callback', () => {
     jest
       .spyOn(ThemeContextModules, 'useTheme')
       .mockImplementation(() => currentTheme);
     const mockCallback = jest.fn();
     const wrapper = shallow(
       <ThemeContext.Provider value={currentTheme}>
-        <LineItemWithSwitch item={mockItem} size={2} setSize={mockCallback} />
+        <LineItemWithSwitch item={mockItem} qty={2} setQty={mockCallback} />
       </ThemeContext.Provider>,
     ).dive();
     expect(wrapper.find('Icon')).toHaveLength(2);
-    (wrapper.find('ForwardRef').at(1).props() as TouchElementProps).onPress();
+    (wrapper.find('ForwardRef').at(0).props() as TouchElementProps).onPress();
     expect(mockCallback).toHaveBeenCalledWith(1);
-    (wrapper.find('ForwardRef').at(2).props() as TouchElementProps).onPress();
+    (wrapper.find('ForwardRef').at(1).props() as TouchElementProps).onPress();
     expect(mockCallback).toHaveBeenCalledWith(3);
   });
 });

@@ -72,7 +72,7 @@ describe('Contacts Page', () => {
     expect(loadingEle.prop('loading')).toEqual(true);
   });
 
-  it('renders Loading Error text if Data Fetch is failed', async () => {
+  it('hides Loading Indicator if Data Fetch is failed', async () => {
     mockClient = createMockClient();
     mockClient.setRequestHandler(FETCH_CONTACTS, () =>
       Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
@@ -88,7 +88,9 @@ describe('Contacts Page', () => {
     );
     await wait(0);
     wrapper.update();
-    expect(wrapper.text()).toContain('Loading Error');
+    const loadingEle = wrapper.find('Memo(CircularLoading)');
+    expect(loadingEle).toHaveLength(1);
+    expect(loadingEle.prop('loading')).toEqual(false);
   });
 
   it('renders successfully', async () => {
@@ -108,7 +110,7 @@ describe('Contacts Page', () => {
     expect(loadingEle.prop('loading')).toEqual(false);
   });
 
-  it('should have one Table component with 5 columns', async () => {
+  it('should have one Table component with 4 columns', async () => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
@@ -122,7 +124,6 @@ describe('Contacts Page', () => {
     wrapper.update();
     const dataTable = wrapper.find('Memo(AppDataTable)');
     expect(dataTable).toHaveLength(1);
-    expect(dataTable.prop('rows')).toEqual(CONTACTS_MOCKDATA.contacts);
     expect(dataTable.prop('sortOp')).toEqual({
       sortBy: '',
       sortOrder: 'ASC',

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import {TouchableOpacity, View, Alert} from 'react-native';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
@@ -19,6 +19,7 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
+  CircularLoading,
 } from '@root/components';
 import {FETCH_CONTACTS} from './graphql';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
@@ -183,12 +184,18 @@ export default function Contacts({
 
   const contacts = useSelector((state: any) => state.contacts);
   const contactsSortOps = contacts.sortOp;
-  useQuery(FETCH_CONTACTS, {
+  const [loading, setLoading] = React.useState<boolean>(true);
+  const {error} = useQuery(FETCH_CONTACTS, {
     onCompleted: (data) => {
+      console.log('---- completed');
+      setLoading(false);
       const newData = data.contacts;
       setAction('contacts', {
         contacts: newData,
       });
+    },
+    onError: () => {
+      setLoading(false);
     },
   });
   const [searchText, setSearchText] = useState<string | undefined>('');
@@ -197,7 +204,6 @@ export default function Contacts({
   );
 
   useEffect(() => {
-    console.log('--------- contacts changed:');
     setVisibleContacts(contacts.contacts);
     setSearchText('');
   }, [contacts]);
@@ -225,6 +231,11 @@ export default function Contacts({
       cellContent(header, row, styles, themeStyle, navigation),
     [contacts],
   );
+
+  if (loading && error) {
+    setLoading(false);
+    Alert.alert(error.message);
+  }
 
   return (
     <View style={styles.container}>
@@ -263,6 +274,7 @@ export default function Contacts({
           rows={visibleContacts}
           onSortChanged={onSortChanged}
         />
+        <CircularLoading loading={loading} />
       </View>
     </View>
   );
