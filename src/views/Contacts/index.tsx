@@ -187,7 +187,6 @@ export default function Contacts({
   const [loading, setLoading] = React.useState<boolean>(true);
   const {error} = useQuery(FETCH_CONTACTS, {
     onCompleted: (data) => {
-      console.log('---- completed');
       setLoading(false);
       const newData = data.contacts;
       setAction('contacts', {

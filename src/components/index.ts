@@ -14,4 +14,7 @@ export {default as IndoorOutdoorSwitch} from './IndoorOutdoorSwitch';
 export {default as LineItemWithSwitch} from './LineItemWithSwitch';
 export {default as LineItem} from './LineItem';
 export {default as LineItemWithImage} from './LineItemWithImage';
-export {default as UpholsteryOption} from './UpholsteryOption';
+export {
+  default as UpholsteryOption,
+  SUPPORTED_COLORS,
+} from './UpholsteryOption';

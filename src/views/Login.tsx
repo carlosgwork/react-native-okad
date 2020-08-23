@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
-// import {firebase} from '@react-native-firebase/auth';
+import {firebase} from '@react-native-firebase/auth';
 import {setAction} from '@redux/actions';
 import {Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -10,7 +10,7 @@ import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
-  // User,
+  User,
 } from '@react-native-community/google-signin';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -97,12 +97,12 @@ export default function Login() {
       return;
     }
     try {
-      // await GoogleSignin.hasPlayServices();
-      // const {idToken}: User = await GoogleSignin.signIn();
-      // const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-      // // const userInfo = await firebase.auth().signInWithCredential(credential);
-      // await firebase.auth().signInWithCredential(credential);
-      // setLoading(false);
+      await GoogleSignin.hasPlayServices();
+      const {idToken}: User = await GoogleSignin.signIn();
+      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      // const userInfo = await firebase.auth().signInWithCredential(credential);
+      await firebase.auth().signInWithCredential(credential);
+      setLoading(false);
       setUserId(1);
       navigateHome(replace);
     } catch (error) {

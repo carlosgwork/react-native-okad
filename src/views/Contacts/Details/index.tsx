@@ -102,7 +102,6 @@ export default function ContactDetails({
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
 
   useEffect(() => {
-    console.log('--------- contact details: contacts state changed');
     const itemIndex = contacts.findIndex(
       (contact: Contact) => contact.id === itemId,
     );

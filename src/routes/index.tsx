@@ -70,7 +70,6 @@ export default function Routes() {
 
   React.useEffect(() => {
     const mutations = offlineMutations.slice();
-    console.log('---------- offlineMutations: ', mutations);
     if (network.online && mutations.length > 0) {
       mutations.map((mutation: OfflineMutationType) => {
         const updatedAgreements = agreements.slice();

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, NativeScrollEvent} from 'react-native';
+import {View, NativeScrollEvent, Alert} from 'react-native';
 import {gql, useQuery} from '@apollo/client';
 import numeral from 'numeral';
 
@@ -19,6 +19,7 @@ import {
   AppTextButton,
   AppText,
   AppDataTable,
+  CircularLoading,
 } from '@root/components';
 
 const HEADERS: TableHeaderType[] = [
@@ -114,13 +115,17 @@ export default function Agreements({
   const agreements = useSelector((state: any) => state.agreements);
   const agreementsSortOps = agreements.sortOp;
   const [offset, setOffset] = useState<number>(0);
-  useQuery(FETCH_AGREEMENTS, {
+  const [showError, setShowError] = useState<boolean>(false);
+  const {loading, error} = useQuery(FETCH_AGREEMENTS, {
     variables: {offset},
     onCompleted: (data) => {
       const newData = agreements.agreements.concat(data.agreements);
       setAction('agreements', {
         agreements: newData,
       });
+    },
+    onError: (err) => {
+      Alert.alert(err.message);
     },
   });
   const [searchText, setSearchText] = useState<string | undefined>('');
@@ -129,7 +134,6 @@ export default function Agreements({
   );
 
   useEffect(() => {
-    console.log('-------- agreements changed');
     setVisibleAgreements(agreements.agreements);
   }, [agreements, navigation]);
 
@@ -179,6 +183,11 @@ export default function Agreements({
     [agreements],
   );
 
+  if (loading && error && !showError) {
+    setShowError(true);
+    Alert.alert(error.message);
+  }
+
   return (
     <View style={styles.container}>
       <AppHeader
@@ -200,6 +209,7 @@ export default function Agreements({
           onSortChanged={onSortChanged}
           onScroll={onContainerScroll}
         />
+        <CircularLoading loading={loading && !error} />
       </View>
     </View>
   );

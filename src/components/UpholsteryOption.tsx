@@ -19,7 +19,7 @@ type ColorOptionType = {
   price: number;
 };
 
-const SUPPORTED_COLORS = [
+export const SUPPORTED_COLORS = [
   {
     color: '#BEAB90',
     name: 'Cream',

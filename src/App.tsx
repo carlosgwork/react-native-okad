@@ -22,11 +22,9 @@ export default function App() {
   const [isOnline, setIsOnline] = React.useState<boolean>(true);
 
   NetInfo.addEventListener((state) => {
-    console.log('---- state.isInternetReachable: ', state.isInternetReachable);
     if (isOnline !== !!state.isInternetReachable) {
       setIsOnline(!!state.isInternetReachable);
       setAction('network', {online: !!state.isInternetReachable});
-      console.log('---- now is online: ', !!state.isInternetReachable);
     }
   });
   const fetchSession = async () => {

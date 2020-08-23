@@ -3,6 +3,7 @@
  */
 
 import React from 'react';
+import {Alert} from 'react-native';
 import Agreements, {FETCH_AGREEMENTS} from '@root/views/Agreements';
 import {Provider} from 'react-redux';
 import {createMockClient} from 'mock-apollo-client';
@@ -45,22 +46,21 @@ const store2 = mockStore({
 });
 
 let mockClient: any;
+const navigation = {navigate: jest.fn()};
+jest.spyOn(Alert, 'alert');
 
 describe('Agreements Page', () => {
-  beforeEach(() => {
+  it('renders Loading component while fetching data', () => {
     mockClient = createMockClient();
     queryHandler = jest.fn().mockResolvedValue({
       data: AGREEMENTS_MOCKDATA,
     });
     mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
-  });
-
-  it('renders Loading component while fetching data', () => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Agreements />
+            <Agreements navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -70,7 +70,7 @@ describe('Agreements Page', () => {
     expect(loadingEle.prop('loading')).toEqual(true);
   });
 
-  it('renders Loading Error text if Data Fetch is failed', async () => {
+  it('shows an Alert and hides Loading Indicator if Data Fetch is failed', async () => {
     mockClient = createMockClient();
     mockClient.setRequestHandler(FETCH_AGREEMENTS, () =>
       Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
@@ -79,39 +79,30 @@ describe('Agreements Page', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Agreements />
+            <Agreements navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
     );
     await wait(0);
     wrapper.update();
-    expect(wrapper.text()).toContain('Loading Error');
-  });
-
-  it('renders successfully', async () => {
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    await wait(0);
-    wrapper.update();
+    expect(Alert.alert).toHaveBeenCalled();
     const loadingEle = wrapper.find('Memo(CircularLoading)');
     expect(loadingEle).toHaveLength(1);
     expect(loadingEle.prop('loading')).toEqual(false);
   });
 
   it('should have one Table component with 5 columns', async () => {
+    mockClient = createMockClient();
+    queryHandler = jest.fn().mockResolvedValue({
+      data: AGREEMENTS_MOCKDATA,
+    });
+    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Agreements />
+            <Agreements navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -120,42 +111,50 @@ describe('Agreements Page', () => {
     wrapper.update();
     const dataTable = wrapper.find('Memo(AppDataTable)');
     expect(dataTable).toHaveLength(1);
-    expect(dataTable.prop('rows')).toEqual(AGREEMENTS_MOCKDATA.agreements);
     expect(dataTable.prop('sortOp')).toEqual({
       sortBy: '',
       sortOrder: 'ASC',
     });
-    expect(dataTable.text()).toContain('Id');
+    expect(dataTable.text()).toContain('Name');
     expect(dataTable.text()).toContain('Contact');
     expect(dataTable.text()).toContain('Shipping Address');
-    expect(dataTable.text()).toContain('Template Id');
+    expect(dataTable.text()).toContain('Template');
     expect(dataTable.text()).toContain('Created');
   });
 
-  it('sorts rows by Id/Contact/Shipping Address/Template Id/Created fields', () => {
+  it('sorts rows by Contact/Shipping Address/Template/Created fields', () => {
+    mockClient = createMockClient();
+    queryHandler = jest.fn().mockResolvedValue({
+      data: AGREEMENTS_MOCKDATA,
+    });
+    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
     const dataTable = wrapper.find('Memo(AppDataTable)');
     expect(dataTable).toHaveLength(1);
     const nameField = dataTable.find('Memo(TableHeader)');
     const field = nameField.find('TouchableOpacity');
-    const ele = field.filterWhere((x) => x.text() === 'Id');
-    expect(ele).toHaveLength(1);
-    (ele.first().props() as TouchElementProps).onPress();
+    const ele1 = field.filterWhere((x) => x.text() === 'Name');
+    (ele1.first().props() as TouchElementProps).onPress();
     const ele2 = field.filterWhere((x) => x.text() === 'Contact');
     (ele2.first().props() as TouchElementProps).onPress();
     const ele3 = field.filterWhere((x) => x.text() === 'Shipping Address');
     (ele3.first().props() as TouchElementProps).onPress();
-    const ele4 = field.filterWhere((x) => x.text() === 'Template Id');
+    const ele4 = field.filterWhere((x) => x.text() === 'Template');
     (ele4.first().props() as TouchElementProps).onPress();
     const ele5 = field.filterWhere((x) => x.text() === 'Created');
     (ele5.first().props() as TouchElementProps).onPress();
   });
 
   it('update table rows when state.sortOp is changed', async () => {
+    mockClient = createMockClient();
+    queryHandler = jest.fn().mockResolvedValue({
+      data: AGREEMENTS_MOCKDATA,
+    });
+    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store2}>
           <ThemeContext.Provider value={currentTheme}>
-            <Agreements />
+            <Agreements navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
