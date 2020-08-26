@@ -46,6 +46,7 @@ export const FETCH_AGREEMENTS = gql`
   query AgreementQuery($offset: Int!) {
     agreements(limit: 20, offset: $offset, order_by: {id: desc}) {
       id
+      agreement_template_id
       agreement_events {
         type
         id
@@ -103,6 +104,8 @@ export const FETCH_AGREEMENTS = gql`
         organization_id
       }
       user_id
+      created
+      last_modified
     }
   }
 `;

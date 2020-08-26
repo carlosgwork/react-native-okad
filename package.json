@@ -115,7 +115,7 @@
       "<rootDir>/__tests__/__mocks__/"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(react-native|@react-navigation|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient|react-native-iphone-x-helper|react-native-snap-carousel)/)"
+      "node_modules/(?!(react-native|@react-navigation|redux-persist-sensitive-storage|react-native-gesture-handler|react-native-elements|react-native-status-bar-height|react-native-sensitive-info|react-native-vector-icons|react-native-ratings|react-native-linear-gradient|react-native-iphone-x-helper|react-native-snap-carousel|react-native-swipe-list-view|react-native-dialog|react-native-modal|react-native-animatable|react-native-signature-capture)/)"
     ]
   }
 }
