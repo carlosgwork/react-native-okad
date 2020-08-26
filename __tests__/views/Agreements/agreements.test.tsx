@@ -50,12 +50,15 @@ const navigation = {navigate: jest.fn()};
 jest.spyOn(Alert, 'alert');
 
 describe('Agreements Page', () => {
-  it('renders Loading component while fetching data', () => {
+  beforeEach(() => {
     mockClient = createMockClient();
     queryHandler = jest.fn().mockResolvedValue({
       data: AGREEMENTS_MOCKDATA,
     });
     mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
+  });
+
+  it('renders Loading component while fetching data', () => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
@@ -93,11 +96,6 @@ describe('Agreements Page', () => {
   });
 
   it('should have one Table component with 5 columns', async () => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: AGREEMENTS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
@@ -122,12 +120,18 @@ describe('Agreements Page', () => {
     expect(dataTable.text()).toContain('Created');
   });
 
-  it('sorts rows by Contact/Shipping Address/Template/Created fields', () => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: AGREEMENTS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
+  it('sorts rows by Contact/Shipping Address/Template/Created fields', async () => {
+    wrapper = mount(
+      <ApolloProvider client={mockClient as any}>
+        <Provider store={store}>
+          <ThemeContext.Provider value={currentTheme}>
+            <Agreements navigation={navigation as any} route={{} as any} />
+          </ThemeContext.Provider>
+        </Provider>
+      </ApolloProvider>,
+    );
+    await wait(0);
+    wrapper.update();
     const dataTable = wrapper.find('Memo(AppDataTable)');
     expect(dataTable).toHaveLength(1);
     const nameField = dataTable.find('Memo(TableHeader)');
@@ -145,11 +149,6 @@ describe('Agreements Page', () => {
   });
 
   it('update table rows when state.sortOp is changed', async () => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: AGREEMENTS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
         <Provider store={store2}>

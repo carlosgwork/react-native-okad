@@ -2,6 +2,9 @@ export const AGREEMENTS_MOCKDATA = {
   agreements: [
     {
       id: 814,
+      agreement_template_id: 1,
+      created: '2020-08-21T16:30:58.921003+00:00',
+      last_modified: null,
       agreement_events: [
         {
           type: 'texted',
@@ -80,6 +83,9 @@ export const AGREEMENTS_MOCKDATA = {
     },
     {
       id: 813,
+      agreement_template_id: 1,
+      created: '2020-08-21T16:28:13.689353+00:00',
+      last_modified: null,
       agreement_events: [
         {
           type: 'texted',
