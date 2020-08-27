@@ -46,11 +46,6 @@ NativeModules.RNGoogleSignin = {
 
 export {NativeModules};
 
-
-jest.mock('@react-navigation/native', () => ({
-  useNavigation: () => jest.fn(),
-}));
-
 jest.mock('react-native-reanimated', () => {
   const Reanimated = require('react-native-reanimated/mock');
 
