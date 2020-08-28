@@ -8,7 +8,7 @@ type Props = {
   onPress: () => void;
 };
 
-export default function AgreementTile({logo, onPress}: Props) {
+export default function TemplateTile({logo, onPress}: Props) {
   const {styles} = useStyles(getStyles);
   return (
     <TouchableOpacity

@@ -3,7 +3,6 @@ jest.mock('@react-native-community/google-signin', () => {
   const mockGoogleSignin = require.requireActual(
     '@react-native-community/google-signin',
   );
-
   mockGoogleSignin.GoogleSignin.hasPlayServices = () => Promise.resolve(true);
   mockGoogleSignin.GoogleSignin.configure = () => Promise.resolve();
   mockGoogleSignin.GoogleSignin.currentUserAsync = () => {
@@ -15,7 +14,6 @@ jest.mock('@react-native-community/google-signin', () => {
   };
 
   // ... and other functions you want to mock
-
   return mockGoogleSignin;
 });
 
