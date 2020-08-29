@@ -90,11 +90,7 @@ export default function BrunoStraightStairlift({
               style={styles.marginRight15}
             />
           </TouchableOpacity>
-          <AppText
-            style={styles.uppercaseText}
-            color={'textBlack2'}
-            size={20}
-            font={'anSemiBold'}>
+          <AppText color={'textBlack2'} size={20} font={'anSemiBold'}>
             {item.name}
           </AppText>
         </View>
@@ -124,6 +120,7 @@ export default function BrunoStraightStairlift({
           <View style={styles.ctaBtn}>
             <AppGradButton
               btnStyle={styles.ctaInnerBtn}
+              textStyle={styles.ctaInnerBtnText}
               title={`Select ${category}`}
               onPress={selectProduct}
             />
@@ -236,6 +233,10 @@ const getStyles = (themeStyle: StyleType) => ({
   ctaInnerBtn: {
     paddingRight: 0,
     paddingLeft: 20,
+  },
+  ctaInnerBtnText: {
+    textTransform: 'uppercase',
+    letterSpacing: 2,
   },
   diagonalBox: {
     backgroundColor: themeStyle.backgroundWhite,

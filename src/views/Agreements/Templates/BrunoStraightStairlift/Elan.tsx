@@ -4,6 +4,7 @@ import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {useMutation} from '@apollo/client';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -381,7 +382,7 @@ export default function ElanTemplate({
                         cartItems.findIndex(
                           (it: LineItemType) => it.id === item.id,
                         )
-                      ]?.quantity || 0
+                      ]?.qty || 0
                     }
                     setQty={(num) => updateQty(item, num)}
                   />
@@ -410,7 +411,9 @@ export default function ElanTemplate({
           title={`$${numeral(totalPrice / 100).format('0,0.00')} or $${numeral(
             totalPrice / 100 / 60,
           ).format('0,0.00')}/month`}
-          leftIconContent={<></>}
+          rightIconContent={
+            <Icon color={'#fff'} name={'ios-arrow-forward-sharp'} size={20} />
+          }
           onPress={createQuote}
         />
       </View>
@@ -507,13 +510,16 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   createBtn: {
     borderTopLeftRadius: 0,
-    paddingVertical: 10,
+    paddingVertical: 14,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    fontSize: 30,
   },
   createBtnText: {
-    textTransform: 'uppercase',
+    ...themeStyle.getTextStyle({
+      color: 'textWhite',
+      font: 'anSemiBold',
+      size: 18,
+    }),
   },
 });
