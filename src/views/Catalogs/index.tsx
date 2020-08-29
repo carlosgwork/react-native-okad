@@ -6,7 +6,7 @@ import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@utils/styles';
 import {useStyles} from '@global/Hooks';
-import {TableSortOps, Vendor} from '@utils/types';
+import {TableSortOps, Vendor, Catalog} from '@utils/types';
 import {emptyTableSortOption} from '@utils/constants';
 import VendorRow from './vendorRow';
 import {VendorsState} from '@redux/reducers/vendors';
@@ -59,6 +59,7 @@ export default function Catalogs() {
 
   const onFilterCatalog = (text: string) => {
     const filtered = filterVendors(text, vendors);
+    console.log('---- fifiltered: ', filtered);
     setFilteredVendors(filtered);
     sortVendors(filtered);
     setSearchText(text);
@@ -73,13 +74,27 @@ export default function Catalogs() {
 
   const filterVendors = (text: string, v: Vendor[]) => {
     if (searchText) {
-      const filtered = v.filter(
+      const filteredVendor = v.filter(
         (vendor: Vendor) =>
           vendor.name.toLowerCase().indexOf(text.toLowerCase()) > -1,
       );
-      return filtered;
+      v.forEach((item) => {
+        const matchItems = item.catalog_items.filter(
+          (catalog: Catalog) =>
+            catalog.name.toLowerCase().indexOf(text.toLowerCase()) > -1 ||
+            catalog.sku.toLowerCase().indexOf(text.toLowerCase()) > -1,
+        );
+        if (matchItems.length > 0) {
+          if (filteredVendor.findIndex((it) => it.id === item.id) < 0) {
+            const newV = Object.assign({}, item);
+            newV.catalog_items = matchItems;
+            filteredVendor.push(newV);
+          }
+        }
+      });
+      return filteredVendor;
     }
-    return [];
+    return v;
   };
 
   const sortVendors = (v: Vendor[]) => {
@@ -145,7 +160,7 @@ export default function Catalogs() {
           style={styles.container}>
           {filteredVendors.map((item, index) => (
             <VendorRow
-              key={index}
+              key={`vendor-row-${index}-${item.catalog_items.length}`}
               vendorName={item.name}
               catalogs={item.catalog_items}
               catalogSortOps={vendorsSortOps[index].sortOps}
@@ -154,7 +169,10 @@ export default function Catalogs() {
               }
             />
           ))}
-          <CircularLoading loading={loading || !vendorsSortOps.length} />
+          {filteredVendors.length === 0 && (
+            <Text style={styles.centerText}>No Result</Text>
+          )}
+          <CircularLoading loading={loading} />
         </ScrollView>
       </View>
     </View>
@@ -188,5 +206,9 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     flex: 1,
     marginTop: 10,
+  },
+  centerText: {
+    textAlign: 'center',
+    marginTop: 20,
   },
 });
