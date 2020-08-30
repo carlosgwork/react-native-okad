@@ -38,7 +38,7 @@ export default function NewAgreement({
     setAction('cart', {product: {}, items: []});
     const templateName = Templates[index].name as keyof ContactsStackParamList;
     navigation.navigate(templateName, {
-      parent: 'NewAgreement',
+      parent: 'New Agreement',
       templateId: 1,
       contact: contact,
     });
@@ -57,7 +57,6 @@ export default function NewAgreement({
           <TouchableOpacity
             style={styles.switchText}
             onPress={() => {
-              navigation.pop();
               navigation.navigate(AppRouteEnum.ContactDetails, {
                 itemId: contact.id,
                 itemTitle,

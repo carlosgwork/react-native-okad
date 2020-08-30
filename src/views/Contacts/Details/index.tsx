@@ -228,10 +228,13 @@ export default function ContactDetails({
           <AppTextButton
             style={{...styles.cellLayout, ...styles.agreementsBtn}}
             onPress={() => {
-              navigation.navigate(AppRouteEnum.NewAgreement, {
-                parent: `${contactData.name_first} ${contactData.name_last}`,
-                contact: contactData,
-                itemTitle: `${contactData.name_first} ${contactData.name_last}`,
+              navigation.navigate(AppRouteEnum.NewAgreements, {
+                screen: 'NewAgreement',
+                params: {
+                  parent: `${contactData.name_first} ${contactData.name_last}`,
+                  contact: contactData,
+                  itemTitle: `${contactData.name_first} ${contactData.name_last}`,
+                },
               });
             }}
             leftIconContent={

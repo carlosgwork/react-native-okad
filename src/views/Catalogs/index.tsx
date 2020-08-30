@@ -59,7 +59,6 @@ export default function Catalogs() {
 
   const onFilterCatalog = (text: string) => {
     const filtered = filterVendors(text, vendors);
-    console.log('---- fifiltered: ', filtered);
     setFilteredVendors(filtered);
     sortVendors(filtered);
     setSearchText(text);

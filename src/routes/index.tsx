@@ -9,6 +9,7 @@ import Splash from '@root/views/Splash';
 import Login from '@root/views/Login';
 
 import {useBackHandler} from '@global/Hooks';
+import NewAgreementRoutes from './newAgreement';
 
 import {MainTabRoutes} from './main';
 import {OfflineMutationType, Agreement, LineItemType} from '@root/utils/types';
@@ -164,6 +165,7 @@ export default function Routes() {
       <Stack.Navigator initialRouteName="Splash" headerMode="none">
         <Stack.Screen name="Splash" component={SplashRoutes} />
         <Stack.Screen name="Auth" component={AuthRoutes} />
+        <Stack.Screen name="NewAgreements" component={NewAgreementRoutes} />
         <Stack.Screen name="Main" component={MainTabRoutes} />
       </Stack.Navigator>
     </NavigationContainer>

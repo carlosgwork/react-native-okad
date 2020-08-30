@@ -10,7 +10,12 @@ import {useMutation} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
-import {AppHeader, AppText, AppGradButton, CircularLoading} from '@root/components';
+import {
+  AppHeader,
+  AppText,
+  AppGradButton,
+  CircularLoading,
+} from '@root/components';
 import {Contact, Address} from '@root/utils/types';
 import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';

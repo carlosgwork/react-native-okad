@@ -8,6 +8,7 @@ import {useStyles, useTheme} from '@global/Hooks';
 
 type Props = {
   leftIconContent?: React.ReactElement;
+  rightIconContent?: React.ReactElement;
   title: string;
   btnStyle?: object;
   containerStyle?: object;
@@ -21,6 +22,7 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
 
   const {
     leftIconContent = null,
+    rightIconContent = null,
     onPress,
     title,
     btnStyle,
@@ -44,6 +46,9 @@ export default React.memo<Props>(function AppGradButton(props: Props) {
         <View style={styles.textContainer}>
           <Text style={{...styles.text, ...textStyle}}>{title}</Text>
         </View>
+        {rightIconContent && (
+          <View style={styles.rightIconCont}>{rightIconContent}</View>
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );
@@ -64,6 +69,9 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   iconCont: {
     marginRight: themeStyle.scale(9),
+  },
+  rightIconCont: {
+    marginLeft: -10,
   },
   text: {
     ...themeStyle.getTextStyle({

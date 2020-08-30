@@ -148,10 +148,13 @@ const cellContent = (
         <AppTextButton
           style={{...styles.cellLayout, ...styles.agreementsBtn}}
           onPress={() =>
-            navigation.navigate('NewAgreement', {
-              parent: 'Contacts',
-              contact: row,
-              itemTitle: `${row.name_first} ${row.name_last}`,
+            navigation.navigate('NewAgreements', {
+              screen: 'NewAgreement',
+              params: {
+                parent: 'Contacts',
+                contact: row,
+                itemTitle: `${row.name_first} ${row.name_last}`,
+              },
             })
           }
           leftIconContent={

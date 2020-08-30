@@ -1,7 +1,8 @@
-import {TableSortOps} from '@utils/types';
+import {TableSortOps, Contact} from '@utils/types';
 
 export type ContactsState = {
-  contacts: [];
+  contacts: Contact[];
+  selectedContact: Contact;
   sortOp: TableSortOps;
 };
 
@@ -9,6 +10,7 @@ export const initialContacts: {
   [_: string]: any;
 } = {
   contacts: [],
+  selectedContact: {},
   sortOp: {sortBy: 'phoneNumber', sortOrder: 'ASC'},
 };
 
@@ -47,6 +49,7 @@ export type ContactsAction = {
   payload?: {
     key: string | undefined;
     contacts: [];
+    selectedContact: {};
     sortOp: TableSortOps;
   };
   type: string;

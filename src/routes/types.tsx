@@ -4,6 +4,7 @@ import {Contact, Agreement} from '@root/utils/types';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
+  NewAgreements = 'NewAgreements',
   MainContacts = 'MainContacts',
   ContactDetails = 'ContactDetails',
   NewContactModal = 'NewContactModal',
@@ -56,6 +57,7 @@ export type ContactsStackParamList = {
     contact: Contact;
   };
   [AppRouteEnum.AgreementsMain]: {};
+  [AppRouteEnum.NewAgreements]: {};
 };
 
 type SettingsStackParamList = {};

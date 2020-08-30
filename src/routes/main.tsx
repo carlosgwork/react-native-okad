@@ -6,9 +6,9 @@ import Home from '@root/views/Dashboard';
 import ContactsRoutes from './contacts';
 import Agreements from '@root/views/Agreements';
 import Catalog from '@root/views/Catalogs';
+import {useTheme} from '@global/Hooks';
 
 const MainTab = createBottomTabNavigator();
-import {useTheme} from '@global/Hooks';
 export function MainTabRoutes() {
   const {themeStyle} = useTheme();
 

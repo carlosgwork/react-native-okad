@@ -16,6 +16,7 @@ type Props = {
 
 export default function LineItemWithSwitch({item, qty, setQty}: Props) {
   const {styles} = useStyles(getStyles);
+  console.log('---------- qtyL:', qty);
   return (
     <View style={styles.rowLayout}>
       <View style={[styles.rowLayout, styles.rectWithSwitch]}>

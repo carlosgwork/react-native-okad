@@ -97,11 +97,11 @@ export default function Login() {
       return;
     }
     try {
-      await GoogleSignin.hasPlayServices();
-      const {idToken}: User = await GoogleSignin.signIn();
-      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-      // const userInfo = await firebase.auth().signInWithCredential(credential);
-      await firebase.auth().signInWithCredential(credential);
+      // await GoogleSignin.hasPlayServices();
+      // const {idToken}: User = await GoogleSignin.signIn();
+      // const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      // // const userInfo = await firebase.auth().signInWithCredential(credential);
+      // await firebase.auth().signInWithCredential(credential);
       setLoading(false);
       setUserId(1);
       navigateHome(replace);
