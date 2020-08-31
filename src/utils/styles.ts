@@ -107,6 +107,12 @@ const textSizes: {
     lineHeight: scale(20),
     height: scale(20),
   },
+  [22]: {
+    fontSize: scale(22),
+    letterSpacing: scale(0.3),
+    lineHeight: scale(22),
+    height: scale(22),
+  },
   [24]: {
     fontSize: scale(24),
     letterSpacing: scale(0.3),
@@ -196,6 +202,7 @@ export type TextSizes =
   | 16
   | 18
   | 20
+  | 22
   | 24
   | 26
   | 30

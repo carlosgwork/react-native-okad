@@ -1,14 +1,14 @@
 import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView, Alert} from 'react-native';
 import randomColor from 'randomcolor';
-import {Button} from 'react-native-elements';
 import {GoogleSignin} from '@react-native-community/google-signin';
+import AppGradButton from '@components/AppGradButton';
 
 import {gql, useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {Agreement} from '@utils/types';
+import {Agreement, Contact} from '@utils/types';
 import {
   AppHeader,
   AppText,
@@ -18,6 +18,7 @@ import {
 import AgreementTile from './AgreementTile';
 import {logout} from '@redux/actions';
 import {useNavigation} from '@react-navigation/native';
+import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
 
 export const FETCH_AGREEMENTS = gql`
   query AgreementsQuery($type: agreement_event!) {
@@ -25,16 +26,67 @@ export const FETCH_AGREEMENTS = gql`
       agreement_events(where: {type: {_neq: $type}}) {
         type
       }
+      id
+      address {
+        city
+        county
+        id
+        line1
+        line2
+        us_state
+        postal_code
+      }
+      addressByShippingAddressId {
+        city
+        county
+        id
+        line2
+        line1
+        us_state
+        postal_code
+      }
       contact {
         name_first
         name_last
+        id
       }
-      created
+      contact_id
+      line_items {
+        agreement_id
+        catalog_item_id
+        current_cost
+        discount
+        price
+        qty
+        id
+        catalog_item {
+          name
+        }
+      }
+      number
+      revision
+      sales_tax_rate
+      shipping_address_id
+      signature
+      user {
+        prefix
+        pres
+        public_id
+        name_last
+        name_first
+        google_id
+        email
+        default_sales_tax_rate
+        organization_id
+      }
+      user_id
     }
   }
 `;
 
-export default function Dashboard() {
+export default function Dashboard({
+  navigation,
+}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {replace} = useNavigation<any>();
 
@@ -77,6 +129,15 @@ export default function Dashboard() {
     setSearchText(text);
   };
 
+  const navigateContact = (agreement: Agreement) => {
+    const contact = agreement.contact as Contact;
+    navigation.navigate(AppRouteEnum.AgreementDetails, {
+      agreement,
+      contact: contact,
+      parent: `${contact.name_first} ${contact.name_last}`,
+    });
+  };
+
   if (error) {
     return (
       <View style={styles.emptyContainer}>
@@ -113,7 +174,7 @@ export default function Dashboard() {
         }
       />
       <ScrollView style={styles.mainContent}>
-        <AppText size={20} color={'textBlack2'} font={'anSemiBold'}>
+        <AppText size={22} color={'textBlack2'} font={'anSemiBold'}>
           Recent Open Agreements
         </AppText>
         <View style={styles.rowLayout} key={visibleAgreements.length}>
@@ -122,15 +183,19 @@ export default function Dashboard() {
               key={index}
               agreement={agreement}
               color={BgColors[index]}
+              onPress={() => navigateContact(agreement)}
             />
           ))}
         </View>
         <CircularLoading loading={loading} />
       </ScrollView>
-      <Button
-        style={{marginTop: 100, height: 100}}
+      <AppGradButton
+        containerStyle={styles.logoutBtnContainer}
+        btnStyle={styles.logoutBtn}
+        textStyle={styles.logoutBtnText}
+        title={'LOG OUT'}
+        leftIconContent={<></>}
         onPress={onLogout}
-        title={'Logout'}
       />
     </View>
   );
@@ -172,10 +237,22 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     paddingVertical: themeStyle.scale(30),
     paddingLeft: themeStyle.scale(20),
+    flex: 1,
   },
   emptyContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 250,
+  },
+  logoutBtnText: {
+    color: themeStyle.textWhite,
+  },
+  logoutBtnContainer: {
+    width: 300,
+    alignSelf: 'center',
+    marginBottom: 50,
+  },
+  logoutBtn: {
+    paddingLeft: 50,
   },
 });
