@@ -4,8 +4,8 @@ import {Icon} from 'react-native-elements';
 
 import Home from '@root/views/Dashboard';
 import ContactsRoutes from './contacts';
+import CatalogsRoutes from './catalogs';
 import Agreements from '@root/views/Agreements';
-import Catalog from '@root/views/Catalogs';
 import {useTheme} from '@global/Hooks';
 
 const MainTab = createBottomTabNavigator();
@@ -54,7 +54,7 @@ export function MainTabRoutes() {
       <MainTab.Screen name="Home" component={Home} />
       <MainTab.Screen name="Contacts" component={ContactsRoutes} />
       <MainTab.Screen name="Agreements" component={Agreements} />
-      <MainTab.Screen name="Catalog" component={Catalog} />
+      <MainTab.Screen name="Catalogs" component={CatalogsRoutes} />
     </MainTab.Navigator>
   );
 }

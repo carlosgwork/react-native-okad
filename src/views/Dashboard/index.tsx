@@ -18,7 +18,7 @@ import {
 import AgreementTile from './AgreementTile';
 import {logout} from '@redux/actions';
 import {useNavigation} from '@react-navigation/native';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 
 export const FETCH_AGREEMENTS = gql`
   query AgreementsQuery($type: agreement_event!) {
@@ -86,7 +86,7 @@ export const FETCH_AGREEMENTS = gql`
 
 export default function Dashboard({
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {replace} = useNavigation<any>();
 

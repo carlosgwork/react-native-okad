@@ -6,7 +6,7 @@ import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText, NavBackBtn} from '@root/components';
 import TemplateTile from './TemplateTile';
 import {
-  ContactsNavProps,
+  AppNavProps,
   ContactsStackParamList,
   AppRouteEnum,
 } from '@root/routes/types';
@@ -30,7 +30,7 @@ const Templates = [
 export default function NewAgreement({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.NewAgreement>) {
+}: AppNavProps<AppRouteEnum.NewAgreement>) {
   const {styles} = useStyles(getStyles);
   const {contact, parent = '', itemTitle = ''} = route.params || {};
   const navigateTemplate = (index: number) => {

@@ -18,7 +18,7 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
   Agreement,
@@ -33,7 +33,7 @@ import {setAction} from '@root/redux/actions';
 export default function AgreementDetails({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementDetails>) {
+}: AppNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
   const {
     prefix,

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
 import Icon from 'react-native-vector-icons/Entypo';
 import IonIcon from 'react-native-vector-icons/Ionicons';
@@ -17,6 +17,7 @@ import {
 
 import {AppTextButton, AppText, AppDataTable} from '@root/components';
 import {emptyCatalog} from '@root/utils/constants';
+import {AppRouteEnum} from '@root/routes/types';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Sku', value: 'sku', sortable: true, style: {width: 150}},
@@ -46,11 +47,24 @@ const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | '') => {
   });
 };
 
-const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
+const cellContent = (
+  navigation: any,
+  vendorName: string,
+  header: TableHeaderType,
+  row: Catalog,
+  styles: any,
+) => {
   switch (header.value) {
     case 'sku':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => {
+            navigation.navigate(AppRouteEnum.CatalogDetails, {
+              vendor: vendorName,
+              data: row,
+            });
+          }}>
           <AppText
             style={styles.noSpacing}
             color={'textBlack2'}
@@ -95,9 +109,16 @@ const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
       );
     case 'actions':
       return (
-        <View style={styles.cellLayout}>
+        <TouchableOpacity
+          style={styles.cellLayout}
+          onPress={() => {
+            navigation.navigate(AppRouteEnum.CatalogDetails, {
+              vendor: vendorName,
+              data: row,
+            });
+          }}>
           <Icon name={'chevron-thin-right'} color={'#855C9C'} size={20} />
-        </View>
+        </TouchableOpacity>
       );
     default:
       return <></>;
@@ -105,6 +126,7 @@ const cellContent = (header: TableHeaderType, row: Catalog, styles: any) => {
 };
 
 type Props = {
+  navigation: any;
   vendorName: string;
   catalogs: Catalog[];
   catalogSortOps: TableSortOps;
@@ -112,6 +134,7 @@ type Props = {
 };
 
 export default function VendorRow({
+  navigation,
   vendorName,
   catalogs,
   catalogSortOps,
@@ -131,7 +154,8 @@ export default function VendorRow({
   };
 
   const renderCell = React.useCallback(
-    (header: TableHeaderType, row: Catalog) => cellContent(header, row, styles),
+    (header: TableHeaderType, row: Catalog) =>
+      cellContent(navigation, vendorName, header, row, styles),
     [catalogs],
   );
   return (

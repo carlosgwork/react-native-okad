@@ -22,7 +22,7 @@ import {
   CircularLoading,
 } from '@root/components';
 import {FETCH_CONTACTS} from './graphql';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
@@ -181,7 +181,7 @@ const cellContent = (
 
 export default function Contacts({
   navigation,
-}: ContactsNavProps<AppRouteEnum.MainContacts>) {
+}: AppNavProps<AppRouteEnum.MainContacts>) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 

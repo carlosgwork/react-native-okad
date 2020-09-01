@@ -17,7 +17,7 @@ import {
   AppDataTable,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
 import {MsgIcon, CallIcon, EnvelopIcon} from '@root/assets/assets';
@@ -100,7 +100,7 @@ const cellContent = (
 export default function ContactDetails({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.ContactDetails>) {
+}: AppNavProps<AppRouteEnum.ContactDetails>) {
   const {styles} = useStyles(getStyles);
   const {themeStyle} = useTheme();
   const [contactData, setContactData] = useState<Contact>(emptyContact);

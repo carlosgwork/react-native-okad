@@ -166,7 +166,10 @@ export default function Routes() {
         <Stack.Screen name="Splash" component={SplashRoutes} />
         <Stack.Screen name="Auth" component={AuthRoutes} />
         <Stack.Screen name="Main" component={MainTabRoutes} />
-        <Stack.Screen name="NewAgre" component={NewAgreementNavigationStack} />
+        <Stack.Screen
+          name="NewAgreements"
+          component={NewAgreementNavigationStack}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

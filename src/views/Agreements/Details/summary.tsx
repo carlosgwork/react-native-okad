@@ -11,7 +11,7 @@ import {useStyles} from '@global/Hooks';
 import {UPDATE_AGREEMENT} from '../graphql';
 
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
   OfflineMutationType,
@@ -30,7 +30,7 @@ type SignCaptureType = {
 export default function AgreementSummary({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementSummary>) {
+}: AppNavProps<AppRouteEnum.AgreementSummary>) {
   const {styles} = useStyles(getStyles);
   const {parent = 'Summary', itemTitle, agreement, contact} =
     route.params || {};

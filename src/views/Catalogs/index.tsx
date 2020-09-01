@@ -12,6 +12,7 @@ import VendorRow from './vendorRow';
 import {VendorsState} from '@redux/reducers/vendors';
 import {AppHeader, AppSearchInput, CircularLoading} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 
 const FETCH_COUNT = 20;
 
@@ -29,12 +30,17 @@ export const FETCH_VENDORS = gql`
         sku
         taxable
         name
+        description
+        category
+        created
       }
     }
   }
 `;
 
-export default function Catalogs() {
+export default function Catalogs({
+  navigation,
+}: AppNavProps<AppRouteEnum.Catalogs>) {
   const {styles} = useStyles(getStyles);
   const {vendors, sortOptions} = useSelector(
     (state: any): VendorsState => state.vendors,
@@ -160,6 +166,7 @@ export default function Catalogs() {
           {filteredVendors.map((item, index) => (
             <VendorRow
               key={`vendor-row-${index}-${item.catalog_items.length}`}
+              navigation={navigation}
               vendorName={item.name}
               catalogs={item.catalog_items}
               catalogSortOps={vendorsSortOps[index].sortOps}

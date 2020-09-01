@@ -10,7 +10,7 @@ import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 
 import {
@@ -112,7 +112,7 @@ export const FETCH_AGREEMENTS = gql`
 
 export default function Agreements({
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementsMain>) {
+}: AppNavProps<AppRouteEnum.AgreementsMain>) {
   const {styles} = useStyles(getStyles);
 
   const agreements = useSelector((state: any) => state.agreements);

@@ -14,7 +14,7 @@ import {
   AppGradButton,
 } from '@root/components';
 import {
-  ContactsNavProps,
+  AppNavProps,
   ContactsStackParamList,
   AppRouteEnum,
 } from '@root/routes/types';
@@ -30,7 +30,7 @@ const {width: viewportWidth} = Dimensions.get('window');
 export default function BrunoStraightStairlift({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {contact, templateId, parent = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);

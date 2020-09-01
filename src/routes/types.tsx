@@ -1,6 +1,6 @@
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
-import {Contact, Agreement} from '@root/utils/types';
+import {Contact, Agreement, Catalog} from '@root/utils/types';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
@@ -17,6 +17,8 @@ export enum AppRouteEnum {
   AgreementDetails = 'AgreementDetails',
   AgreementSummary = 'AgreementSummary',
   AgreementsMain = 'AgreementsMain',
+  Catalogs = 'Catalogs',
+  CatalogDetails = 'CatalogDetails',
 }
 
 type TemplatesParamsType = {
@@ -60,11 +62,21 @@ export type ContactsStackParamList = {
   [AppRouteEnum.NewAgreements]: {};
 };
 
+export type CatalogsStackParamList = {
+  [AppRouteEnum.Catalogs]: {};
+  [AppRouteEnum.CatalogDetails]: {
+    data: Catalog;
+    vendor: string;
+  };
+};
+
 type SettingsStackParamList = {};
 
-type AppStackParamList = ContactsStackParamList & SettingsStackParamList;
+type AppStackParamList = ContactsStackParamList &
+  CatalogsStackParamList &
+  SettingsStackParamList;
 
-export type ContactsNavProps<T extends keyof AppStackParamList> = {
+export type AppNavProps<T extends keyof AppStackParamList> = {
   navigation: StackNavigationProp<
     AppStackParamList,
     AppRouteEnum.NewContactModal

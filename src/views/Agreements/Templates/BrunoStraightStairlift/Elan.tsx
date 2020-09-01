@@ -16,7 +16,7 @@ import {
   LineItem,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   LineItemType,
   Agreement,
@@ -159,7 +159,7 @@ const ElanCatalogs = [
 export default function ElanTemplate({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
   const {
     userInfo,

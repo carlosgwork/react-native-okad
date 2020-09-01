@@ -6,6 +6,7 @@ import NewContact from '@root/views/Contacts/New';
 import ContactDetails from '@root/views/Contacts/Details';
 import AgreementDetails from '@root/views/Agreements/Details';
 import AgreementSummary from '@root/views/Agreements/Details/summary';
+import CatalogDetails from '@root/views/Catalogs/Details';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -46,6 +47,7 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
         options={{headerShown: false}}
       />
       <RootStack.Screen name="NewContactModal" component={NewContact} />
+      <RootStack.Screen name="CatalogDetails" component={CatalogDetails} />
     </RootStack.Navigator>
   );
 }
