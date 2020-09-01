@@ -129,7 +129,7 @@ export default function Dashboard({
     setSearchText(text);
   };
 
-  const navigateContact = (agreement: Agreement) => {
+  const navigateDetails = (agreement: Agreement) => {
     const contact = agreement.contact as Contact;
     navigation.navigate(AppRouteEnum.AgreementDetails, {
       agreement,
@@ -187,7 +187,7 @@ export default function Dashboard({
               key={index}
               agreement={agreement}
               color={BgColors[index]}
-              onPress={() => navigateContact(agreement)}
+              onPress={() => navigateDetails(agreement)}
             />
           ))}
         </View>

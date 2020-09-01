@@ -11,7 +11,7 @@ import moment from 'moment';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {Agreement, TableHeaderType, TableSortOps} from '@utils/types';
+import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 
 import {
   AppHeader,
@@ -182,7 +182,7 @@ export default function Agreements({
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Agreement) =>
-      cellContent(header, row, styles),
+      cellContent(navigation, header, row, styles),
     [agreements],
   );
 
@@ -272,11 +272,16 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
   return sorted;
 };
 
-const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
+const cellContent = (
+  navigation: any,
+  header: TableHeaderType,
+  row: Agreement,
+  styles: any,
+) => {
   switch (header.value) {
     case 'contact':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
             <>
               {row.contact?.name_first || ''} {row.contact?.name_last || ''}
@@ -286,7 +291,16 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       );
     case 'name':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => {
+            const contact = row.contact as Contact;
+            navigation.navigate(AppRouteEnum.AgreementDetails, {
+              agreement: row,
+              contact: contact,
+              parent: `${contact.name_first} ${contact.name_last}`,
+            });
+          }}>
           <AppText
             style={styles.noSpacing}
             color={'textLightPurple'}
