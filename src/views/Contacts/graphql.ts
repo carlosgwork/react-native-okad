@@ -24,21 +24,63 @@ export const FETCH_CONTACTS = gql`
         us_state
       }
       agreements {
-        id
-        number
+        agreement_events {
+          type
+          id
+        }
+        address {
+          city
+          county
+          id
+          line1
+          line2
+          us_state
+          postal_code
+        }
+        addressByShippingAddressId {
+          city
+          county
+          id
+          line2
+          line1
+          us_state
+          postal_code
+        }
+        contact {
+          name_first
+          name_last
+          id
+        }
+        contact_id
         line_items {
+          agreement_id
+          catalog_item_id
+          current_cost
           discount
           price
           qty
-        }
-        sales_tax_rate
-        created
-        agreement_template_id
-        user {
-          email
           id
-          prefix
+          catalog_item {
+            name
+          }
         }
+        number
+        revision
+        sales_tax_rate
+        shipping_address_id
+        signature
+        user {
+          prefix
+          pres
+          public_id
+          name_last
+          name_first
+          google_id
+          email
+          default_sales_tax_rate
+          organization_id
+        }
+        user_id
       }
     }
   }

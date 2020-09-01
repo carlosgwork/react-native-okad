@@ -40,11 +40,25 @@ const HEADERS: TableHeaderType[] = [
   },
 ];
 
-const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
+const cellContent = (
+  navigation: any,
+  header: TableHeaderType,
+  row: Agreement,
+  contact: Contact,
+  styles: any,
+) => {
   switch (header.value) {
     case 'number':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => {
+            navigation.navigate(AppRouteEnum.AgreementDetails, {
+              agreement: row,
+              contact: contact,
+              parent: `${contact.name_first} ${contact.name_last}`,
+            });
+          }}>
           <AppText
             style={styles.noSpacing}
             color={'textLightPurple'}
@@ -135,7 +149,7 @@ export default function ContactDetails({
   }, [contacts, itemId]);
 
   const renderCell = (header: TableHeaderType, row: Agreement) =>
-    cellContent(header, row, styles);
+    cellContent(navigation, header, row, contactData, styles);
 
   const onSortChanged = (sortOp: TableSortOps) => {
     setAgreementsSortOps(sortOp);

@@ -40,11 +40,11 @@ const HEADERS: TableHeaderType[] = [
   {label: 'Created', value: 'created', sortable: true, style: {width: 150}},
 ];
 
-const FETCH_COUNT = 20;
+const FETCH_COUNT = 40;
 
 export const FETCH_AGREEMENTS = gql`
   query AgreementQuery($offset: Int!) {
-    agreements(limit: 20, offset: $offset, order_by: {id: desc}) {
+    agreements(limit: 40, offset: $offset, order_by: {id: desc}) {
       id
       agreement_template_id
       agreement_events {
