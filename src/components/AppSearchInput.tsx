@@ -7,6 +7,7 @@ import {useStyles, useTheme} from '@global/Hooks';
 
 type Props = {
   value: string | undefined;
+  placeholderText?: string;
   onChange?: (text: string) => void;
 };
 
@@ -14,26 +15,29 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
-  const {value, onChange} = props;
+  const {value, placeholderText = 'Search', onChange} = props;
 
   return (
     <Input
-      placeholder="Search"
+      placeholder={placeholderText}
       leftIcon={{
         type: 'ionicon',
         name: 'ios-search',
         color: themeStyle.textGray,
-        size: themeStyle.scale(20),
+        size: themeStyle.scale(22),
+        style: {marginLeft: 5, marginTop: 2},
       }}
       rightIcon={{
-        type: 'ionicon',
-        name: 'ios-mic',
+        type: 'font-awesome',
+        name: 'microphone',
         color: themeStyle.textGray,
         size: themeStyle.scale(20),
+        style: {marginRight: 5},
       }}
       containerStyle={styles.container}
       inputContainerStyle={styles.inputContainer}
       inputStyle={styles.input}
+      placeholderTextColor={themeStyle.textGray}
       onChangeText={onChange}
       value={value}
       errorStyle={styles.error}
@@ -49,15 +53,15 @@ const getStyles = (themeStyle: StyleType) => ({
   inputContainer: {
     borderWidth: 1,
     borderRadius: themeStyle.scale(40),
-    paddingHorizontal: 10,
     minWidth: 200,
     height: 35,
   },
   input: {
     padding: 0,
+    paddingHorizontal: 3,
     ...themeStyle.getTextStyle({
-      color: 'textGray',
-      font: 'anRegular',
+      color: 'textBlack',
+      font: 'anMedium',
       size: 14,
     }),
   },

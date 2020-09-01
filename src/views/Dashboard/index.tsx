@@ -163,7 +163,11 @@ export default function Dashboard({
         pageTitle={'Dashboard'}
         toolbarCenterContent={
           <View style={styles.searchContainer}>
-            <AppSearchInput value={searchText} onChange={onFilterAgreement} />
+            <AppSearchInput
+              value={searchText}
+              placeholderText="Search for anything"
+              onChange={onFilterAgreement}
+            />
           </View>
         }
         toolbarRightContent={
