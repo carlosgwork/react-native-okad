@@ -1,5 +1,5 @@
 import * as React from 'react';
-
+import {View} from 'react-native';
 import {Input} from 'react-native-elements';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -18,30 +18,32 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
   const {value, placeholderText = 'Search', onChange} = props;
 
   return (
-    <Input
-      placeholder={placeholderText}
-      leftIcon={{
-        type: 'ionicon',
-        name: 'ios-search',
-        color: themeStyle.textGray,
-        size: themeStyle.scale(22),
-        style: {marginLeft: 5, marginTop: 2},
-      }}
-      rightIcon={{
-        type: 'font-awesome',
-        name: 'microphone',
-        color: themeStyle.textGray,
-        size: themeStyle.scale(20),
-        style: {marginRight: 5},
-      }}
-      containerStyle={styles.container}
-      inputContainerStyle={styles.inputContainer}
-      inputStyle={styles.input}
-      placeholderTextColor={themeStyle.textGray}
-      onChangeText={onChange}
-      value={value}
-      errorStyle={styles.error}
-    />
+    <View style={styles.container}>
+      <Input
+        placeholder={placeholderText}
+        leftIcon={{
+          type: 'ionicon',
+          name: 'ios-search',
+          color: themeStyle.textGray,
+          size: themeStyle.scale(22),
+          style: {marginLeft: 5, marginTop: 2},
+        }}
+        rightIcon={{
+          type: 'font-awesome',
+          name: 'microphone',
+          color: themeStyle.textGray,
+          size: themeStyle.scale(20),
+          style: {marginRight: 5},
+        }}
+        inputContainerStyle={styles.inputContainer}
+        inputStyle={styles.input}
+        placeholderTextColor={themeStyle.textGray}
+        onChangeText={onChange}
+        numberOfLines={1}
+        value={value}
+        errorStyle={styles.error}
+      />
+    </View>
   );
 });
 
@@ -59,11 +61,9 @@ const getStyles = (themeStyle: StyleType) => ({
   input: {
     padding: 0,
     paddingHorizontal: 3,
-    ...themeStyle.getTextStyle({
-      color: 'textBlack',
-      font: 'anMedium',
-      size: 14,
-    }),
+    color: themeStyle.textBlack,
+    fontSize: 14,
+    fontFamily: 'Metropolis-Medium',
   },
   error: {
     height: 0,
