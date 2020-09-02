@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useState, useEffect} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
 import {gql, useQuery} from '@apollo/client';
 import {setAction} from '@redux/actions';
@@ -42,13 +43,17 @@ export default function Catalogs({
   navigation,
 }: AppNavProps<AppRouteEnum.Catalogs>) {
   const {styles} = useStyles(getStyles);
-  const {vendors, sortOptions} = useSelector(
+  const {vendors, searchText: vendorSearchText, sortOptions} = useSelector(
     (state: any): VendorsState => state.vendors,
   );
   const [offset, setOffset] = useState<number>(0);
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
+
+  useEffect(() => {
+    onFilterCatalog(vendorSearchText);
+  }, [vendorSearchText]);
 
   const {loading, error} = useQuery(FETCH_VENDORS, {
     variables: {offset},
@@ -58,6 +63,7 @@ export default function Catalogs({
         vendors: newData,
       });
       setSearchText('');
+      setAction('vendors', {searchText: ''});
       sortVendors(newData);
       setFilteredVendors(newData);
     },
@@ -68,6 +74,7 @@ export default function Catalogs({
     setFilteredVendors(filtered);
     sortVendors(filtered);
     setSearchText(text);
+    setAction('vendors', {searchText: text});
   };
 
   const onSortChanged = (sortOp: TableSortOps, index: number) => {
@@ -78,7 +85,7 @@ export default function Catalogs({
   };
 
   const filterVendors = (text: string, v: Vendor[]) => {
-    if (searchText) {
+    if (text) {
       const filteredVendor = v.filter(
         (vendor: Vendor) =>
           vendor.name.toLowerCase().indexOf(text.toLowerCase()) > -1,

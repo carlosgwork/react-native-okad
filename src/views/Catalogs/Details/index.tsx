@@ -9,6 +9,7 @@ import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText} from '@root/components';
 import {Catalog} from '@root/utils/types';
 import moment from 'moment';
+import {setAction} from '@root/redux/actions';
 
 export default function CatalogDetails({
   route,
@@ -16,6 +17,11 @@ export default function CatalogDetails({
 }: AppNavProps<AppRouteEnum.CatalogDetails>) {
   const {styles} = useStyles(getStyles);
   const {data, vendor}: {data: Catalog; vendor: string} = route.params || {};
+
+  const showCatalogsByVendor = () => {
+    setAction('vendors', {searchText: vendor});
+    navigation.pop();
+  };
 
   return (
     <View style={styles.container}>
@@ -31,9 +37,11 @@ export default function CatalogDetails({
         pageTitle={data.name}
         toolbarCenterContent={null}
         toolbarRightContent={
-          <AppText size={14} color={'textLightPurple'} font="anMedium">
-            {vendor}
-          </AppText>
+          <TouchableOpacity onPress={showCatalogsByVendor}>
+            <AppText size={14} color={'textLightPurple'} font="anMedium">
+              {vendor}
+            </AppText>
+          </TouchableOpacity>
         }
       />
       <View style={styles.mainContent}>

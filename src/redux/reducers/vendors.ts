@@ -2,6 +2,7 @@ import {Vendor, TableSortOps} from '@utils/types';
 
 export const initialVendors = {
   vendors: [],
+  searchText: '',
   sortOptions: [],
 };
 
@@ -34,6 +35,7 @@ export type VendorsAction = {
 
 export type VendorsState = {
   vendors: Vendor[];
+  searchText: string;
   sortOptions: SortOpsByVendor[];
 };
 

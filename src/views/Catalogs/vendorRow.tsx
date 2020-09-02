@@ -60,10 +60,12 @@ const cellContent = (
         <AppTextButton
           style={styles.cellLayout}
           onPress={() => {
-            navigation.navigate(AppRouteEnum.CatalogDetails, {
-              vendor: vendorName,
-              data: row,
-            });
+            if (row.name) {
+              navigation.navigate(AppRouteEnum.CatalogDetails, {
+                vendor: vendorName,
+                data: row,
+              });
+            }
           }}>
           <AppText
             style={styles.noSpacing}
@@ -112,10 +114,12 @@ const cellContent = (
         <TouchableOpacity
           style={styles.cellLayout}
           onPress={() => {
-            navigation.navigate(AppRouteEnum.CatalogDetails, {
-              vendor: vendorName,
-              data: row,
-            });
+            if (row.name) {
+              navigation.navigate(AppRouteEnum.CatalogDetails, {
+                vendor: vendorName,
+                data: row,
+              });
+            }
           }}>
           <Icon name={'chevron-thin-right'} color={'#855C9C'} size={20} />
         </TouchableOpacity>
