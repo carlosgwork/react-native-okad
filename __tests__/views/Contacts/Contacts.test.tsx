@@ -47,16 +47,13 @@ const store2 = mockStore({
 
 const navigation = {navigate: jest.fn()};
 let mockClient: any;
+mockClient = createMockClient();
+queryHandler = jest.fn().mockResolvedValue({
+  data: CONTACTS_MOCKDATA,
+});
+mockClient.setRequestHandler(FETCH_CONTACTS, queryHandler);
 
 describe('Contacts Page', () => {
-  beforeEach(() => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: CONTACTS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_CONTACTS, queryHandler);
-  });
-
   it('renders Loading component while fetching data', () => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
