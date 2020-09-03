@@ -1,11 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {
-  View,
-  Text,
-  Switch,
-  TouchableOpacity,
-  ListRenderItemInfo,
-} from 'react-native';
+import {View, Switch, TouchableOpacity, ListRenderItemInfo} from 'react-native';
 import {useMutation} from '@apollo/client';
 import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
 import LinearGradient from 'react-native-linear-gradient';
@@ -350,9 +344,15 @@ export default function AgreementDetails({
         }
         rightContent={
           <View style={styles.flexRow}>
-            <Text style={styles.switchText}>Show details</Text>
+            <AppText
+              color={'textLightPurple'}
+              size={12}
+              font={'anMedium'}
+              style={styles.switchText}>
+              Show details
+            </AppText>
             <Switch
-              ios_backgroundColor="#3e3e3e"
+              trackColor={{true: '#855C9C', false: '#f4f4f4'}}
               onValueChange={() => setShowDetails(!showDetails)}
               value={showDetails}
             />
@@ -736,7 +736,7 @@ const getStyles = (themeStyle: StyleType) => ({
     height: themeStyle.scale(24),
   },
   switchText: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(8),
   },
   flexRow: {
     flexDirection: 'row',

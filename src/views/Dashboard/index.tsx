@@ -152,9 +152,15 @@ export default function Dashboard({
         leftContent={null}
         rightContent={
           <View style={styles.flexRow}>
-            <Text style={styles.switchText}>Show details</Text>
+            <AppText
+              color={'textLightPurple'}
+              size={12}
+              font={'anMedium'}
+              style={styles.switchText}>
+              Show details
+            </AppText>
             <Switch
-              ios_backgroundColor="#3e3e3e"
+              trackColor={{true: '#855C9C', false: '#f4f4f4'}}
               onValueChange={() => setShowDetails(!showDetails)}
               value={showDetails}
             />
@@ -221,7 +227,7 @@ const getStyles = (themeStyle: StyleType) => ({
     }),
   },
   switchText: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(8),
   },
   logo: {
     resizeMode: 'stretch',
