@@ -50,7 +50,13 @@ export default React.memo<Props>(function AppDataTable(props: Props) {
                 </View>
               ))}
             </View>
-            <View style={styles.divider} />
+            <View
+              style={
+                index % 2 !== 1 && rows.length === index + 1
+                  ? styles.noBorder
+                  : styles.divider
+              }
+            />
           </React.Fragment>
         ))}
       </ScrollView>
@@ -85,6 +91,9 @@ const getStyles = (themeStyle: StyleType) => ({
   rowOdd: {},
   rowEven: {
     backgroundColor: themeStyle.backgroundGray1,
+  },
+  noBorder: {
+    borderWidth: 0,
   },
   cell: {
     paddingVertical: themeStyle.scale(5),
