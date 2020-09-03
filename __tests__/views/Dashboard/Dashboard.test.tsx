@@ -127,7 +127,7 @@ describe('Dashboard Page', () => {
     );
     await wait(0);
     wrapper.update();
-    expect(wrapper.find('Memo(AppText)').first().text()).toEqual(
+    expect(wrapper.find('Memo(AppText)').at(1).text()).toEqual(
       'Recent Open Agreements',
     );
     const AgreementTile = wrapper.find('AgreementTile');

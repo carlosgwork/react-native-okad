@@ -72,7 +72,9 @@ describe('Agreement Details Page', () => {
     expect(appHeader).toHaveLength(1);
     expect(appHeader.find('Text').contains('Quote LH00013')).toEqual(true);
     expect(appHeader.find('Switch')).toHaveLength(1);
-    expect(appHeader.find('Text').contains('Show details')).toBeTruthy();
+    expect(
+      appHeader.find('Memo(AppText)').contains('Show details'),
+    ).toBeTruthy();
   });
 
   it('should render Billing Address section.', () => {
