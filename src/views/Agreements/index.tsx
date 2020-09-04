@@ -1,9 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {View, NativeScrollEvent, Alert} from 'react-native';
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
 import numeral from 'numeral';
-
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import moment from 'moment';
@@ -12,7 +11,6 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
-
 import {
   AppHeader,
   AppSearchInput,
@@ -21,6 +19,7 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
+import {FETCH_AGREEMENTS} from './graphql';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 120}},
@@ -41,74 +40,6 @@ const HEADERS: TableHeaderType[] = [
 ];
 
 const FETCH_COUNT = 40;
-
-export const FETCH_AGREEMENTS = gql`
-  query AgreementQuery($offset: Int!) {
-    agreements(limit: 40, offset: $offset, order_by: {id: desc}) {
-      id
-      agreement_template_id
-      agreement_events {
-        type
-        id
-      }
-      address {
-        city
-        county
-        id
-        line1
-        line2
-        us_state
-        postal_code
-      }
-      addressByShippingAddressId {
-        city
-        county
-        id
-        line2
-        line1
-        us_state
-        postal_code
-      }
-      contact {
-        name_first
-        name_last
-        id
-      }
-      contact_id
-      line_items {
-        agreement_id
-        catalog_item_id
-        current_cost
-        discount
-        price
-        qty
-        id
-        catalog_item {
-          name
-        }
-      }
-      number
-      revision
-      sales_tax_rate
-      shipping_address_id
-      signature
-      user {
-        prefix
-        pres
-        public_id
-        name_last
-        name_first
-        google_id
-        email
-        default_sales_tax_rate
-        organization_id
-      }
-      user_id
-      created
-      last_modified
-    }
-  }
-`;
 
 export default function Agreements({
   navigation,

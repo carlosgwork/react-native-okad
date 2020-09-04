@@ -12,13 +12,19 @@ import {useBackHandler} from '@global/Hooks';
 import NewAgreementNavigationStack from './newAgreement';
 
 import {MainTabRoutes} from './main';
-import {OfflineMutationType, Agreement, LineItemType} from '@root/utils/types';
+import {
+  OfflineMutationType,
+  Agreement,
+  LineItemType,
+  Contact,
+} from '@root/utils/types';
 import {
   CREATE_AGREEMENT,
   UPDATE_AGREEMENT,
   UPDATE_LINE_ITEM,
   REMOVE_LINE_ITEM,
 } from '@root/views/Agreements/graphql';
+import {CREATE_CONTACT} from '@root/views/Contacts/graphql';
 import {setAction} from '@root/redux/actions';
 
 // Gets the current screen from navigation state
@@ -58,26 +64,39 @@ function AuthRoutes() {
 const Stack = createStackNavigator();
 export default function Routes() {
   const routeNameRef = React.useRef<string>();
-  const {offlineMutations, agreements, network} = useSelector((state: any) => ({
-    offlineMutations: state.offlineMutations.data,
-    agreements: state.agreements.agreements,
-    network: state.network,
-  }));
+  const {offlineMutations, contacts, agreements, network} = useSelector(
+    (state: any) => ({
+      offlineMutations: state.offlineMutations.data,
+      contacts: state.contacts.contacts,
+      agreements: state.agreements.agreements,
+      network: state.network,
+    }),
+  );
 
   const [inset_agreement] = useMutation(CREATE_AGREEMENT);
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+  const [insert_contacts] = useMutation(CREATE_CONTACT);
 
   React.useEffect(() => {
     const mutations = offlineMutations.slice();
     if (network.online && mutations.length > 0) {
       mutations.map((mutation: OfflineMutationType) => {
-        const updatedAgreements = agreements.slice();
-        const itemIndex = updatedAgreements.findIndex(
-          (ag: Agreement) => ag.id === mutation.itemId,
-        );
-        const data = updatedAgreements[itemIndex];
+        let data;
+        if (mutation.type !== 'CREATE_CONTACT') {
+          const offlineAgreements = agreements.slice();
+          const itemIndex = offlineAgreements.findIndex(
+            (ag: Agreement) => ag.id === mutation.itemId,
+          );
+          data = offlineAgreements[itemIndex];
+        } else {
+          const offlineContacts = contacts.slice();
+          const itemIndex = offlineContacts.findIndex(
+            (co: Contact) => co.id === mutation.itemId,
+          );
+          data = offlineContacts[itemIndex];
+        }
         switch (mutation.type) {
           case 'CREATE_AGREEMENT':
             const lineItems = data.line_items.map((item: any) => ({
@@ -137,7 +156,7 @@ export default function Routes() {
               },
             });
             break;
-          case 'DELETE_AGREEMENT':
+          case 'DELETE_LINEITEM':
             const lineItIndex2 = data.line_items.findIndex(
               (lineItem2: LineItemType) => lineItem2.id === mutation.lineItemId,
             );
@@ -145,6 +164,25 @@ export default function Routes() {
             delete_line_items({
               variables: {
                 id: deletingLineItem.id,
+              },
+            });
+            break;
+          case 'CREATE_CONTACT':
+            insert_contacts({
+              variables: {
+                company: data.company,
+                email: data.email,
+                name_first: data.name_first,
+                name_last: data.name_last,
+                phone_mobile: data.phone_mobile,
+                phone_office: data.phone_office,
+                title: data.title,
+                city: data.address.city,
+                line1: data.address.line1,
+                line2: data.address.line2,
+                postal_code: data.address.postal_code,
+                us_state: data.address.us_state,
+                organization_id: 1,
               },
             });
             break;

@@ -1,5 +1,6 @@
 import React from 'react';
 import {TouchableOpacity, Image, ImageSourcePropType} from 'react-native';
+
 import {ThemeStyle} from '@root/utils/styles';
 import {useStyles} from '@root/global/Hooks';
 

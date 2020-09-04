@@ -2,9 +2,8 @@ import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView, Alert} from 'react-native';
 import randomColor from 'randomcolor';
 import {GoogleSignin} from '@react-native-community/google-signin';
-import AppGradButton from '@components/AppGradButton';
-
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
+import {useNavigation} from '@react-navigation/native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -15,74 +14,11 @@ import {
   AppSearchInput,
   CircularLoading,
 } from '@root/components';
-import AgreementTile from './AgreementTile';
 import {logout} from '@redux/actions';
-import {useNavigation} from '@react-navigation/native';
+import AppGradButton from '@components/AppGradButton';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
-
-export const FETCH_AGREEMENTS = gql`
-  query AgreementsQuery($type: agreement_event!) {
-    agreements(limit: 10, order_by: {created: desc}) {
-      agreement_events(where: {type: {_neq: $type}}) {
-        type
-      }
-      id
-      address {
-        city
-        county
-        id
-        line1
-        line2
-        us_state
-        postal_code
-      }
-      addressByShippingAddressId {
-        city
-        county
-        id
-        line2
-        line1
-        us_state
-        postal_code
-      }
-      contact {
-        name_first
-        name_last
-        id
-      }
-      contact_id
-      line_items {
-        agreement_id
-        catalog_item_id
-        current_cost
-        discount
-        price
-        qty
-        id
-        catalog_item {
-          name
-        }
-      }
-      number
-      revision
-      sales_tax_rate
-      shipping_address_id
-      signature
-      user {
-        prefix
-        pres
-        public_id
-        name_last
-        name_first
-        google_id
-        email
-        default_sales_tax_rate
-        organization_id
-      }
-      user_id
-    }
-  }
-`;
+import AgreementTile from './AgreementTile';
+import {FETCH_10_AGREEMENTS} from './graphql';
 
 export default function Dashboard({
   navigation,
@@ -91,7 +27,7 @@ export default function Dashboard({
   const {replace} = useNavigation<any>();
 
   const [BgColors, setBgColors] = useState<string[]>([]);
-  const {error, loading} = useQuery(FETCH_AGREEMENTS, {
+  const {error, loading} = useQuery(FETCH_10_AGREEMENTS, {
     variables: {type: 'accepted'},
     onCompleted: (data) => {
       setSearchText('');

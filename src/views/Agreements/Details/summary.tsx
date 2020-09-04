@@ -5,11 +5,12 @@ import SignatureCapture, {
   SaveEventParams,
 } from 'react-native-signature-capture';
 import {useSelector} from 'react-redux';
+import {useMutation} from '@apollo/client';
+
 import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {UPDATE_AGREEMENT} from '../graphql';
-
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
@@ -19,7 +20,6 @@ import {
   Contact,
 } from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
-import {useMutation} from '@apollo/client';
 
 type SignCaptureType = {
   current: any;

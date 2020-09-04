@@ -7,10 +7,10 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import numeral from 'numeral';
 import Dialog from 'react-native-dialog';
 import moment from 'moment';
+import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-
 import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
@@ -21,7 +21,6 @@ import {
   OfflineMutationType,
 } from '@root/utils/types';
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
-import {useSelector} from 'react-redux';
 import {setAction} from '@root/redux/actions';
 
 export default function AgreementDetails({

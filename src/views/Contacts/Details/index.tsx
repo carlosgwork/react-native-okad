@@ -5,10 +5,10 @@ import MapView from 'react-native-maps';
 import {Icon} from 'react-native-elements';
 import moment from 'moment';
 import numeral from 'numeral';
+import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
-
 import {
   AppHeader,
   NavBackBtn,
@@ -21,7 +21,6 @@ import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
 import {MsgIcon, CallIcon, EnvelopIcon} from '@root/assets/assets';
-import {useSelector} from 'react-redux';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'NUMBER', value: 'number', sortable: true, style: {width: 200}},

@@ -3,12 +3,12 @@ import {View, TouchableOpacity, Text} from 'react-native';
 import {AppRouteEnum, AppNavProps} from '@root/routes/types';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import numeral from 'numeral';
+import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText} from '@root/components';
 import {Catalog} from '@root/utils/types';
-import moment from 'moment';
 import {setAction} from '@root/redux/actions';
 
 export default function CatalogDetails({

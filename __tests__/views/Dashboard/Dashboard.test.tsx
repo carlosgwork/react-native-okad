@@ -3,18 +3,20 @@
  */
 
 import React from 'react';
-import Dashboard, {FETCH_AGREEMENTS} from '@root/views/Dashboard';
 import {Provider} from 'react-redux';
 import {createMockClient} from 'mock-apollo-client';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
-import {ThemeContext, ThemeContextType} from '@global/Context';
-import getThemeStyle from '@root/utils/styles';
 import configureStore from 'redux-mock-store';
-import {DASHBOARD_MOCKDATA} from '../../__mocks__/Dashboard';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {NavigationContainer} from '@react-navigation/native';
+
+import Dashboard from '@root/views/Dashboard';
+import {ThemeContext, ThemeContextType} from '@global/Context';
+import getThemeStyle from '@root/utils/styles';
+import {DASHBOARD_MOCKDATA} from '../../__mocks__/Dashboard';
+import {FETCH_10_AGREEMENTS} from '@root/views/Dashboard/graphql';
 
 let wrapper: ReactWrapper;
 let queryHandler;
@@ -45,7 +47,7 @@ describe('Dashboard Page', () => {
     queryHandler = jest.fn().mockResolvedValue({
       data: DASHBOARD_MOCKDATA,
     });
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
+    mockClient.setRequestHandler(FETCH_10_AGREEMENTS, queryHandler);
   });
 
   it('renders Loading component while fetching data', () => {
@@ -69,7 +71,7 @@ describe('Dashboard Page', () => {
 
   it('renders Loading Error text if Data Fetch is failed', async () => {
     mockClient = createMockClient();
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, () =>
+    mockClient.setRequestHandler(FETCH_10_AGREEMENTS, () =>
       Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
     );
     wrapper = mount(

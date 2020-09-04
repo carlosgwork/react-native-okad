@@ -5,8 +5,9 @@ import Geolocation, {
   GeolocationResponse,
 } from '@react-native-community/geolocation';
 import phone from 'phone';
-import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {useMutation} from '@apollo/client';
+import Icon from 'react-native-vector-icons/Ionicons';
+import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -20,13 +21,20 @@ import {Contact, Address} from '@root/utils/types';
 import {fetchAddressFromLocation} from '@root/utils/apis';
 import {emptyContact} from '@root/utils/constants';
 import {CREATE_CONTACT} from '../graphql';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import {setAction} from '@root/redux/actions';
 
 export default function NewContact({
   navigation,
 }: AppNavProps<AppRouteEnum.NewContactModal>) {
   const {styles} = useStyles(getStyles);
   const {themeStyle} = useTheme();
+  const {contacts, offlineMutations, isOnline} = useSelector((state: any) => ({
+    contacts: state.contacts.contacts,
+    offlineMutations: state.offlineMutations,
+    isOnline: state.network.online,
+  }));
+
   const [insert_contacts] = useMutation(CREATE_CONTACT, {
     onCompleted() {
       Alert.alert('New contact was successfully created.');
@@ -162,23 +170,39 @@ export default function NewContact({
   };
 
   const createContact = (formData: Contact) => {
-    insert_contacts({
-      variables: {
-        company: formData.company,
-        email: formData.email,
-        name_first: formData.name_first,
-        name_last: formData.name_last,
-        phone_mobile: formData.phone_mobile,
-        phone_office: formData.phone_office,
-        title: formData.title,
-        city: formData.address.city,
-        line1: formData.address.line1,
-        line2: formData.address.line2,
-        postal_code: formData.address.postal_code,
-        us_state: formData.address.us_state,
-        organization_id: 1,
-      },
-    });
+    const newContacts = contacts.slice();
+    const createdContact = formData;
+    createdContact.agreements = [];
+    createdContact.offlineAgreements = [];
+    newContacts.push(createdContact);
+    setAction('contacts', {contacts: newContacts});
+    if (isOnline) {
+      insert_contacts({
+        variables: {
+          company: formData.company,
+          email: formData.email,
+          name_first: formData.name_first,
+          name_last: formData.name_last,
+          phone_mobile: formData.phone_mobile,
+          phone_office: formData.phone_office,
+          title: formData.title,
+          city: formData.address.city,
+          line1: formData.address.line1,
+          line2: formData.address.line2,
+          postal_code: formData.address.postal_code,
+          us_state: formData.address.us_state,
+          organization_id: 1,
+        },
+      });
+    } else {
+      const lastContact = contacts[contacts.length - 1];
+      const newMutations = offlineMutations.data;
+      newMutations.push({
+        type: 'CREATE_CONTACT',
+        itemId: lastContact.id + 1,
+      });
+      setAction('offlineMutations', {data: newMutations});
+    }
   };
 
   return (

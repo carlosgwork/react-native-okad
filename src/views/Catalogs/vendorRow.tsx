@@ -7,14 +7,12 @@ import IonIcon from 'react-native-vector-icons/Ionicons';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-
 import {
   Catalog,
   CatalogKeys,
   TableHeaderType,
   TableSortOps,
 } from '@utils/types';
-
 import {AppTextButton, AppText, AppDataTable} from '@root/components';
 import {emptyCatalog} from '@root/utils/constants';
 import {AppRouteEnum} from '@root/routes/types';

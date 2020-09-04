@@ -8,10 +8,8 @@ import {useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
-
 import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
 import {phoneFormat} from '@utils/functions';
-
 import {
   AppHeader,
   AppGradButton,
