@@ -71,7 +71,7 @@ export const FETCH_CONTACTS = gql`
         signature
         user {
           prefix
-          pres
+          prefs
           public_id
           name_last
           name_first

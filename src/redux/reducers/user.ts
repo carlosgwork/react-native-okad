@@ -15,7 +15,9 @@ export const initialUser: UserType = {
   organization_id: -1,
   prefix: '',
   public_id: undefined,
-  pres: undefined,
+  prefs: {
+    passcode: null,
+  },
 };
 
 export const user = (state: UserType = initialUser, action: UserAction) => {

@@ -66,7 +66,7 @@ export const AGREEMENT_DETAILS_MOCKDATA = {
   signature: null,
   user: {
     prefix: 'LH',
-    pres: {
+    prefs: {
       passcode: null,
     },
     public_id: '8d806ff5-0c68-430c-956d-42f2f3dd3d87',

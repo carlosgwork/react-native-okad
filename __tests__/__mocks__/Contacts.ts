@@ -73,7 +73,7 @@ export const CONTACTS_MOCKDATA = {
           signature: null,
           user: {
             prefix: 'PK',
-            pres: {
+            prefs: {
               passcode: null,
             },
             public_id: '9c6b8c19-4b63-490b-a1e9-7639c01097e8',

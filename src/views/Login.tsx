@@ -33,7 +33,7 @@ const GET_USERINFO = gql`
       organization_id
       prefix
       public_id
-      pres
+      prefs
     }
   }
 `;
@@ -77,7 +77,7 @@ export default function Login() {
           organization_id: data.users[0].organization_id,
           prefix: data.users[0].prefix,
           public_id: data.users[0].public_id,
-          pres: data.users[0].pres,
+          prefs: data.users[0].prefs,
         });
       }
     },

@@ -99,7 +99,9 @@ export type UserType = {
   organization_id: number;
   prefix: string;
   public_id?: string;
-  pres?: any;
+  prefs?: {
+    passcode?: string;
+  };
 };
 
 export type ReduxState = {

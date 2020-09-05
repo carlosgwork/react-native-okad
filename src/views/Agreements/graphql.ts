@@ -52,7 +52,7 @@ export const FETCH_AGREEMENTS = gql`
       signature
       user {
         prefix
-        pres
+        prefs
         public_id
         name_last
         name_first
@@ -141,7 +141,7 @@ export const CREATE_AGREEMENT = gql`
         signature
         user {
           prefix
-          pres
+          prefs
           public_id
           name_last
           name_first
@@ -208,7 +208,7 @@ export const UPDATE_AGREEMENT = gql`
         signature
         user {
           prefix
-          pres
+          prefs
           public_id
           name_last
           name_first
