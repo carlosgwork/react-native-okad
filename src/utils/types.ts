@@ -169,6 +169,7 @@ export type AgreementLineItemType = {
   discount: number;
   price: number;
   qty: number;
+  order?: number;
   catalog_item: any;
 };
 

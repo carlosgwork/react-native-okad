@@ -1,13 +1,17 @@
 import React, {useState, useEffect} from 'react';
-import {View, Switch, TouchableOpacity, ListRenderItemInfo} from 'react-native';
+import {View, Switch, TouchableOpacity, LayoutAnimation} from 'react-native';
 import {useMutation} from '@apollo/client';
-import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 import numeral from 'numeral';
 import Dialog from 'react-native-dialog';
 import moment from 'moment';
 import {useSelector} from 'react-redux';
+import DraggableFlatList, {
+  RenderItemParams,
+} from 'react-native-draggable-flatlist';
+import SwipeableItem from 'react-native-swipeable-item';
+import Animated from 'react-native-reanimated';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -22,6 +26,13 @@ import {
 } from '@root/utils/types';
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
 import {setAction} from '@root/redux/actions';
+import {phoneFormat} from '@root/utils/functions';
+
+const {multiply, sub} = Animated;
+type SwipeRowType = {
+  item: AgreementLineItemType;
+  drag: () => void;
+};
 
 export default function AgreementDetails({
   route,
@@ -47,7 +58,6 @@ export default function AgreementDetails({
     agreement,
   );
   const [showDetails, setShowDetails] = useState<boolean>(false);
-
   const [listData, setListData] = useState<AgreementLineItemType[]>(
     activeAgreement.line_items || [],
   );
@@ -215,6 +225,45 @@ export default function AgreementDetails({
     }
   };
 
+  const updateLineItemsOrder = (data: AgreementLineItemType[]) => {
+    const itemIndex = offlineMutations.data.findIndex(
+      (it: OfflineMutationType) =>
+        it.type === 'CREATE_AGREEMENT' && activeAgreement.id === it.itemId,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        data.forEach((it) => {
+          update_line_items({
+            variables: {
+              _set: {
+                order: it.order,
+              },
+              id: it.id,
+            },
+          });
+        });
+      } else {
+        const newMutations = offlineMutations.data;
+        data.map((it) => {
+          newMutations.push({
+            type: 'UPDATE_LINEITEM',
+            itemId: agreement.id, // agreement id
+            lineItemId: it.id, // lineItem id
+          });
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
+  };
+
+  const continueClicked = () => {
+    navigation.navigate(AppRouteEnum.AgreementSummary, {
+      itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
+      agreement: activeAgreement,
+      contact: contact,
+    });
+  };
+
   const removeLineItem = (item: AgreementLineItemType) => {
     const itemIndex = offlineMutations.data.findIndex(
       (it: OfflineMutationType) =>
@@ -237,93 +286,130 @@ export default function AgreementDetails({
         setAction('offlineMutations', {data: newMutations});
       }
     }
+    // Animate list to close gap when item is deleted
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   };
 
-  const continueClicked = () => {
-    navigation.navigate(AppRouteEnum.AgreementSummary, {
-      itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
-      agreement: activeAgreement,
-      contact: contact,
-    });
+  const renderUnderlayRight = ({
+    item,
+    percentOpen,
+  }: {
+    item: any;
+    percentOpen: any;
+  }) => (
+    <Animated.View
+      style={[
+        styles.row,
+        styles.underlayRight,
+        {
+          transform: [{translateX: multiply(sub(1, percentOpen), -100)}], // Translate from left on open
+        },
+      ]}>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+        onPress={() => {
+          setActiveRow(item.item.id);
+          setShowDiscount(true);
+        }}>
+        <LinearGradient
+          style={styles.gradientBtn}
+          start={{x: 0.1, y: 0.8}}
+          end={{x: 0.6, y: 1.0}}
+          locations={[0, 1]}
+          colors={['#7CB6C7', '#528DA4']}>
+          <AppText color={'white'} size={16} font={'anSemiBold'}>
+            Discount
+          </AppText>
+        </LinearGradient>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
+        onPress={() => deleteRow(item.item.id)}>
+        <LinearGradient
+          style={styles.gradientBtn}
+          start={{x: 0.1, y: 0.9}}
+          end={{x: 1.0, y: 0.4}}
+          locations={[0, 1]}
+          colors={['#C05252', '#A33333']}>
+          <AppText color={'white'} size={16} font={'anSemiBold'}>
+            Delete
+          </AppText>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  const renderItem = ({
+    item,
+    index,
+    drag,
+  }: RenderItemParams<AgreementLineItemType>) => {
+    return (
+      <SwipeableItem
+        key={index}
+        item={{item, drag}}
+        overSwipe={195}
+        renderUnderlayLeft={renderUnderlayRight}
+        renderOverlay={renderOverlay}
+        snapPointsLeft={[195]}
+      />
+    );
   };
 
-  const renderItem = (
-    rowData: ListRenderItemInfo<AgreementLineItemType>,
-    _: RowMap<AgreementLineItemType>,
-  ): Element => (
-    <SwipeRow
-      disableLeftSwipe={false}
-      disableRightSwipe={false}
-      leftOpenValue={0}
-      key={`swipe-row-${rowData.item.id}`}
-      rightOpenValue={-195}>
-      <View style={styles.rowBack}>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnLeft]}
-          onPress={() => {
-            setActiveRow(rowData.item.id);
-            setShowDiscount(true);
-          }}>
-          <LinearGradient
-            style={styles.gradientBtn}
-            start={{x: 0.1, y: 0.8}}
-            end={{x: 0.6, y: 1.0}}
-            locations={[0, 1]}
-            colors={['#7CB6C7', '#528DA4']}>
-            <AppText color={'white'} size={16} font={'anSemiBold'}>
-              Discount
-            </AppText>
-          </LinearGradient>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnRight]}
-          onPress={() => deleteRow(rowData.item.id)}>
-          <LinearGradient
-            style={styles.gradientBtn}
-            start={{x: 0.1, y: 0.9}}
-            end={{x: 1.0, y: 0.4}}
-            locations={[0, 1]}
-            colors={['#C05252', '#A33333']}>
-            <AppText color={'white'} size={16} font={'anSemiBold'}>
-              Delete
-            </AppText>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+  const renderOverlay = ({item}: {item: SwipeRowType}) => {
+    return (
       <View style={[styles.rowLayout, styles.rowFront]}>
+        <TouchableOpacity onLongPress={item.drag} style={styles.dragbarCell}>
+          <Icon name="reorder-three-outline" size={24} color="#a7a7a7" />
+        </TouchableOpacity>
         <View style={styles.qtyCell}>
           <AppText color={'lightPurple'} size={16} font={'anSemiBold'}>
-            {`${rowData.item.qty}`}
+            {`${item.item.qty}`}
           </AppText>
         </View>
         <View style={styles.descCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {rowData.item.catalog_item.name}
+            {item.item.catalog_item.name}
           </AppText>
         </View>
         <View style={styles.priceCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {`$${numeral(rowData.item.price / 100).format('0,0.00')}`}
+            {`$${numeral(item.item.price / 100).format('0,0.00')}`}
           </AppText>
         </View>
         <View style={styles.discountCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {rowData.item.discount
-              ? `$${numeral(rowData.item.discount / 100).format('0,0.00')}`
+            {item.item.discount
+              ? `$${numeral(item.item.discount / 100).format('0,0.00')}`
               : ''}
           </AppText>
         </View>
         <View style={styles.subTotalCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
             {`$${numeral(
-              (rowData.item.qty * rowData.item.price - rowData.item.discount) /
-                100,
+              (item.item.qty * item.item.price - item.item.discount) / 100,
             ).format('0,0.00')}`}
           </AppText>
         </View>
       </View>
-    </SwipeRow>
-  );
+    );
+  };
+
+  const dragEnded = ({data}: {data: AgreementLineItemType[]}) => {
+    const newData = data.map((it, index) => {
+      const it_copy = Object.assign({}, it);
+      it_copy.order = index;
+      return it_copy;
+    });
+    updateLineItemsOrder(newData);
+    setListData(newData);
+  };
+
+  const shippingAddress = activeAgreement.addressByShippingAddressId
+    ? activeAgreement.addressByShippingAddressId
+    : activeAgreement.address;
+  const phoneNum =
+    contact.phone_home || contact.phone_mobile || contact.phone_office;
 
   return (
     <View style={styles.container}>
@@ -405,26 +491,38 @@ export default function AgreementDetails({
                 font={'anRegular'}>
                 {activeAgreement.address?.line1}
               </AppText>
+              {activeAgreement.address?.line2 && (
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={16}
+                  font={'anRegular'}>
+                  {activeAgreement.address?.line2}
+                </AppText>
+              )}
               <AppText
                 style={styles.lineHeight15}
                 color={'textBlack2'}
                 size={16}
+                numberOfLines={1}
                 font={'anRegular'}>
-                {activeAgreement.address?.line2}
+                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state} ${activeAgreement.address?.postal_code}`}
               </AppText>
+              {phoneNum && (
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={16}
+                  font={'anRegular'}>
+                  {phoneFormat(phoneNum)}
+                </AppText>
+              )}
               <AppText
                 style={styles.lineHeight15}
                 color={'textBlack2'}
                 size={16}
                 font={'anRegular'}>
-                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state}`}
-              </AppText>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {activeAgreement.address?.postal_code}
+                {contact.email}
               </AppText>
             </View>
             <View style={styles.addressView}>
@@ -446,75 +544,66 @@ export default function AgreementDetails({
                 color={'textBlack2'}
                 size={16}
                 font={'anRegular'}>
-                {activeAgreement.addressByShippingAddressId?.line1}
+                {shippingAddress?.line1}
               </AppText>
-              {activeAgreement.addressByShippingAddressId?.line2 && (
+              {shippingAddress?.line2 && (
                 <AppText
                   style={styles.lineHeight15}
                   color={'textBlack2'}
                   size={16}
                   font={'anRegular'}>
-                  {activeAgreement.addressByShippingAddressId?.line2}
+                  {shippingAddress?.line2}
                 </AppText>
               )}
               <AppText
                 style={styles.lineHeight15}
                 color={'textBlack2'}
                 size={16}
+                numberOfLines={1}
                 font={'anRegular'}>
-                {`${activeAgreement.addressByShippingAddressId?.city}, ${activeAgreement.addressByShippingAddressId?.us_state}`}
-              </AppText>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {activeAgreement.addressByShippingAddressId?.postal_code}
+                {`${shippingAddress?.city}, ${shippingAddress?.us_state} ${shippingAddress?.postal_code}`}
               </AppText>
             </View>
           </View>
-          <View style={styles.metaView}>
-            {showDetails && (
-              <>
-                <View style={styles.bottomBorder}>
-                  <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                    META
-                  </AppText>
-                </View>
-                <View style={styles.rowLayout}>
-                  <AppText
-                    style={styles.lineHeight15}
-                    color={'textBlack2'}
-                    size={14}
-                    font={'anRegular'}>
-                    Created
-                  </AppText>
-                  <AppText
-                    style={styles.lineHeight15}
-                    color={'textBlack2'}
-                    size={14}
-                    font={'anRegular'}>
-                    {moment(activeAgreement.created).format(
-                      'M/DD/YYYY, HH:mm A',
-                    )}
-                  </AppText>
-                </View>
-                <View style={[styles.lineHeight15, styles.rowLayout]}>
-                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
-                    First View
-                  </AppText>
-                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
-                    {moment(activeAgreement.created).format(
-                      'M/DD/YYYY, HH:mm A',
-                    )}
-                  </AppText>
-                </View>
-              </>
-            )}
-          </View>
+          {showDetails && (
+            <View style={styles.metaView}>
+              <View style={styles.bottomBorder}>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  META
+                </AppText>
+              </View>
+              <View style={styles.rowLayout}>
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={14}
+                  font={'anRegular'}>
+                  Created
+                </AppText>
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={14}
+                  font={'anRegular'}>
+                  {moment(activeAgreement.created).format('M/DD/YYYY, HH:mm A')}
+                </AppText>
+              </View>
+              <View style={[styles.lineHeight15, styles.rowLayout]}>
+                <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                  First View
+                </AppText>
+                <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                  {moment(activeAgreement.created).format('M/DD/YYYY, HH:mm A')}
+                </AppText>
+              </View>
+            </View>
+          )}
         </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.tableHeader]}>
+            <View style={styles.dragbarCell}>
+              <></>
+            </View>
             <View style={styles.qtyCell}>
               <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
                 QTY
@@ -541,11 +630,15 @@ export default function AgreementDetails({
               </AppText>
             </View>
           </View>
-          <SwipeListView
-            data={listData}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={renderItem as any}
-          />
+          <View style={styles.rowLayout}>
+            <DraggableFlatList
+              activationDistance={15}
+              keyExtractor={(_, index) => index.toString()}
+              data={listData}
+              renderItem={renderItem}
+              onDragEnd={dragEnded}
+            />
+          </View>
         </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.totalRow]}>
@@ -740,6 +833,8 @@ const getStyles = (themeStyle: StyleType) => ({
   flexRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'nowrap',
+    flex: 1,
   },
   rowLayout: {
     flexDirection: 'row',
@@ -754,7 +849,9 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   addressView: {
     marginRight: 40,
+    flex: 1,
     alignSelf: 'flex-start',
+    maxWidth: '50%',
   },
   lineHeight15: {
     height: 24,
@@ -829,6 +926,9 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dragbarCell: {
+    width: 40,
+  },
   totalCell: {
     width: 180,
     alignItems: 'flex-end',
@@ -869,5 +969,10 @@ const getStyles = (themeStyle: StyleType) => ({
     paddingHorizontal: 20,
     alignItems: 'center',
     paddingBottom: 10,
+  },
+  underlayRight: {
+    flex: 1,
+    backgroundColor: 'teal',
+    justifyContent: 'flex-start',
   },
 });

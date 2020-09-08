@@ -6264,6 +6264,11 @@ react-native-dialog@^5.6.0:
     prop-types "^15.7.2"
     react-native-modal "^9.0.0"
 
+react-native-draggable-flatlist@^2.4.0:
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/react-native-draggable-flatlist/-/react-native-draggable-flatlist-2.4.0.tgz#3aa2b4762c7473315c8d10caebb05455fc3e5b9e"
+  integrity sha512-d/R7iWXgd07UuOuwEWbwy21mvvTExDBhUMSZoHssmJmEHgz4jpGn/4nVDtZfrRukB1BDC3BDPFE8cv52VkpTRA==
+
 react-native-elements@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/react-native-elements/-/react-native-elements-2.0.4.tgz#ea5a6bb34cabd48dcd6c6546e4737d2075e40ee3"
@@ -6394,6 +6399,11 @@ react-native-swipe-list-view@^3.2.3:
   version "3.2.3"
   resolved "https://registry.yarnpkg.com/react-native-swipe-list-view/-/react-native-swipe-list-view-3.2.3.tgz#2b4aa361f26b6e55efe38a829ce122dff6c00292"
   integrity sha512-f0B92eZiO0mCk7ZFtn8tbLz4lb+mR8xzcfjFqCVSDeXnuNw7GenUMsccGnclIOhnxnip5BHvUHavlD41peGqig==
+
+react-native-swipeable-item@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/react-native-swipeable-item/-/react-native-swipeable-item-1.5.2.tgz#ab6905a6140543a37e4c745f5b3e9aa7f2e9f7bc"
+  integrity sha512-yhxxpyCojnaSq9FRTRKfoGFleOlngKg1DqYXT79Dl9j5Z4fMoRJ/LE+Mq8z8VWafD3/Vsh8eQWZ0uzcPywc7WQ==
 
 react-native-vector-icons@^7.0.0:
   version "7.0.0"

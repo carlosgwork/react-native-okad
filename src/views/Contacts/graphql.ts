@@ -59,6 +59,7 @@ export const FETCH_CONTACTS = gql`
           discount
           price
           qty
+          order
           id
           catalog_item {
             name
@@ -150,6 +151,7 @@ export const CREATE_CONTACT = gql`
           line_items {
             discount
             price
+            order
             qty
           }
           sales_tax_rate

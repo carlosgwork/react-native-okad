@@ -41,6 +41,7 @@ export const FETCH_AGREEMENTS = gql`
         price
         qty
         id
+        order
         catalog_item {
           name
         }
@@ -129,6 +130,7 @@ export const CREATE_AGREEMENT = gql`
           discount
           price
           qty
+          order
           id
           catalog_item {
             name
@@ -196,6 +198,7 @@ export const UPDATE_AGREEMENT = gql`
           discount
           price
           qty
+          order
           id
           catalog_item {
             name

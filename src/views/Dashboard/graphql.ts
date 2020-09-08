@@ -38,6 +38,7 @@ export const FETCH_10_AGREEMENTS = gql`
         discount
         price
         qty
+        order
         id
         catalog_item {
           name
