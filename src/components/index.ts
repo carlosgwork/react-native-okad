@@ -18,3 +18,4 @@ export {
   default as UpholsteryOption,
   SUPPORTED_COLORS,
 } from './UpholsteryOption';
+export {default as StatusIndicator} from './StatusIndicator';

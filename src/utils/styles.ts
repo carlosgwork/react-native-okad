@@ -24,6 +24,8 @@ const defaultColors = {
   lightBlue: '#add8e6',
   lightPurple10: 'rgba(158, 95, 194, 0.1)',
   lightBorderColor: '#C6C6C8',
+  lightBlueColor: '#50B0F0',
+  lightGreenColor: '#48AB9E',
 };
 
 function getThemeColors(theme: Theme): AppColors {

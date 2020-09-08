@@ -13,3 +13,7 @@ export const SignBg = require('./images/sign-bg.png');
 export const MsgIcon = require('./images/icons/msg.png');
 export const CallIcon = require('./images/icons/call.png');
 export const EnvelopIcon = require('./images/icons/envelop-icon.png');
+export const StatusOpenIcon = require('./images/icons/status-open.png');
+export const StatusEyeIcon = require('./images/icons/status-eye.png');
+export const StatusUpIcon = require('./images/icons/status-up.png');
+export const StatusTickIcon = require('./images/icons/status-tick2.png');

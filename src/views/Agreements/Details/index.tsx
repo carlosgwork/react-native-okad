@@ -11,18 +11,24 @@ import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist';
 import SwipeableItem from 'react-native-swipeable-item';
-import Animated from 'react-native-reanimated';
+import Animated, {event} from 'react-native-reanimated';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
+import {
+  AppHeader,
+  NavBackBtn,
+  AppText,
+  AppGradButton,
+  StatusIndicator,
+} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
   Agreement,
-  AgreementEvent,
   Contact,
   OfflineMutationType,
+  AgreementEvent,
 } from '@root/utils/types';
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
 import {setAction} from '@root/redux/actions';
@@ -405,11 +411,26 @@ export default function AgreementDetails({
     setListData(newData);
   };
 
+  const getAgreementStatus = () => {
+    const events: AgreementEvent[] = activeAgreement.agreement_events as AgreementEvent[];
+    if (events.length === 0) {
+      return 'open';
+    }
+    if (events.findIndex((e) => e.type === 'accepted') > -1) {
+      return 'accepted';
+    }
+    if (events.findIndex((e) => e.type === 'viewed') > -1) {
+      return 'viewed';
+    }
+    return 'sent';
+  };
+
   const shippingAddress = activeAgreement.addressByShippingAddressId
     ? activeAgreement.addressByShippingAddressId
     : activeAgreement.address;
   const phoneNum =
     contact.phone_home || contact.phone_mobile || contact.phone_office;
+  const status = getAgreementStatus();
 
   return (
     <View style={styles.container}>
@@ -450,17 +471,10 @@ export default function AgreementDetails({
         toolbarRightContent={
           showDetails ? (
             <View style={styles.flexRow}>
-              <AppText size={14} color={'textBlack2'} font={'anRegular'}>
-                STATUS:
+              <AppText size={14} color={'textBlack2'} font={'anMedium'}>
+                STATUS:&nbsp;
               </AppText>
-              <AppText size={14} color={'textBlue'} font={'anSemiBold'}>
-                {` ${
-                  (activeAgreement.agreement_events as AgreementEvent[])[0]
-                    ?.type !== 'accepted'
-                    ? 'OPEN'
-                    : 'CLOSED'
-                }`}
-              </AppText>
+              <StatusIndicator status={status} />
             </View>
           ) : (
             <View />
