@@ -3,16 +3,31 @@
  */
 
 import React from 'react';
-import NewContact from '@root/views/Contacts/New';
+import {Provider} from 'react-redux';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
+import {createMockClient} from 'mock-apollo-client';
 import wait from 'waait';
+import configureStore from 'redux-mock-store';
+
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
-import {createMockClient} from 'mock-apollo-client';
+import NewContact from '@root/views/Contacts/New';
 
 let wrapper: ReactWrapper;
 
+const mockStore = configureStore([]);
+const store = mockStore({
+  contacts: {
+    contacts: [],
+  },
+  offlineMutations: {
+    data: [],
+  },
+  network: {
+    online: true,
+  },
+});
 const theme = 'normal';
 const currentTheme = {
   setTheme: jest.fn(),
@@ -28,9 +43,11 @@ describe('New Contact Page', () => {
     mockClient = createMockClient();
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
-        <ThemeContext.Provider value={currentTheme}>
-          <NewContact navigation={navigation as any} route={{} as any} />
-        </ThemeContext.Provider>
+        <Provider store={store}>
+          <ThemeContext.Provider value={currentTheme}>
+            <NewContact navigation={navigation as any} route={{} as any} />
+          </ThemeContext.Provider>
+        </Provider>
       </ApolloProvider>,
     );
     await wait(0);

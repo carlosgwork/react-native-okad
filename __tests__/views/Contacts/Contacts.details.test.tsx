@@ -11,7 +11,6 @@ import configureStore from 'redux-mock-store';
 import ContactDetails from '@root/views/Contacts/Details';
 import {CONTACT_DETAILS_MOCKDATA} from '../../__mocks__/ContactDetails';
 import wait from 'waait';
-import {TouchElementProps} from '@root/utils/types';
 
 let wrapper: ReactWrapper;
 
