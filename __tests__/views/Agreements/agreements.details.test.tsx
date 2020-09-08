@@ -96,13 +96,8 @@ describe('Agreement Details Page', () => {
       billingAddressEle
         .find('Memo(AppText)')
         .contains(
-          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state}`,
+          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.address?.postal_code}`,
         ),
-    ).toBeTruthy();
-    expect(
-      billingAddressEle
-        .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.address?.postal_code),
     ).toBeTruthy();
   });
 
@@ -119,29 +114,24 @@ describe('Agreement Details Page', () => {
     expect(
       projectAddressEle
         .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.address.line1),
+        .contains(AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId.line1),
     ).toBeTruthy();
     expect(
       projectAddressEle
         .find('Memo(AppText)')
         .contains(
-          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state}`,
+          `${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.city}, ${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.postal_code}`,
         ),
-    ).toBeTruthy();
-    expect(
-      projectAddressEle
-        .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.address?.postal_code),
     ).toBeTruthy();
   });
 
   it('should render Line Items list section.', () => {
-    const swipeListEle = wrapper.find('SwipeListView');
+    const swipeListEle = wrapper.find('DraggableFlatList');
     expect(swipeListEle).toHaveLength(1);
-    expect(swipeListEle.find('SwipeRow')).toHaveLength(
+    expect(swipeListEle.find('SwipeableItem')).toHaveLength(
       AGREEMENT_DETAILS_MOCKDATA.line_items.length,
     );
-    const swipeRow = swipeListEle.find('SwipeRow');
+    const swipeRow = swipeListEle.find('SwipeableItem');
     expect(swipeRow.find('Memo(AppText)').contains('Discount')).toBeTruthy();
     expect(swipeRow.find('Memo(AppText)').contains('Delete')).toBeTruthy();
   });
