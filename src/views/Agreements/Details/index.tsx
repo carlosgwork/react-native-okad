@@ -1,5 +1,11 @@
 import React, {useState, useEffect} from 'react';
-import {View, Switch, TouchableOpacity, LayoutAnimation} from 'react-native';
+import {
+  View,
+  Switch,
+  TouchableOpacity,
+  LayoutAnimation,
+  Modal,
+} from 'react-native';
 import {useMutation} from '@apollo/client';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -11,7 +17,7 @@ import DraggableFlatList, {
   RenderItemParams,
 } from 'react-native-draggable-flatlist';
 import SwipeableItem from 'react-native-swipeable-item';
-import Animated, {event} from 'react-native-reanimated';
+import Animated from 'react-native-reanimated';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -33,6 +39,7 @@ import {
 import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
+import LineItemModal from './LineItemModal';
 
 const {multiply, sub} = Animated;
 type SwipeRowType = {
@@ -75,6 +82,9 @@ export default function AgreementDetails({
   const [salesTax, setSalesTax] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
+  const [lineItemModalVisible, setLineItemModalVisible] = useState<boolean>(
+    false,
+  );
 
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
@@ -653,6 +663,21 @@ export default function AgreementDetails({
               onDragEnd={dragEnded}
             />
           </View>
+          <View style={styles.rowLayout}>
+            <TouchableOpacity
+              style={[styles.flexRow, styles.addLineItem]}
+              onPress={() => setLineItemModalVisible(true)}>
+              <AppText color={'textLightPurple'} size={14} font={'anMedium'}>
+                Add Item
+              </AppText>
+              <Icon
+                color={'#855C9C'}
+                name={'ios-add-outline'}
+                size={26}
+                style={styles.marginLeft5}
+              />
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.totalRow]}>
@@ -827,6 +852,13 @@ export default function AgreementDetails({
           }}
         />
       </Dialog.Container>
+      {lineItemModalVisible && <View style={styles.modalWrapper} />}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={lineItemModalVisible}>
+        <LineItemModal onClose={() => setLineItemModalVisible(false)} />
+      </Modal>
     </View>
   );
 }
@@ -835,6 +867,7 @@ const getStyles = (themeStyle: StyleType) => ({
   container: {
     flex: 1,
     backgroundColor: themeStyle.backgroundWhite,
+    position: 'relative',
   },
   logo: {
     resizeMode: 'stretch',
@@ -988,5 +1021,19 @@ const getStyles = (themeStyle: StyleType) => ({
     flex: 1,
     backgroundColor: 'teal',
     justifyContent: 'flex-start',
+  },
+  addLineItem: {
+    justifyContent: 'flex-end',
+    marginVertical: 8,
+    marginRight: -5,
+  },
+  modalWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
 });
