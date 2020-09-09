@@ -43,7 +43,7 @@ const sortCatalog = (arr: Catalog[], sortBy: CatalogKeys | '') => {
 };
 
 const cellContent = (
-  onItemPress: () => void,
+  onItemPress: (_: Catalog) => void,
   header: TableHeaderType,
   row: Catalog,
   styles: any,
@@ -51,7 +51,9 @@ const cellContent = (
   switch (header.value) {
     case 'sku':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={onItemPress}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => onItemPress(row)}>
           <AppText
             style={styles.noSpacing}
             color={'textBlack2'}
@@ -63,7 +65,9 @@ const cellContent = (
       );
     case 'name':
       return (
-        <TouchableOpacity style={styles.cellLayout} onPress={onItemPress}>
+        <TouchableOpacity
+          style={styles.cellLayout}
+          onPress={() => onItemPress(row)}>
           <AppText style={styles.noSpacing} size={16}>
             {row.name}
           </AppText>
@@ -71,7 +75,9 @@ const cellContent = (
       );
     case 'cost':
       return (
-        <TouchableOpacity style={styles.cellLayout} onPress={onItemPress}>
+        <TouchableOpacity
+          style={styles.cellLayout}
+          onPress={() => onItemPress(row)}>
           <AppText style={styles.noSpacing} size={16}>
             {row.cost ? numeral(row.cost / 100).format('$0,0.00') : ''}
           </AppText>
@@ -79,7 +85,9 @@ const cellContent = (
       );
     case 'price':
       return (
-        <TouchableOpacity style={styles.cellLayout} onPress={onItemPress}>
+        <TouchableOpacity
+          style={styles.cellLayout}
+          onPress={() => onItemPress(row)}>
           <AppText style={styles.noSpacing} size={16}>
             {row.price ? numeral(row.price / 100).format('$0,0.00') : ''}
           </AppText>
@@ -89,7 +97,7 @@ const cellContent = (
       return (
         <TouchableOpacity
           style={[styles.cellLayout, styles.alignRight]}
-          onPress={onItemPress}>
+          onPress={() => onItemPress(row)}>
           {row.taxable && (
             <IonIcon name={'checkmark-sharp'} color={'#55465F'} size={22} />
           )}
@@ -102,7 +110,7 @@ const cellContent = (
 };
 
 type Props = {
-  onItemPress: () => void;
+  onItemPress: (_: Catalog) => void;
   vendorName: string;
   catalogs: Catalog[];
   catalogSortOps: TableSortOps;

@@ -35,8 +35,14 @@ import {
   Contact,
   OfflineMutationType,
   AgreementEvent,
+  Catalog,
 } from '@root/utils/types';
-import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
+import {
+  UPDATE_AGREEMENT,
+  UPDATE_LINE_ITEM,
+  REMOVE_LINE_ITEM,
+  CREATE_LINE_ITEM,
+} from '../graphql';
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
 import LineItemModal from './LineItemModal';
@@ -89,6 +95,7 @@ export default function AgreementDetails({
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+  const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM);
 
   useEffect(() => {
     let total = 0;
@@ -433,6 +440,25 @@ export default function AgreementDetails({
       return 'viewed';
     }
     return 'sent';
+  };
+
+  const onAddItem = (item: Catalog) => {
+    insert_line_items_one({
+      variables: {
+        object: {
+          agreement_id: activeAgreement.id,
+          catalog_item_id: item.id,
+          current_cost: item.cost,
+          discount: 0,
+          order: activeAgreement.line_items
+            ? activeAgreement.line_items.length - 1
+            : 0,
+          price: item.price,
+          qty: 1,
+          taxable: item.taxable,
+        },
+      },
+    });
   };
 
   const shippingAddress = activeAgreement.addressByShippingAddressId
@@ -857,7 +883,10 @@ export default function AgreementDetails({
         animationType="slide"
         transparent={true}
         visible={lineItemModalVisible}>
-        <LineItemModal onClose={() => setLineItemModalVisible(false)} />
+        <LineItemModal
+          onClose={() => setLineItemModalVisible(false)}
+          onAddItem={onAddItem}
+        />
       </Modal>
     </View>
   );

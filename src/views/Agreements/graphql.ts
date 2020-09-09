@@ -226,6 +226,24 @@ export const UPDATE_AGREEMENT = gql`
   }
 `;
 
+export const CREATE_LINE_ITEM = gql`
+  mutation CreateLineItem($object: line_items_insert_input!) {
+    insert_line_items_one(object: $object) {
+      catalog_item_id
+      agreement_id
+      current_cost
+      discount
+      id
+      order
+      price
+      qty
+      taxable
+      created
+      last_modified
+    }
+  }
+`;
+
 export const UPDATE_LINE_ITEM = gql`
   mutation UpdateLineItem($_set: line_items_set_input, $id: Int) {
     update_line_items(where: {id: {_eq: $id}}, _set: $_set) {

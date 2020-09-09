@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -22,19 +22,21 @@ import {useStyles} from '@global/Hooks';
 
 const FETCH_COUNT = 20;
 
-const LineItemModal = ({onClose}: {onClose: () => void}) => {
+const LineItemModal = ({
+  onClose,
+  onAddItem,
+}: {
+  onClose: () => void;
+  onAddItem: (_: Catalog) => void;
+}) => {
   const {styles} = useStyles(getStyles);
-  const {vendors, searchText: vendorSearchText, sortOptions} = useSelector(
+  const {vendors, sortOptions} = useSelector(
     (state: any): VendorsState => state.vendors,
   );
   const [offset, setOffset] = useState<number>(0);
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
-
-  useEffect(() => {
-    onFilterCatalog(vendorSearchText);
-  }, [vendorSearchText]);
 
   const {loading, error} = useQuery(FETCH_VENDORS, {
     variables: {offset},
@@ -104,8 +106,8 @@ const LineItemModal = ({onClose}: {onClose: () => void}) => {
     setVendorsSortOps(sortOps);
   };
 
-  const onItemPress = () => {
-    console.log('----- item press');
+  const onItemPress = (item: Catalog) => {
+    onAddItem(item);
     onClose();
   };
 
@@ -174,7 +176,9 @@ const LineItemModal = ({onClose}: {onClose: () => void}) => {
               />
             ))}
             {filteredVendors.length === 0 && (
-              <Text style={styles.centerText}>No Result</Text>
+              <View style={styles.centerText}>
+                <Text>No Result</Text>
+              </View>
             )}
             <CircularLoading loading={loading} />
           </ScrollView>
@@ -234,6 +238,11 @@ const getStyles = () => ({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  centerText: {
+    marginVertical: 10,
+    flex: 1,
+    alignItems: 'center',
   },
 });
 

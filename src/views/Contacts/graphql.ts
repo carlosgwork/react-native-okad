@@ -24,6 +24,7 @@ export const FETCH_CONTACTS = gql`
         us_state
       }
       agreements {
+        id
         agreement_events {
           type
           id
