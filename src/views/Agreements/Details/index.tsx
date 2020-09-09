@@ -9,6 +9,7 @@ import {
 import {useMutation} from '@apollo/client';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import numeral from 'numeral';
 import Dialog from 'react-native-dialog';
 import moment from 'moment';
@@ -91,7 +92,6 @@ export default function AgreementDetails({
   const [lineItemModalVisible, setLineItemModalVisible] = useState<boolean>(
     false,
   );
-
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
@@ -431,15 +431,18 @@ export default function AgreementDetails({
   const getAgreementStatus = () => {
     const events: AgreementEvent[] = activeAgreement.agreement_events as AgreementEvent[];
     if (events.length === 0) {
-      return 'open';
+      return {status: 'open', agreementEditable: true};
     }
     if (events.findIndex((e) => e.type === 'accepted') > -1) {
-      return 'accepted';
+      return {status: 'accepted', agreementEditable: false};
     }
     if (events.findIndex((e) => e.type === 'viewed') > -1) {
-      return 'viewed';
+      return {status: 'viewed', agreementEditable: false};
     }
-    return 'sent';
+    if (events.findIndex((e) => e.type === 'printed') > -1) {
+      return {status: 'printed', agreementEditable: false};
+    }
+    return {status: 'sent', agreementEditable: true};
   };
 
   const onAddItem = (item: Catalog) => {
@@ -466,7 +469,7 @@ export default function AgreementDetails({
     : activeAgreement.address;
   const phoneNum =
     contact.phone_home || contact.phone_mobile || contact.phone_office;
-  const status = getAgreementStatus();
+  const {status, agreementEditable} = getAgreementStatus();
 
   return (
     <View style={styles.container}>
@@ -500,9 +503,22 @@ export default function AgreementDetails({
             />
           </View>
         }
-        pageTitle={`Quote ${prefix}${numeral(agreement.number).format(
-          '00000',
-        )}`}
+        pageTitle=""
+        toolbarLeftContent={
+          <View style={styles.toolbarLeftContent}>
+            <AppText color={'textBlack2'} size={34} font={'anSemiBold'}>
+              {`Quote ${prefix}${numeral(agreement.number).format('00000')}`}
+            </AppText>
+            {!agreementEditable && (
+              <FontAwesomeIcon
+                name="lock"
+                color="#55465F"
+                size={30}
+                style={styles.lockIcon}
+              />
+            )}
+          </View>
+        }
         toolbarCenterContent={null}
         toolbarRightContent={
           showDetails ? (
@@ -525,14 +541,16 @@ export default function AgreementDetails({
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
                   BILLING ADDRESS
                 </AppText>
-                <TouchableOpacity onPress={() => {}}>
-                  <AppText
-                    color={'textLightPurple'}
-                    size={12}
-                    font={'anSemiBold'}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => {}}>
+                    <AppText
+                      color={'textLightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
               </View>
               <AppText
                 style={styles.lineHeight15}
@@ -580,14 +598,16 @@ export default function AgreementDetails({
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
                   PROJECT ADDRESS
                 </AppText>
-                <TouchableOpacity onPress={() => {}}>
-                  <AppText
-                    color={'textLightPurple'}
-                    size={12}
-                    font={'anSemiBold'}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => {}}>
+                    <AppText
+                      color={'textLightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
               </View>
               <AppText
                 style={styles.lineHeight15}
@@ -718,11 +738,13 @@ export default function AgreementDetails({
                   SALES TAX
                 </AppText>
               </View>
-              <TouchableOpacity onPress={() => setShowSalesTax(true)}>
-                <AppText color={'lightPurple'} size={12} font={'anSemiBold'}>
-                  Edit
-                </AppText>
-              </TouchableOpacity>
+              {agreementEditable && (
+                <TouchableOpacity onPress={() => setShowSalesTax(true)}>
+                  <AppText color={'lightPurple'} size={12} font={'anSemiBold'}>
+                    Edit
+                  </AppText>
+                </TouchableOpacity>
+              )}
             </View>
             <View style={styles.totalCell}>
               <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
@@ -1064,5 +1086,13 @@ const getStyles = (themeStyle: StyleType) => ({
     height: '100%',
     zIndex: 10,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  toolbarLeftContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lockIcon: {
+    height: 34,
+    marginLeft: 20,
   },
 });
