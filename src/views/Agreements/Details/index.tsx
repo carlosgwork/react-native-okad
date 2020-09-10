@@ -38,7 +38,6 @@ import {
   OfflineMutationType,
   AgreementEvent,
   Catalog,
-  LineItemType,
 } from '@root/utils/types';
 import {
   UPDATE_AGREEMENT,
@@ -50,7 +49,6 @@ import {
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
 import LineItemModal from './LineItemModal';
-import {user} from '@root/redux/reducers/user';
 
 const {multiply, sub} = Animated;
 type SwipeRowType = {
@@ -757,96 +755,103 @@ export default function AgreementDetails({
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.block}>
-          <View style={[styles.rowLayout, styles.totalRow]}>
-            <View style={styles.priceCell}>
-              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                SUBTOTAL
-              </AppText>
-            </View>
-            <View style={styles.priceCell}>
-              <View>
-                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  SALES TAX
-                </AppText>
+        <View style={styles.subInfoContainer}>
+          {showDetails && (
+            <>
+              <View style={[styles.block, styles.subInfoView]}>
+                <View style={[styles.rowLayout, styles.totalRow]}>
+                  <View style={styles.priceCell}>
+                    <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                      TOTAL COST
+                    </AppText>
+                  </View>
+                  <View style={styles.subInfoCell}>
+                    <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                      MARGIN
+                    </AppText>
+                  </View>
+                </View>
+                <View style={[styles.rowLayout, styles.totalRow]}>
+                  <View style={styles.priceCell}>
+                    <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                      {`$${numeral(totalCost / 100).format('0,0.00')}`}
+                    </AppText>
+                  </View>
+                  <View style={styles.subInfoCell}>
+                    <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                      {`${Math.round(
+                        ((totalPrice - totalCost) / totalPrice) * 100,
+                      )}%`}
+                    </AppText>
+                  </View>
+                </View>
               </View>
-              {agreementEditable && (
-                <TouchableOpacity onPress={() => setShowSalesTax(true)}>
-                  <AppText color={'lightPurple'} size={12} font={'anSemiBold'}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
-              )}
-            </View>
-            <View style={styles.totalCell}>
-              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                TOTAL
-              </AppText>
-            </View>
-          </View>
-          <View style={[styles.rowLayout, styles.totalRow]}>
-            <View style={styles.priceCell}>
-              <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                {`$${numeral(totalPrice / 100).format('0,0.00')}`}
-              </AppText>
-            </View>
-            <View style={[styles.priceCell, styles.editDiscountCell]}>
-              <View>
-                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`$${numeral(
-                    (totalPrice * activeAgreement.sales_tax_rate) / 100 / 100,
-                  ).format('0,0.00')}`}
-                </AppText>
-              </View>
-              <View>
-                <AppText color={'textBlack2'} size={18} font={'anRegular'}>
-                  {` @ ${activeAgreement.sales_tax_rate}%`}
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.totalCell}>
-              <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
-                {`$${numeral(
-                  (totalPrice * (100 + activeAgreement.sales_tax_rate)) /
-                    100 /
-                    100,
-                ).format('0,0.00')}`}
-              </AppText>
-            </View>
-          </View>
-        </View>
-        {showDetails && (
+              <View style={[styles.block, styles.flex1, styles.rightBorder]} />
+              <View style={styles.flex1} />
+            </>
+          )}
           <View style={styles.block}>
             <View style={[styles.rowLayout, styles.totalRow]}>
               <View style={styles.priceCell}>
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  TOTAL COST
+                  SUBTOTAL
                 </AppText>
               </View>
               <View style={styles.priceCell}>
+                <View>
+                  <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                    SALES TAX
+                  </AppText>
+                </View>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => setShowSalesTax(true)}>
+                    <AppText
+                      color={'lightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={styles.totalCell}>
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  MARGIN
+                  TOTAL
                 </AppText>
               </View>
-              <View style={styles.priceCell} />
             </View>
             <View style={[styles.rowLayout, styles.totalRow]}>
               <View style={styles.priceCell}>
                 <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`$${numeral(totalCost / 100).format('0,0.00')}`}
+                  {`$${numeral(totalPrice / 100).format('0,0.00')}`}
                 </AppText>
               </View>
-              <View style={styles.priceCell}>
-                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`${Math.round(
-                    ((totalPrice - totalCost) / totalPrice) * 100,
-                  )}%`}
+              <View style={[styles.priceCell, styles.editDiscountCell]}>
+                <View>
+                  <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                    {`$${numeral(
+                      (totalPrice * activeAgreement.sales_tax_rate) / 100 / 100,
+                    ).format('0,0.00')}`}
+                  </AppText>
+                </View>
+                <View>
+                  <AppText color={'textBlack2'} size={18} font={'anRegular'}>
+                    {` @ ${activeAgreement.sales_tax_rate}%`}
+                  </AppText>
+                </View>
+              </View>
+              <View style={styles.totalCell}>
+                <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
+                  {`$${numeral(
+                    (totalPrice * (100 + activeAgreement.sales_tax_rate)) /
+                      100 /
+                      100,
+                  ).format('0,0.00')}`}
                 </AppText>
               </View>
-              <View style={styles.priceCell} />
             </View>
           </View>
-        )}
+        </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.totalRow]}>
             <TouchableOpacity
@@ -857,7 +862,7 @@ export default function AgreementDetails({
                 color={'textLightPurple'}
                 size={14}
                 font={'anSemiBold'}>
-                CONTINUE
+                REVIEW AND ACCEPT
               </AppText>
               <Icon
                 color={'#855C9C'}
@@ -970,6 +975,13 @@ const getStyles = (themeStyle: StyleType) => ({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  subInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  subInfoCell: {
+    width: 70,
+  },
   bottomBorder: {
     borderBottomColor: themeStyle.lightBorderColor,
     borderBottomWidth: 1,
@@ -991,7 +1003,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignSelf: 'flex-start',
   },
   block: {
-    paddingTop: 40,
+    marginTop: 40,
     paddingHorizontal: 20,
   },
   tableHeader: {
@@ -1102,7 +1114,6 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   underlayRight: {
     flex: 1,
-    backgroundColor: 'teal',
     justifyContent: 'flex-start',
   },
   addLineItem: {
@@ -1126,5 +1137,13 @@ const getStyles = (themeStyle: StyleType) => ({
   lockIcon: {
     height: 34,
     marginLeft: 20,
+  },
+  rightBorder: {
+    borderRightWidth: 1,
+    borderRightColor: themeStyle.lightBorderColor,
+  },
+  flex1: {
+    flex: 1,
+    paddingHorizontal: 0,
   },
 });
