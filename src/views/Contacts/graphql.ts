@@ -25,6 +25,7 @@ export const FETCH_CONTACTS = gql`
       }
       agreements {
         id
+        agreement_template_id
         agreement_events {
           type
           id
@@ -62,6 +63,7 @@ export const FETCH_CONTACTS = gql`
           qty
           order
           id
+          taxable
           catalog_item {
             name
           }
@@ -148,12 +150,21 @@ export const CREATE_CONTACT = gql`
         }
         agreements {
           id
+          agreement_template_id
           number
           line_items {
+            agreement_id
+            catalog_item_id
+            current_cost
             discount
             price
-            order
             qty
+            order
+            id
+            taxable
+            catalog_item {
+              name
+            }
           }
           sales_tax_rate
           created

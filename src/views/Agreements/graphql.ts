@@ -42,6 +42,7 @@ export const FETCH_AGREEMENTS = gql`
         qty
         id
         order
+        taxable
         catalog_item {
           name
         }
@@ -89,12 +90,12 @@ export const CREATE_AGREEMENT = gql`
         number: $number
         shipping_address_id: $shipping_address_id
         line_items: {data: $line_items}
-        agreement_events: {data: {type: "texted"}}
         user_id: $user_id
       }
     ) {
       returning {
         id
+        agreement_template_id
         agreement_events {
           type
           id
@@ -132,6 +133,7 @@ export const CREATE_AGREEMENT = gql`
           qty
           order
           id
+          taxable
           catalog_item {
             name
           }
@@ -163,6 +165,7 @@ export const UPDATE_AGREEMENT = gql`
     update_agreements(where: {id: {_eq: $id}}, _set: $_set) {
       returning {
         id
+        agreement_template_id
         agreement_events {
           type
           id
@@ -200,6 +203,7 @@ export const UPDATE_AGREEMENT = gql`
           qty
           order
           id
+          taxable
           catalog_item {
             name
           }

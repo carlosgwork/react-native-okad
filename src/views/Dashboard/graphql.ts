@@ -7,6 +7,7 @@ export const FETCH_10_AGREEMENTS = gql`
         type
       }
       id
+      agreement_template_id
       address {
         city
         county
@@ -40,6 +41,7 @@ export const FETCH_10_AGREEMENTS = gql`
         qty
         order
         id
+        taxable
         catalog_item {
           name
         }

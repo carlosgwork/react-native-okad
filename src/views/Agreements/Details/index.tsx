@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   LayoutAnimation,
   Modal,
+  Alert,
 } from 'react-native';
 import {useMutation} from '@apollo/client';
 import LinearGradient from 'react-native-linear-gradient';
@@ -37,16 +38,19 @@ import {
   OfflineMutationType,
   AgreementEvent,
   Catalog,
+  LineItemType,
 } from '@root/utils/types';
 import {
   UPDATE_AGREEMENT,
   UPDATE_LINE_ITEM,
   REMOVE_LINE_ITEM,
   CREATE_LINE_ITEM,
+  CREATE_AGREEMENT,
 } from '../graphql';
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
 import LineItemModal from './LineItemModal';
+import {user} from '@root/redux/reducers/user';
 
 const {multiply, sub} = Animated;
 type SwipeRowType = {
@@ -60,12 +64,14 @@ export default function AgreementDetails({
 }: AppNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
   const {
+    userInfo,
     prefix,
     agreements,
     contacts,
     offlineMutations,
     isOnline,
   } = useSelector((state: any) => ({
+    userInfo: state.user,
     prefix: state.user.prefix,
     agreements: state.agreements.agreements,
     contacts: state.contacts.contacts,
@@ -96,6 +102,12 @@ export default function AgreementDetails({
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
   const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM);
+  const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
+    onCompleted() {
+      // Update agreement number of current usr
+      Alert.alert('A Revision agreement is successfully created.');
+    },
+  });
 
   useEffect(() => {
     let total = 0;
@@ -171,10 +183,30 @@ export default function AgreementDetails({
 
   const updateAgreementRevision = () => {
     const newAgreement = Object.assign({}, activeAgreement);
-    newAgreement.revision = newAgreement.revision + 1;
-    updateActiveAgreement(newAgreement);
-    updateAgreementState(newAgreement);
-    runAgreementUpdateQuery(newAgreement);
+    const line_items = newAgreement.line_items?.map(
+      (item: AgreementLineItemType) => {
+        return {
+          catalog_item_id: item.catalog_item_id,
+          current_cost: item.current_cost,
+          discount: item.discount,
+          price: item.price,
+          qty: item.qty,
+          taxable: item.taxable,
+        };
+      },
+    );
+    inset_agreement({
+      variables: {
+        billing_address_id: newAgreement.billing_address_id,
+        agreement_template_id: newAgreement.agreement_template_id,
+        contact_id: newAgreement.contact_id,
+        shipping_address_id: newAgreement.shipping_address_id,
+        line_items,
+        user_id: newAgreement.user_id,
+        sales_tax_rate: newAgreement.sales_tax_rate,
+        number: `${userInfo.lastAgreementNumber + 1}`,
+      },
+    });
   };
 
   const updateAgreement = (data: Agreement) => {

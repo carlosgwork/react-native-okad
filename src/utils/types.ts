@@ -171,6 +171,7 @@ export type AgreementLineItemType = {
   qty: number;
   order?: number;
   catalog_item: any;
+  taxable?: boolean;
 };
 
 export type ProductItemProps = {
