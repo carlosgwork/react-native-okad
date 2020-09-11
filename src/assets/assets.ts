@@ -17,3 +17,5 @@ export const StatusOpenIcon = require('./images/icons/status-open.png');
 export const StatusEyeIcon = require('./images/icons/status-eye.png');
 export const StatusUpIcon = require('./images/icons/status-up.png');
 export const StatusTickIcon = require('./images/icons/status-tick2.png');
+export const DeleteIcon = require('./images/icons/delete-icon.png');
+export const ShareIcon = require('./images/icons/upload-icon.png');

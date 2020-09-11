@@ -516,11 +516,18 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   createBtn: {
     borderTopLeftRadius: 0,
-    paddingVertical: 10,
+    paddingVertical: 11,
+    paddingLeft: 20,
     borderTopRightRadius: 0,
     borderRadius: 0,
   },
   createBtnText: {
     textTransform: 'uppercase',
+    ...themeStyle.getTextStyle({
+      color: 'textWhite',
+      font: 'anSemiBold',
+      size: 16,
+    }),
+    letterSpacing: 2.91,
   },
 });

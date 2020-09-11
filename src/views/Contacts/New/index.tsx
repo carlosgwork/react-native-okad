@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, Alert} from 'react-native';
+import {View, TouchableOpacity, Alert, StatusBar} from 'react-native';
 import {Input} from 'react-native-elements';
 import Geolocation, {
   GeolocationResponse,
@@ -207,6 +207,12 @@ export default function NewContact({
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        animated={false}
+        backgroundColor="transparent"
+        barStyle={'light-content'}
+        translucent={true}
+      />
       <AppHeader
         leftContent={
           <TouchableOpacity onPress={() => navigation.pop()}>

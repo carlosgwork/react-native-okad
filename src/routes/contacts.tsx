@@ -16,8 +16,6 @@ function ContactsStackNavigation() {
     <Stack.Navigator headerMode="none">
       <Stack.Screen name="MainContacts" component={Main} />
       <Stack.Screen name="ContactDetails" component={ContactDetails} />
-      <Stack.Screen name="AgreementDetails" component={AgreementDetails} />
-      <Stack.Screen name="AgreementSummary" component={AgreementSummary} />
     </Stack.Navigator>
   );
 }
@@ -48,6 +46,8 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
       />
       <RootStack.Screen name="NewContactModal" component={NewContact} />
       <RootStack.Screen name="CatalogDetails" component={CatalogDetails} />
+      <RootStack.Screen name="AgreementDetails" component={AgreementDetails} />
+      <RootStack.Screen name="AgreementSummary" component={AgreementSummary} />
     </RootStack.Navigator>
   );
 }

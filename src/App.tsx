@@ -45,7 +45,7 @@ export default function App() {
       <ApolloProvider client={client}>
         <ThemeContext.Provider value={currentTheme}>
           <StatusBar
-            animated={true}
+            animated={false}
             backgroundColor="transparent"
             barStyle={currentTheme.themeStyle.statusBarStyle as StatusBarStyle}
             translucent={true}

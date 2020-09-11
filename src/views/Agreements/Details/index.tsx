@@ -6,6 +6,8 @@ import {
   LayoutAnimation,
   Modal,
   Alert,
+  Image,
+  StatusBar,
 } from 'react-native';
 import {useMutation} from '@apollo/client';
 import LinearGradient from 'react-native-linear-gradient';
@@ -27,7 +29,6 @@ import {
   AppHeader,
   NavBackBtn,
   AppText,
-  AppGradButton,
   StatusIndicator,
 } from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
@@ -49,6 +50,7 @@ import {
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
 import LineItemModal from './LineItemModal';
+import {DeleteIcon, ShareIcon} from '@assets/assets';
 
 const {multiply, sub} = Animated;
 type SwipeRowType = {
@@ -524,6 +526,12 @@ export default function AgreementDetails({
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        animated={false}
+        backgroundColor="transparent"
+        barStyle={'light-content'}
+        translucent={true}
+      />
       <AppHeader
         leftContent={
           <NavBackBtn
@@ -760,21 +768,23 @@ export default function AgreementDetails({
               onDragEnd={dragEnded}
             />
           </View>
-          <View style={styles.rowLayout}>
-            <TouchableOpacity
-              style={[styles.flexRow, styles.addLineItem]}
-              onPress={() => setLineItemModalVisible(true)}>
-              <AppText color={'textLightPurple'} size={14} font={'anMedium'}>
-                Add Item
-              </AppText>
-              <Icon
-                color={'#855C9C'}
-                name={'ios-add-outline'}
-                size={26}
-                style={styles.marginLeft5}
-              />
-            </TouchableOpacity>
-          </View>
+          {agreementEditable && (
+            <View style={styles.rowLayout}>
+              <TouchableOpacity
+                style={[styles.flexRow, styles.addLineItem]}
+                onPress={() => setLineItemModalVisible(true)}>
+                <AppText color={'textLightPurple'} size={14} font={'anMedium'}>
+                  Add Item
+                </AppText>
+                <Icon
+                  color={'#855C9C'}
+                  name={'ios-add-outline'}
+                  size={26}
+                  style={styles.marginLeft5}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
         <View style={styles.subInfoContainer}>
           {showDetails && (
@@ -895,14 +905,19 @@ export default function AgreementDetails({
           </View>
         </View>
         <View style={[styles.block, styles.revisionBtnView]}>
-          <AppGradButton
-            containerStyle={styles.revisionBtnContainer}
-            btnStyle={styles.revisionBtn}
-            textStyle={styles.revisionBtnText}
-            title={'CREATE REVISION'}
-            leftIconContent={<></>}
-            onPress={updateAgreementRevision}
-          />
+          <TouchableOpacity
+            style={[styles.flex1, styles.revisionText]}
+            onPress={updateAgreementRevision}>
+            <AppText color={'textLightPurple'} size={16} font={'anMedium'}>
+              Create Revision
+            </AppText>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.flex1}>
+            <Image source={ShareIcon} style={styles.shareIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.flex1}>
+            <Image source={DeleteIcon} style={styles.deleteIcon} />
+          </TouchableOpacity>
         </View>
       </View>
       <Dialog.Container key="set-discount-dialog" visible={showDiscount}>
@@ -1112,15 +1127,6 @@ const getStyles = (themeStyle: StyleType) => ({
   revisionBtnText: {
     color: themeStyle.textWhite,
   },
-  revisionBtnView: {
-    position: 'absolute',
-    bottom: 20,
-    alignItems: 'center',
-    width: '100%',
-  },
-  revisionBtnContainer: {
-    width: 300,
-  },
   revisionBtn: {
     paddingLeft: 50,
   },
@@ -1166,5 +1172,32 @@ const getStyles = (themeStyle: StyleType) => ({
   flex1: {
     flex: 1,
     paddingHorizontal: 0,
+  },
+  shareIcon: {
+    height: 28,
+    alignSelf: 'center',
+    resizeMode: 'contain',
+  },
+  deleteIcon: {
+    height: 28,
+    alignSelf: 'flex-end',
+    resizeMode: 'contain',
+  },
+  revisionBtnView: {
+    position: 'absolute',
+    paddingBottom: 20,
+    height: 70,
+    bottom: 0,
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: 'rgb(249, 249, 249)',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopColor: themeStyle.lightBorderColor,
+  },
+  revisionText: {
+    height: 50,
+    justifyContent: 'center',
   },
 });
