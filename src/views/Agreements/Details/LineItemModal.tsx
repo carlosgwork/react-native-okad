@@ -175,7 +175,7 @@ const LineItemModal = ({
                 }
               />
             ))}
-            {filteredVendors.length === 0 && (
+            {!loading && filteredVendors.length === 0 && (
               <View style={styles.centerText}>
                 <Text>No Result</Text>
               </View>

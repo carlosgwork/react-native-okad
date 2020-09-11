@@ -244,6 +244,9 @@ export const CREATE_LINE_ITEM = gql`
       taxable
       created
       last_modified
+      catalog_item {
+        name
+      }
     }
   }
 `;

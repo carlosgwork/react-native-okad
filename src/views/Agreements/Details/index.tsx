@@ -99,7 +99,17 @@ export default function AgreementDetails({
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
-  const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM);
+  const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM, {
+    onCompleted(data) {
+      const newData = [...listData];
+      newData.push(data.insert_line_items_one);
+      setListData(newData);
+      const newAgreement = Object.assign({}, activeAgreement);
+      newAgreement.line_items = newData;
+      updateActiveAgreement(newAgreement);
+      updateAgreementState(newAgreement);
+    },
+  });
   const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted() {
       // Update agreement number of current usr
@@ -181,6 +191,17 @@ export default function AgreementDetails({
 
   const updateAgreementRevision = () => {
     const newAgreement = Object.assign({}, activeAgreement);
+    agreements.unshift(newAgreement);
+    const newAgreements = agreements.slice();
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        ct.agreements?.push(agreement);
+      }
+      return ct;
+    });
+    setAction('contacts', {contacts: newContacts});
     const line_items = newAgreement.line_items?.map(
       (item: AgreementLineItemType) => {
         return {
@@ -1086,7 +1107,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
   },
   continueBtn: {
-    letterSpacing: 3.5,
+    letterSpacing: 3,
   },
   revisionBtnText: {
     color: themeStyle.textWhite,
