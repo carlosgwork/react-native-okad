@@ -18,7 +18,7 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
   const {value, placeholderText = 'Search', onChange} = props;
 
   return (
-    <View style={styles.container}>
+    <View>
       <Input
         placeholder={placeholderText}
         leftIcon={{
@@ -35,6 +35,7 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
           size: themeStyle.scale(20),
           style: {marginRight: 5},
         }}
+        containerStyle={styles.container}
         inputContainerStyle={styles.inputContainer}
         inputStyle={styles.input}
         placeholderTextColor={themeStyle.textGray}

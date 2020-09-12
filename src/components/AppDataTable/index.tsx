@@ -90,7 +90,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   rowOdd: {},
   rowEven: {
-    backgroundColor: themeStyle.backgroundGray1,
+    backgroundColor: themeStyle.lightGray,
   },
   noBorder: {
     borderWidth: 0,

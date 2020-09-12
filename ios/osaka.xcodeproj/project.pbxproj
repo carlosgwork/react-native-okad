@@ -27,6 +27,7 @@
 		D47D0F7F2C44563D730A07A8 /* libPods-osaka-osakaTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CD53BED67222C1AF6DC09C6 /* libPods-osaka-osakaTests.a */; };
 		D506A7A2F7F2448B604F85DE /* libPods-osaka-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 733CEC7CBFFBA03A832E5CC6 /* libPods-osaka-tvOSTests.a */; };
 		D8DF41CFA83F4F96513BA2D4 /* libPods-osaka-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 863B8689A0CD661064881F4E /* libPods-osaka-tvOS.a */; };
+		D887DA3A49004B8293CD4ACC /* icomoon.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5F41327782264D27A9769DE6 /* icomoon.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -129,6 +130,7 @@
 		F35E77B3E4084B5896D96AD1 /* AntDesign.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = AntDesign.ttf; path = ../assets/fonts/AntDesign.ttf; sourceTree = "<group>"; };
 		FA0E41BEB5C146B2A3E4719E /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Brands.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Brands.ttf"; sourceTree = "<group>"; };
 		FC5D5C28F6564B8B8A5953CD /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome5_Solid.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome5_Solid.ttf"; sourceTree = "<group>"; };
+		5F41327782264D27A9769DE6 /* icomoon.ttf */ = {isa = PBXFileReference; name = "icomoon.ttf"; path = "../assets/fonts/icomoon.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -303,6 +305,7 @@
 				EA450E15BFEE4308BA486CB8 /* SimpleLineIcons.ttf */,
 				AF4F614896844C44AA32C8A9 /* Zocial.ttf */,
 				C0099080F6FC467A9E3A72D9 /* AvenirNextLTPro-Medium.otf */,
+				5F41327782264D27A9769DE6 /* icomoon.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -474,6 +477,7 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
 				B1A69BC6C3C04EEB91ACFACD /* AvenirNextLTPro-Medium.otf in Resources */,
+				D887DA3A49004B8293CD4ACC /* icomoon.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

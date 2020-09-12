@@ -99,6 +99,11 @@
     "redux-mock-store": "^1.5.4",
     "typescript": "^3.9.7"
   },
+  "rnpm": {
+    "assets": [
+	    "./assets/fonts/"
+    ]
+  },
   "jest": {
     "preset": "react-native",
     "moduleFileExtensions": [

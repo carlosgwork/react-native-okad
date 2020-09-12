@@ -26,6 +26,7 @@ const defaultColors = {
   lightBorderColor: '#C6C6C8',
   lightBlueColor: '#50B0F0',
   lightGreenColor: '#48AB9E',
+  lightGray: '#F7F7F7',
 };
 
 function getThemeColors(theme: Theme): AppColors {
@@ -84,6 +85,12 @@ const textSizes: {
     letterSpacing: scale(0.5),
     lineHeight: scale(12),
     height: scale(12),
+  },
+  [13]: {
+    fontSize: scale(13),
+    letterSpacing: scale(0.5),
+    lineHeight: scale(13),
+    height: scale(13),
   },
   [14]: {
     fontSize: scale(14),
@@ -200,6 +207,7 @@ export type TextSizes =
   | 10
   | 11
   | 12
+  | 13
   | 14
   | 16
   | 18

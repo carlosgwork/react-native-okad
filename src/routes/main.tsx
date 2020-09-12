@@ -1,6 +1,7 @@
 import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
+import CustomIcon from '@components/CustomIcon';
 
 import Home from '@root/views/Dashboard';
 import ContactsRoutes from './contacts';
@@ -21,29 +22,40 @@ export function MainTabRoutes() {
           switch (route.name) {
             case 'Home':
               iconName = 'ios-home';
-              break;
+              return (
+                <Icon name={iconName} type="ionicon" color={color} size={24} />
+              );
             case 'Contacts':
               iconName = 'ios-people';
-              break;
+              return (
+                <Icon name={iconName} type="ionicon" color={color} size={26} />
+              );
             case 'Agreements':
-              iconName = 'ios-document';
-              break;
+              return (
+                <CustomIcon name="agreements-glyph" size={26} color={color} />
+              );
             case 'Catalog':
-              iconName = 'ios-pricetags';
-              break;
+              return (
+                <CustomIcon name="catalog-glyph" size={24} color={color} />
+              );
             default:
-              iconName = 'ios-people';
+              return (
+                <Icon
+                  name={'ios-people'}
+                  type="ionicon"
+                  color={color}
+                  size={26}
+                />
+              );
           }
-          return (
-            <Icon name={iconName} type="ionicon" color={color} size={26} />
-          );
         },
       })}
       tabBarOptions={{
         activeTintColor: themeStyle.textLightPurple,
         inactiveTintColor: themeStyle.gray,
         labelStyle: {
-          fontSize: 16,
+          fontSize: 13,
+          fontFamily: 'Metropolis-Medium',
           letterSpacing: 0.5,
           paddingVertical: 5,
         },
@@ -54,7 +66,7 @@ export function MainTabRoutes() {
       <MainTab.Screen name="Home" component={Home} />
       <MainTab.Screen name="Contacts" component={ContactsRoutes} />
       <MainTab.Screen name="Agreements" component={Agreements} />
-      <MainTab.Screen name="Catalogs" component={CatalogsRoutes} />
+      <MainTab.Screen name="Catalog" component={CatalogsRoutes} />
     </MainTab.Navigator>
   );
 }
