@@ -185,7 +185,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(30),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),

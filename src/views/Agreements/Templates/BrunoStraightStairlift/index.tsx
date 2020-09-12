@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {View, Image, TouchableOpacity, Text, Dimensions} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Carousel from 'react-native-snap-carousel';
 import numeral from 'numeral';
 
@@ -24,6 +23,7 @@ import {setAction} from '@root/redux/actions';
 import {ProductItemProps} from '@root/utils/types';
 
 import {ELAN_PRODUCTS} from './data';
+import CustomIcon from '@root/components/CustomIcon';
 
 const {width: viewportWidth} = Dimensions.get('window');
 
@@ -75,18 +75,18 @@ export default function BrunoStraightStairlift({
         )}
         <View style={styles.rowLayout}>
           <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'images-outline'}
+            <CustomIcon
+              color={themeStyle.textLightPurple}
+              name="images-glyph"
               size={24}
               style={styles.marginRight15}
             />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'ios-videocam-outline'}
-              size={28}
+            <CustomIcon
+              color={themeStyle.textLightPurple}
+              name={'camera-glyph'}
+              size={20}
               style={styles.marginRight15}
             />
           </TouchableOpacity>
@@ -193,13 +193,13 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(30),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),
   },
   marginRight15: {
-    marginRight: themeStyle.scale(30),
+    marginRight: themeStyle.scale(25),
     paddingVertical: 20,
   },
   imageStyle: {
@@ -225,10 +225,11 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   ctaBtnContainer: {
     alignItems: 'center',
+    marginTop: 10,
   },
   ctaBtn: {
     textAlign: 'center',
-    width: '40%',
+    width: 'auto',
   },
   ctaInnerBtn: {
     paddingRight: 0,
@@ -236,7 +237,8 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   ctaInnerBtnText: {
     textTransform: 'uppercase',
-    letterSpacing: 2,
+    letterSpacing: 3.27,
+    paddingHorizontal: 10,
   },
   diagonalBox: {
     backgroundColor: themeStyle.backgroundWhite,

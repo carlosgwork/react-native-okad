@@ -76,11 +76,10 @@ const getStyles = (themeStyle: StyleType) => ({
   text: {
     ...themeStyle.getTextStyle({
       color: 'textWhite',
-      font: 'anRegular',
+      font: 'anSemiBold',
       size: 14,
     }),
     letterSpacing: 2,
-    fontWeight: '500',
     alignSelf: 'center',
   },
   textContainer: {
