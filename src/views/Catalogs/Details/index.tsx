@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, TouchableOpacity, Text} from 'react-native';
+import {View, TouchableOpacity, Text, StatusBar} from 'react-native';
 import {AppRouteEnum, AppNavProps} from '@root/routes/types';
 import IonIcon from 'react-native-vector-icons/Ionicons';
 import numeral from 'numeral';
@@ -25,6 +25,12 @@ export default function CatalogDetails({
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        animated={false}
+        backgroundColor="transparent"
+        barStyle={'light-content'}
+        translucent={true}
+      />
       <AppHeader
         leftContent={
           <TouchableOpacity onPress={() => navigation.pop()}>

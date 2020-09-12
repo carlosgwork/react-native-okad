@@ -11,7 +11,7 @@ import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {UPDATE_AGREEMENT} from '../graphql';
-import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
+import {AppHeader, AppText, AppGradButton} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
@@ -32,8 +32,7 @@ export default function AgreementSummary({
   navigation,
 }: AppNavProps<AppRouteEnum.AgreementSummary>) {
   const {styles} = useStyles(getStyles);
-  const {parent = 'Summary', itemTitle, agreement, contact} =
-    route.params || {};
+  const {itemTitle, agreement, contact} = route.params || {};
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const signRef = React.useRef<SignCaptureType>(null);
 
@@ -125,12 +124,11 @@ export default function AgreementSummary({
     <View style={styles.container}>
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={parent}
-            onClick={() => {
-              navigation.pop();
-            }}
-          />
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <AppText size={16} color={'textLightPurple'} font="anMedium">
+              Close
+            </AppText>
+          </TouchableOpacity>
         }
         rightContent={null}
         pageTitle={itemTitle || ''}

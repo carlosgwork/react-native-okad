@@ -26,12 +26,7 @@ import Animated from 'react-native-reanimated';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {
-  AppHeader,
-  NavBackBtn,
-  AppText,
-  StatusIndicator,
-} from '@root/components';
+import {AppHeader, AppText, StatusIndicator} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
@@ -81,7 +76,7 @@ export default function AgreementDetails({
     isOnline: state.network.online,
   }));
 
-  const {parent = 'Contacts', contact, agreement} = route.params || {};
+  const {contact, agreement} = route.params || {};
   const [activeAgreement, updateActiveAgreement] = useState<Agreement>(
     agreement,
   );
@@ -597,17 +592,11 @@ export default function AgreementDetails({
       />
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={parent}
-            onClick={() => {
-              navigation.pop();
-              navigation.navigate(AppRouteEnum.ContactDetails, {
-                parent: 'Contacts',
-                itemTitle: `${contact.name_first} ${contact.name_last}`,
-                itemId: contact.id,
-              });
-            }}
-          />
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <AppText size={16} color={'textLightPurple'} font="anMedium">
+              Close
+            </AppText>
+          </TouchableOpacity>
         }
         rightContent={
           <View style={styles.flexRow}>
