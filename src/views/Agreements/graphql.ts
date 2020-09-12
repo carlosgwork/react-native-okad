@@ -230,6 +230,20 @@ export const UPDATE_AGREEMENT = gql`
   }
 `;
 
+export const DELETE_AGREEMENT = gql`
+  mutation REMOVE_AGREEMENT($id: Int!) {
+    delete_agreement_events(where: {agreement_id: {_eq: $id}}) {
+      affected_rows
+    }
+    delete_line_items(where: {agreement_id: {_eq: $id}}) {
+      affected_rows
+    }
+    delete_agreements(where: {id: {_eq: $id}}) {
+      affected_rows
+    }
+  }
+`;
+
 export const CREATE_LINE_ITEM = gql`
   mutation CreateLineItem($object: line_items_insert_input!) {
     insert_line_items_one(object: $object) {

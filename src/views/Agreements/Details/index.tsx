@@ -8,6 +8,7 @@ import {
   Alert,
   Image,
   StatusBar,
+  Share,
 } from 'react-native';
 import {useMutation} from '@apollo/client';
 import LinearGradient from 'react-native-linear-gradient';
@@ -46,6 +47,7 @@ import {
   REMOVE_LINE_ITEM,
   CREATE_LINE_ITEM,
   CREATE_AGREEMENT,
+  DELETE_AGREEMENT,
 } from '../graphql';
 import {setAction} from '@root/redux/actions';
 import {phoneFormat} from '@root/utils/functions';
@@ -98,9 +100,15 @@ export default function AgreementDetails({
   const [lineItemModalVisible, setLineItemModalVisible] = useState<boolean>(
     false,
   );
+  const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+  const [delete_agreements] = useMutation(DELETE_AGREEMENT, {
+    onCompleted() {
+      navigation.pop();
+    },
+  });
   const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM, {
     onCompleted(data) {
       const newData = [...listData];
@@ -112,7 +120,7 @@ export default function AgreementDetails({
       updateAgreementState(newAgreement);
     },
   });
-  const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
+  const [insert_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted() {
       // Update agreement number of current usr
       Alert.alert('A Revision agreement is successfully created.');
@@ -216,7 +224,7 @@ export default function AgreementDetails({
         };
       },
     );
-    inset_agreement({
+    insert_agreement({
       variables: {
         billing_address_id: newAgreement.billing_address_id,
         agreement_template_id: newAgreement.agreement_template_id,
@@ -247,6 +255,42 @@ export default function AgreementDetails({
         id: activeAgreement.id,
       },
     });
+  };
+
+  const deleteAgreement = () => {
+    const newAgreements = JSON.parse(JSON.stringify(agreements));
+    const agIndex = newAgreements.findIndex(
+      (ag: Agreement) => ag.id === activeAgreement.id,
+    );
+    newAgreements.splice(agIndex, 1);
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        const newCtAgreements = ct.agreements?.slice() || [];
+        const agIndex2 = newCtAgreements.findIndex(
+          (ag2: Agreement) => ag2.id === activeAgreement.id,
+        );
+        newCtAgreements.splice(agIndex2, 1);
+        ct.agreements = newCtAgreements;
+      }
+      return ct;
+    });
+    setAction('contacts', {contacts: newContacts});
+    if (isOnline) {
+      delete_agreements({
+        variables: {
+          id: activeAgreement.id,
+        },
+      });
+    } else {
+      const newMutations = offlineMutations.data;
+      newMutations.push({
+        type: 'DELETE_AGREEMENT',
+        itemId: activeAgreement.id, // agreement id
+      });
+      setAction('offlineMutations', {data: newMutations});
+    }
   };
 
   const runAgreementUpdateQuery = (data: Agreement) => {
@@ -515,6 +559,25 @@ export default function AgreementDetails({
         },
       },
     });
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Share content',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
   };
 
   const shippingAddress = activeAgreement.addressByShippingAddressId
@@ -912,10 +975,12 @@ export default function AgreementDetails({
               Create Revision
             </AppText>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.flex1}>
+          <TouchableOpacity style={styles.flex1} onPress={onShare}>
             <Image source={ShareIcon} style={styles.shareIcon} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.flex1}>
+          <TouchableOpacity
+            style={styles.flex1}
+            onPress={() => setShowDeletePrompt(true)}>
             <Image source={DeleteIcon} style={styles.deleteIcon} />
           </TouchableOpacity>
         </View>
@@ -970,6 +1035,27 @@ export default function AgreementDetails({
           onPress={() => {
             setShowSalesTax(false);
             applySalesTax();
+          }}
+        />
+      </Dialog.Container>
+      <Dialog.Container
+        key="delete-agreement-dialog"
+        visible={showDeletePrompt}>
+        <Dialog.Title>Delete Agreement</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to delete this agreement?
+        </Dialog.Description>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setShowDeletePrompt(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ok"
+          onPress={() => {
+            setShowDeletePrompt(false);
+            deleteAgreement();
           }}
         />
       </Dialog.Container>
