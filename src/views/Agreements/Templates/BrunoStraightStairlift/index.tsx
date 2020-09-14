@@ -61,7 +61,9 @@ export default function BrunoStraightStairlift({
 
     return (
       <View key={index} style={styles.slideItem}>
-        <Image style={styles.imageStyle} source={productImage} />
+        <View style={styles.imageContainer}>
+          <Image style={styles.imageStyle} source={productImage} />
+        </View>
         {item.name.indexOf('Reconditioned') > -1 && (
           <View style={styles.diagonalBox}>
             <AppText
@@ -164,6 +166,9 @@ export default function BrunoStraightStairlift({
             renderItem={_renderItem}
             sliderWidth={viewportWidth}
             itemWidth={viewportWidth / 2.2}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1}
           />
         </View>
       </View>
@@ -202,13 +207,17 @@ const getStyles = (themeStyle: StyleType) => ({
     marginRight: themeStyle.scale(25),
     paddingVertical: 20,
   },
+  imageContainer: {
+    paddingRight: 10,
+  },
   imageStyle: {
+    resizeMode: 'stretch',
     width: '100%',
-    resizeMode: 'contain',
     height: 400,
   },
   slideItem: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
+    marginRight: 8,
     justifyContent: 'flex-start',
   },
   itemContent: {
@@ -244,7 +253,7 @@ const getStyles = (themeStyle: StyleType) => ({
     backgroundColor: themeStyle.backgroundWhite,
     paddingVertical: 10,
     paddingHorizontal: 50,
-    transform: [{rotate: '-45deg'}, {translateY: '15%'}, {translateX: '-65%'}],
+    transform: [{rotate: '-45deg'}, {translateY: '0%'}, {translateX: '-75%'}],
     position: 'absolute',
     top: 0,
     left: 0,

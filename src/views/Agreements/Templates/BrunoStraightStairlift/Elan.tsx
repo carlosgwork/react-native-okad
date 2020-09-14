@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
@@ -31,11 +31,11 @@ const ElanCatalogs = [
     items: [
       {
         id: 7,
-        cost: 36740,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Power-Assisted Swivel Seat',
-        price: 72900,
+        name: 'Manual Swivel Seat',
+        price: 0,
         sku: 'SRE-30528',
         taxable: true,
         vendor_id: 1,
@@ -60,11 +60,11 @@ const ElanCatalogs = [
     items: [
       {
         id: 6,
-        cost: 29260,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Automatic Folding Footrest',
-        price: 50000,
+        name: 'Manual Folding Footrest',
+        price: 0,
         sku: 'SRE-30525',
         taxable: true,
         vendor_id: 1,
@@ -89,14 +89,15 @@ const ElanCatalogs = [
     items: [
       {
         id: 4,
-        cost: 73040,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Power Folding Rail',
-        price: 140000,
+        name: 'Fixed Rail',
+        price: 0,
         sku: 'SRE-30529',
         taxable: true,
         vendor_id: 1,
+        image: true,
         subcategory: 'Rail',
       },
       {
@@ -107,18 +108,6 @@ const ElanCatalogs = [
         name: 'Manual Folding Rail',
         price: 70000,
         sku: 'SRE-30530',
-        taxable: true,
-        vendor_id: 1,
-        subcategory: 'Rail',
-      },
-      {
-        id: 9,
-        cost: 36740,
-        category: 'Stairlifts',
-        description: 'For SRE-2010',
-        name: 'Manual Folding Rail',
-        price: 70000,
-        sku: 'SRE-30379',
         taxable: true,
         vendor_id: 1,
         subcategory: 'Rail',
@@ -200,6 +189,14 @@ export default function ElanTemplate({
       });
     },
   });
+
+  useEffect(() => {
+    if (cartItems.length === 1) {
+      const newItems = cartItems.slice();
+      ElanCatalogs.forEach((catalog) => newItems.push(catalog.items[0]));
+      setAction('cart', {items: newItems});
+    }
+  }, [cartItems]);
 
   const updateQty = (item: LineItemType, qty: number) => {
     const itemIndex = cartItems.findIndex(
@@ -443,7 +440,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(50),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),
