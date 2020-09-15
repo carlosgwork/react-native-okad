@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
 import {setAction} from '@redux/actions';
 import {useSelector} from 'react-redux';
 
@@ -14,30 +14,9 @@ import {VendorsState} from '@redux/reducers/vendors';
 import {AppHeader, AppSearchInput, CircularLoading} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import {FETCH_VENDORS} from './graphql';
 
 const FETCH_COUNT = 20;
-
-export const FETCH_VENDORS = gql`
-  query Vendors($offset: Int!) {
-    vendors(limit: 20, offset: $offset) {
-      id
-      logo_uri
-      name
-      short_name
-      catalog_items {
-        cost
-        id
-        price
-        sku
-        taxable
-        name
-        description
-        category
-        created
-      }
-    }
-  }
-`;
 
 export default function Catalogs({
   navigation,
@@ -50,12 +29,13 @@ export default function Catalogs({
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
+  const [loadingData, setLoadingData] = useState<boolean>(true);
 
   useEffect(() => {
     onFilterCatalog(vendorSearchText);
   }, [vendorSearchText]);
 
-  const {loading, error} = useQuery(FETCH_VENDORS, {
+  const {error} = useQuery(FETCH_VENDORS, {
     variables: {offset},
     onCompleted: (data) => {
       const newData = vendors.concat(data.vendors);
@@ -66,6 +46,10 @@ export default function Catalogs({
       setAction('vendors', {searchText: ''});
       sortVendors(newData);
       setFilteredVendors(newData);
+      setLoadingData(false);
+    },
+    onError: () => {
+      setLoadingData(false);
     },
   });
 
@@ -129,7 +113,7 @@ export default function Catalogs({
     nativeEvent: NativeScrollEvent;
   }): void => {
     const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
-    if (loading) {
+    if (loadingData) {
       return;
     }
     if (layoutMeasurement.height > contentSize.height) {
@@ -182,10 +166,10 @@ export default function Catalogs({
               }
             />
           ))}
-          {filteredVendors.length === 0 && (
+          {!loadingData && filteredVendors.length === 0 && (
             <Text style={styles.centerText}>No Result</Text>
           )}
-          <CircularLoading loading={loading} />
+          <CircularLoading loading={loadingData} />
         </ScrollView>
       </View>
     </View>
