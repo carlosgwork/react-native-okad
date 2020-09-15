@@ -32,7 +32,7 @@ const HEADERS: TableHeaderType[] = [
   },
   {
     label: 'Template',
-    value: 'agreement_template_id',
+    value: 'agreement_template_name',
     sortable: true,
     style: {flex: 1},
   },
@@ -177,9 +177,9 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
           b.address?.us_state || ''
         }`.toUpperCase();
         break;
-      case 'agreement_template_id':
-        cmpA = a.agreement_template_id;
-        cmpB = b.agreement_template_id;
+      case 'agreement_template_name':
+        cmpA = a.agreement_template.name;
+        cmpB = b.agreement_template.name;
         break;
       case 'created':
         cmpA = `${a.created}`.toUpperCase();
@@ -259,11 +259,11 @@ const cellContent = (
           </AppText>
         </View>
       );
-    case 'agreement_template_id':
+    case 'agreement_template_name':
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {'Bruno Straight Stairlift'}
+            {row.agreement_template.name}
           </AppText>
         </View>
       );

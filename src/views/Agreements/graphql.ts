@@ -66,6 +66,11 @@ export const FETCH_AGREEMENTS = gql`
       user_id
       created
       last_modified
+      agreement_template {
+        name
+        opts
+        id
+      }
     }
   }
 `;
@@ -155,6 +160,11 @@ export const CREATE_AGREEMENT = gql`
           organization_id
         }
         user_id
+        agreement_template {
+          name
+          opts
+          id
+        }
       }
     }
   }
@@ -225,6 +235,11 @@ export const UPDATE_AGREEMENT = gql`
           organization_id
         }
         user_id
+        agreement_template {
+          name
+          opts
+          id
+        }
       }
     }
   }

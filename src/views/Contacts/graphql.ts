@@ -85,6 +85,11 @@ export const FETCH_CONTACTS = gql`
           organization_id
         }
         user_id
+        agreement_template {
+          name
+          opts
+          id
+        }
       }
     }
   }
@@ -173,6 +178,11 @@ export const CREATE_CONTACT = gql`
             email
             id
             prefix
+          }
+          agreement_template {
+            name
+            opts
+            id
           }
         }
       }

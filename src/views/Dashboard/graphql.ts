@@ -63,6 +63,11 @@ export const FETCH_10_AGREEMENTS = gql`
         organization_id
       }
       user_id
+      agreement_template {
+        name
+        opts
+        id
+      }
     }
   }
 `;

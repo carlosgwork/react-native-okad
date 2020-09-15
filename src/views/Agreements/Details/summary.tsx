@@ -18,6 +18,7 @@ import {
   OfflineMutationType,
   Agreement,
   Contact,
+  PaymentSchedule,
 } from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
 
@@ -252,6 +253,59 @@ export default function AgreementSummary({
                 ).format('0,0.00')}`}
               </AppText>
             </View>
+          </View>
+        </View>
+        <View style={styles.block}>
+          <AppText font={'anSemiBold'} size={20} color={'textBlack2'}>
+            Payment Schedule
+          </AppText>
+          <View style={styles.paymentScheduleRow}>
+            {agreement.agreement_template.opts.payment_schedule.map(
+              (schedule: PaymentSchedule, index: number) => (
+                <View
+                  style={[
+                    styles.rowLayout,
+                    styles.padding10,
+                    index !==
+                      agreement.agreement_template.opts.payment_schedule
+                        .length -
+                        1 && styles.bottomBorder,
+                  ]}
+                  key={index}>
+                  <AppText font={'anRegular'} size={14} color={'textBlack2'}>
+                    {schedule.description}
+                  </AppText>
+                  {schedule.type === 'fixed' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      ((totalPrice * (100 + agreement.sales_tax_rate)) / 100 -
+                        schedule.value) /
+                        100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                  {schedule.type === 'percentage' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      (((totalPrice * (100 + agreement.sales_tax_rate)) / 100) *
+                        schedule.value) /
+                        100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                  {schedule.type === 'balance' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      schedule.value / 100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                </View>
+              ),
+            )}
           </View>
         </View>
         <View style={styles.block}>
@@ -527,5 +581,16 @@ const getStyles = (themeStyle: StyleType) => ({
       size: 16,
     }),
     letterSpacing: 2.91,
+  },
+  paymentScheduleRow: {
+    width: 320,
+    marginTop: 10,
+  },
+  bottomBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: themeStyle.lightBorderColor,
+  },
+  padding10: {
+    paddingVertical: 10,
   },
 });
