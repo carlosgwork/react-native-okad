@@ -312,3 +312,14 @@ export const GET_LAST_AGREEMENT_OF_USER = gql`
     }
   }
 `;
+
+export const LOAD_AGREEMENT_TEMPLATES = gql`
+  query LoadAgreementTemplates {
+    agreement_templates {
+      name
+      logo_uri
+      id
+      opts
+    }
+  }
+`;

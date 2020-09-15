@@ -149,7 +149,7 @@ export default function ElanTemplate({
   route,
   navigation,
 }: AppNavProps<AppRouteEnum.TEMPLATES>) {
-  const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
+  const {parent = '', itemTitle = '', contact, template} = route.params || {};
   const {
     userInfo,
     items: cartItems,
@@ -250,7 +250,7 @@ export default function ElanTemplate({
       inset_agreement({
         variables: {
           billing_address_id: contact.address_id,
-          agreement_template_id: templateId,
+          agreement_template_id: template.id,
           contact_id: contact.id,
           shipping_address_id: contact.address_id,
           line_items: lineItems,
@@ -283,7 +283,8 @@ export default function ElanTemplate({
       setAction('offlineMutations', {data: newMutations});
       const agreement: Agreement = {
         billing_address_id: contact.address_id,
-        agreement_template_id: templateId,
+        agreement_template_id: template.id,
+        agreement_template: template,
         contact_id: contact.id,
         created: new Date(),
         id: lastAgreement.id + 1,

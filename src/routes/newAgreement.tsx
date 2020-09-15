@@ -1,7 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import NewAgreement from '@root/views/Contacts/NewAgreement';
+import NewAgreement from '@root/views/Agreements/New';
 import BrunoStraightStairlift from '@root/views/Agreements/Templates/BrunoStraightStairlift';
 import BrunoCustomStairlift from '@root/views/Agreements/Templates/BrunoCustomStairlift';
 import ElanTemplate from '@root/views/Agreements/Templates/BrunoStraightStairlift/Elan';

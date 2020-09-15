@@ -32,7 +32,7 @@ export default function BrunoStraightStairlift({
   navigation,
 }: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
-  const {contact, templateId, parent = ''} = route.params || {};
+  const {contact, template, parent = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
@@ -43,7 +43,7 @@ export default function BrunoStraightStairlift({
         itemTitle: item.name,
         parent: 'Bruno Straight Stairlift',
         contact,
-        templateId,
+        template,
       });
     };
 
