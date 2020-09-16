@@ -41,9 +41,9 @@ export default function Catalogs({
       const newData = vendors.concat(data.vendors);
       setAction('vendors', {
         vendors: newData,
+        searchText: '',
       });
       setSearchText('');
-      setAction('vendors', {searchText: ''});
       sortVendors(newData);
       setFilteredVendors(newData);
       setLoadingData(false);
@@ -65,7 +65,7 @@ export default function Catalogs({
     const newVendorSortOps = vendorsSortOps.slice();
     newVendorSortOps[index].sortOps = sortOp;
     setVendorsSortOps(newVendorSortOps);
-    setAction('catalogs', {sortOptions: newVendorSortOps});
+    setAction('vendors', {sortOptions: newVendorSortOps});
   };
 
   const filterVendors = (text: string, v: Vendor[]) => {
@@ -95,14 +95,17 @@ export default function Catalogs({
 
   const sortVendors = (v: Vendor[]) => {
     const sortOps: SortOpsByVendor[] = v.map((vendor) => {
-      const opt = sortOptions.filter(
+      const index = sortOptions.findIndex(
         (option) => option.vendor_id === vendor.id,
       );
+      if (index > -1) {
+        return sortOptions[index];
+      }
       const newSortOpt: SortOpsByVendor = {
         sortOps: emptyTableSortOption,
         vendor_id: vendor.id,
       };
-      return opt.length > 0 ? opt[0] : newSortOpt;
+      return newSortOpt;
     });
     setVendorsSortOps(sortOps);
   };
