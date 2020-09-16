@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
-import {Input} from 'react-native-elements';
+import {Input, Icon} from 'react-native-elements';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -14,27 +14,45 @@ type Props = {
 export default React.memo<Props>(function AppSearchInput(props: Props) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
+  const [isFocus, setIsFocus] = useState<boolean>(false);
 
   const {value, placeholderText = 'Search', onChange} = props;
-
   return (
     <View>
       <Input
         placeholder={placeholderText}
-        leftIcon={{
-          type: 'ionicon',
-          name: 'ios-search',
-          color: themeStyle.textGray,
-          size: themeStyle.scale(22),
-          style: {marginLeft: 5, marginTop: 2},
-        }}
-        rightIcon={{
-          type: 'font-awesome',
-          name: 'microphone',
-          color: themeStyle.textGray,
-          size: themeStyle.scale(20),
-          style: {marginRight: 5},
-        }}
+        leftIcon={
+          <Icon
+            type="ionicon"
+            name="ios-search"
+            color={themeStyle.textGray}
+            size={themeStyle.scale(22)}
+            style={styles.leftIconStyle}
+          />
+        }
+        rightIcon={
+          isFocus ? (
+            <Icon
+              type="ionicon"
+              name="close-circle"
+              color={themeStyle.textGray}
+              size={themeStyle.scale(25)}
+              style={styles.rightCloseIcon}
+              onPress={() => {
+                setIsFocus(false);
+                onChange && onChange('');
+              }}
+            />
+          ) : (
+            <Icon
+              type="font-awesome"
+              name="microphone"
+              color={themeStyle.textGray}
+              size={themeStyle.scale(20)}
+              style={styles.rightIconStyle}
+            />
+          )
+        }
         containerStyle={styles.container}
         inputContainerStyle={styles.inputContainer}
         inputStyle={styles.input}
@@ -43,6 +61,8 @@ export default React.memo<Props>(function AppSearchInput(props: Props) {
         numberOfLines={1}
         value={value}
         errorStyle={styles.error}
+        onFocus={() => setIsFocus(true)}
+        onBlur={() => setIsFocus(false)}
       />
     </View>
   );
@@ -70,5 +90,16 @@ const getStyles = (themeStyle: StyleType) => ({
     height: 0,
     padding: 0,
     margin: 0,
+  },
+  leftIconStyle: {
+    marginLeft: 5,
+    marginTop: 2,
+  },
+  rightIconStyle: {
+    marginRight: 5,
+  },
+  rightCloseIcon: {
+    marginLeft: 1,
+    marginTop: 2,
   },
 });
