@@ -182,7 +182,7 @@ export default function ElanTemplate({
       });
       setAction('contacts', {contacts: newContacts});
       navigation.popToTop();
-      navigation.navigate(AppRouteEnum.AgreementDetails, {
+      navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
         agreement,
         contact: contact,
         parent: `${contact.name_first} ${contact.name_last}`,

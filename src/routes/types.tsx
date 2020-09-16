@@ -20,6 +20,8 @@ export enum AppRouteEnum {
   SETTINGS = 'SETTINGS',
   TEMPLATES = 'Templates',
   AgreementDetails = 'AgreementDetails',
+  ContactAgreementDetails = 'ContactAgreementDetails',
+  DashboardAgreementDetails = 'DashboardAgreementDetails',
   AgreementSummary = 'AgreementSummary',
   AgreementsMain = 'AgreementsMain',
   Catalogs = 'Catalogs',
@@ -52,6 +54,18 @@ export type ContactsStackParamList = {
     contact: Contact;
   };
   [AppRouteEnum.AgreementDetails]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+    agreement: Agreement;
+  };
+  [AppRouteEnum.ContactAgreementDetails]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+    agreement: Agreement;
+  };
+  [AppRouteEnum.DashboardAgreementDetails]: {
     parent?: string;
     itemTitle?: string;
     contact: Contact;

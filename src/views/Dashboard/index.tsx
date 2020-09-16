@@ -67,7 +67,7 @@ export default function Dashboard({
 
   const navigateDetails = (agreement: Agreement) => {
     const contact = agreement.contact as Contact;
-    navigation.navigate(AppRouteEnum.AgreementDetails, {
+    navigation.navigate(AppRouteEnum.DashboardAgreementDetails, {
       agreement,
       contact: contact,
       parent: `${contact.name_first} ${contact.name_last}`,

@@ -1,20 +1,16 @@
 import React from 'react';
 import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 
-import Main from '@root/views/Contacts';
-import NewContact from '@root/views/Contacts/New';
-import ContactDetails from '@root/views/Contacts/Details';
+import Dashboard from '@root/views/Dashboard';
 import AgreementDetails from '@root/views/Agreements/Details';
-import CatalogDetails from '@root/views/Catalogs/Details';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
 
-function ContactsStackNavigation() {
+function DashboardStackNavigation() {
   return (
     <Stack.Navigator headerMode="none">
-      <Stack.Screen name="MainContacts" component={Main} />
-      <Stack.Screen name="ContactDetails" component={ContactDetails} />
+      <Stack.Screen name="Dashboard" component={Dashboard} />
     </Stack.Navigator>
   );
 }
@@ -39,14 +35,12 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
         ...TransitionPresets.ModalPresentationIOS,
       }}>
       <RootStack.Screen
-        name="ContactRoutes"
-        component={ContactsStackNavigation}
+        name="DashboardRoutes"
+        component={DashboardStackNavigation}
         options={{headerShown: false}}
       />
-      <RootStack.Screen name="NewContactModal" component={NewContact} />
-      <RootStack.Screen name="CatalogDetails" component={CatalogDetails} />
       <RootStack.Screen
-        name="ContactAgreementDetails"
+        name="DashboardAgreementDetails"
         component={AgreementDetails}
       />
     </RootStack.Navigator>

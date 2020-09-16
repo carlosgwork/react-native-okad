@@ -52,7 +52,7 @@ const cellContent = (
         <AppTextButton
           style={styles.cellLayout}
           onPress={() => {
-            navigation.navigate(AppRouteEnum.AgreementDetails, {
+            navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
               agreement: row,
               contact: contact,
               parent: `${contact.name_first} ${contact.name_last}`,

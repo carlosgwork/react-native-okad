@@ -3,10 +3,10 @@ import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
 import CustomIcon from '@components/CustomIcon';
 
-import Home from '@root/views/Dashboard';
 import ContactsRoutes from './contacts';
 import CatalogsRoutes from './catalogs';
-import Agreements from '@root/views/Agreements';
+import AgreementsRoutes from './agreements';
+import DashboardRoutes from './dashboard';
 import {useTheme} from '@global/Hooks';
 
 const MainTab = createBottomTabNavigator();
@@ -63,9 +63,9 @@ export function MainTabRoutes() {
           backgroundColor: 'rgb(249, 249, 249)',
         },
       }}>
-      <MainTab.Screen name="Home" component={Home} />
+      <MainTab.Screen name="Home" component={DashboardRoutes} />
       <MainTab.Screen name="Contacts" component={ContactsRoutes} />
-      <MainTab.Screen name="Agreements" component={Agreements} />
+      <MainTab.Screen name="Agreements" component={AgreementsRoutes} />
       <MainTab.Screen name="Catalog" component={CatalogsRoutes} />
     </MainTab.Navigator>
   );
