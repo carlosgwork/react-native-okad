@@ -35,7 +35,7 @@ const HEADERS: TableHeaderType[] = [
 ];
 
 const sortContact = (arr: Contact[], sortOp: TableSortOps) => {
-  const sorted = arr.sort((a: Contact, b: Contact) => {
+  const sorted = arr.slice().sort((a: Contact, b: Contact) => {
     let cmpA = '',
       cmpB = '';
     switch (sortOp.sortBy) {
