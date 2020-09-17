@@ -3,6 +3,7 @@ import {createStackNavigator, TransitionPresets} from '@react-navigation/stack';
 
 import Dashboard from '@root/views/Dashboard';
 import AgreementDetails from '@root/views/Agreements/Details';
+import AgreementSummary from '@root/views/Agreements/Details/summary';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -43,6 +44,7 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
         name="DashboardAgreementDetails"
         component={AgreementDetails}
       />
+      <RootStack.Screen name="AgreementSummary" component={AgreementSummary} />
     </RootStack.Navigator>
   );
 }

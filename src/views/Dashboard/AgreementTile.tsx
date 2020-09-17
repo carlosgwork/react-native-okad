@@ -27,7 +27,7 @@ export default function AgreementTile({agreement, color, onPress}: Props) {
         {`${agreement.contact?.name_first} ${agreement.contact?.name_last}  `}
       </AppText>
       <AppText size={16} font={'anMedium'} style={{color: color}}>
-        (Bruno Straight Stairlift)
+        {`(${agreement.agreement_template.name})`}
       </AppText>
     </TouchableOpacity>
   );

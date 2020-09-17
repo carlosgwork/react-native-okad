@@ -6,6 +6,7 @@ import NewContact from '@root/views/Contacts/New';
 import ContactDetails from '@root/views/Contacts/Details';
 import AgreementDetails from '@root/views/Agreements/Details';
 import CatalogDetails from '@root/views/Catalogs/Details';
+import AgreementSummary from '@root/views/Agreements/Details/summary';
 
 const Stack = createStackNavigator();
 const RootStack = createStackNavigator();
@@ -49,6 +50,7 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
         name="ContactAgreementDetails"
         component={AgreementDetails}
       />
+      <RootStack.Screen name="AgreementSummary" component={AgreementSummary} />
     </RootStack.Navigator>
   );
 }
