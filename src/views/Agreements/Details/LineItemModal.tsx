@@ -15,7 +15,7 @@ import {emptyTableSortOption} from '@utils/constants';
 import {VendorsState} from '@redux/reducers/vendors';
 import {AppText, AppSearchInput, CircularLoading} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
-import {FETCH_VENDORS} from '@root/views/Catalogs';
+import {FETCH_VENDORS} from '@root/views/Catalogs/graphql';
 import {setAction} from '@root/redux/actions';
 import VendorRow from './vendorRow';
 import {useStyles} from '@global/Hooks';

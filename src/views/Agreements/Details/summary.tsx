@@ -6,6 +6,7 @@ import SignatureCapture, {
 } from 'react-native-signature-capture';
 import {useSelector} from 'react-redux';
 import {useMutation} from '@apollo/client';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
@@ -407,6 +408,13 @@ export default function AgreementSummary({
           </View>
         </View>
         <View style={styles.block}>
+          <AppText
+            style={styles.signTitleText}
+            font={'anSemiBold'}
+            size={13}
+            color={'lightBorderColor'}>
+            Sign
+          </AppText>
           {!agreement.signature && (
             <View style={[styles.subblock, styles.signView]}>
               <SignatureCapture
@@ -424,8 +432,9 @@ export default function AgreementSummary({
               <TouchableOpacity
                 style={styles.resetBtnStyle}
                 onPress={resetSign}>
-                <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
-                  Clear
+                <Icon name="close" size={26} color={'#855C9C'} />
+                <AppText color={'textLightPurple'} size={16} font={'anMedium'}>
+                  &nbsp;Clear
                 </AppText>
               </TouchableOpacity>
             </View>
@@ -557,6 +566,8 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   resetBtnStyle: {
     paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   bottomBtnView: {
     alignSelf: 'flex-end',
@@ -592,5 +603,9 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   padding10: {
     paddingVertical: 10,
+  },
+  signTitleText: {
+    letterSpacing: 2.64,
+    textTransform: 'uppercase',
   },
 });
