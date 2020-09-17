@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {UPDATE_AGREEMENT} from '../graphql';
+import {ADD_AGREEMENT_EVENT, UPDATE_AGREEMENT} from '../graphql';
 import {AppHeader, AppText, AppGradButton} from '@root/components';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
@@ -20,6 +20,7 @@ import {
   Agreement,
   Contact,
   PaymentSchedule,
+  AgreementEvent,
 } from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
 
@@ -48,6 +49,7 @@ export default function AgreementSummary({
   );
 
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
+  const [insert_agreement_events_one] = useMutation(ADD_AGREEMENT_EVENT);
 
   const updateAgreement = () => {
     signRef.current?.saveImage();
@@ -70,6 +72,14 @@ export default function AgreementSummary({
     const data = {
       ...agreement,
       signature: result.encoded,
+      agreement_events: [
+        {
+          id: -1,
+          agreement_id: agreement.id,
+          created: new Date(),
+          type: 'accepted',
+        },
+      ] as AgreementEvent[],
       last_modified: new Date(),
     };
     const newAgreements = JSON.parse(JSON.stringify(agreements));
@@ -105,6 +115,12 @@ export default function AgreementSummary({
         last_modified: new Date(),
       };
       if (isOnline) {
+        insert_agreement_events_one({
+          variables: {
+            id: agreement.id,
+            event_type: 'accepted',
+          },
+        });
         update_agreement({
           variables: {
             _set: updatingAgreement,
@@ -115,6 +131,10 @@ export default function AgreementSummary({
         const newMutations = offlineMutations.data;
         newMutations.push({
           type: 'UPDATE_AGREEMENT',
+          itemId: agreement.id,
+        });
+        newMutations.push({
+          type: 'INSERT_ACCEPT_AGREEMENT_EVENT',
           itemId: agreement.id,
         });
         setAction('offlineMutations', {data: newMutations});

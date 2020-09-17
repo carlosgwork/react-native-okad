@@ -323,3 +323,14 @@ export const LOAD_AGREEMENT_TEMPLATES = gql`
     }
   }
 `;
+
+export const ADD_AGREEMENT_EVENT = gql`
+  mutation INSERT_AGREEMENT_EVENT($id: Int!, $event_type: agreement_event!) {
+    insert_agreement_events_one(
+      object: {agreement_id: $id, type: $event_type}
+    ) {
+      agreement_id
+      type
+    }
+  }
+`;
