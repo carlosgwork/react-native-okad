@@ -441,23 +441,28 @@ export default function AgreementSummary({
           )}
           {agreement.signature && (
             <View style={[styles.subblock, styles.signView]}>
+              <View pointerEvents="none" style={styles.signBg}>
+                <Image source={SignBg} style={styles.signBg} />
+              </View>
               <Image
                 source={{uri: `data:image/png;base64, ${agreement.signature}`}}
-                style={styles.signBg}
+                style={styles.signature}
               />
             </View>
           )}
         </View>
-        <View style={styles.bottomBtnView}>
-          <AppGradButton
-            containerStyle={styles.createBtnContainer}
-            textStyle={styles.createBtnText}
-            btnStyle={styles.createBtn}
-            title={'ACCEPT QUOTE'}
-            leftIconContent={<></>}
-            onPress={updateAgreement}
-          />
-        </View>
+        {!agreement.signature && (
+          <View style={styles.bottomBtnView}>
+            <AppGradButton
+              containerStyle={styles.createBtnContainer}
+              textStyle={styles.createBtnText}
+              btnStyle={styles.createBtn}
+              title={'ACCEPT QUOTE'}
+              leftIconContent={<></>}
+              onPress={updateAgreement}
+            />
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -544,11 +549,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   signature: {
     width: '100%',
-    borderColor: '#000033',
-    borderWidth: 1,
-    borderType: 'solid',
     height: 200,
-    backgroundColor: 'red',
   },
   signBg: {
     position: 'absolute',
