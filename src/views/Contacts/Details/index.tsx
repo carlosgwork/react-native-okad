@@ -32,7 +32,7 @@ const HEADERS: TableHeaderType[] = [
     style: {width: 200},
   },
   {
-    label: 'Template',
+    label: 'TEMPLATE',
     value: 'agreement_template_name',
     sortable: true,
     style: {flex: 1},

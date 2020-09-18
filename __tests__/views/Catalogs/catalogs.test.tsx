@@ -3,16 +3,18 @@
  */
 
 import React from 'react';
-import Catalogs, {FETCH_VENDORS} from '@root/views/Catalogs';
 import {Provider} from 'react-redux';
 import {createMockClient} from 'mock-apollo-client';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
+import configureStore from 'redux-mock-store';
+
+import Catalogs from '@root/views/Catalogs';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
-import configureStore from 'redux-mock-store';
 import {VENDORS_MOCKDATA} from '../../__mocks__/Vendors';
+import {FETCH_VENDORS} from '@root/views/Catalogs/graphql';
 
 let wrapper: ReactWrapper;
 let queryHandler;

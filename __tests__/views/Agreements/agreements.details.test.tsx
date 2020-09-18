@@ -32,6 +32,9 @@ const store = mockStore({
   contacts: {
     contacts: [],
   },
+  vendors: {
+    vendors: [],
+  },
   offlineMutations: {
     data: [],
   },
@@ -114,13 +117,13 @@ describe('Agreement Details Page', () => {
     expect(
       projectAddressEle
         .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId.line1),
+        .contains(AGREEMENT_DETAILS_MOCKDATA.address.line1),
     ).toBeTruthy();
     expect(
       projectAddressEle
         .find('Memo(AppText)')
         .contains(
-          `${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.city}, ${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.addressByShippingAddressId?.postal_code}`,
+          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.address?.postal_code}`,
         ),
     ).toBeTruthy();
   });
@@ -147,12 +150,14 @@ describe('Agreement Details Page', () => {
   });
 
   it('should render "continue" button.', () => {
-    expect(wrapper.find('TouchableOpacity').contains('CONTINUE')).toBeTruthy();
+    expect(
+      wrapper.find('TouchableOpacity').contains('REVIEW AND ACCEPT'),
+    ).toBeTruthy();
   });
 
   it('should render "Create Revision" button.', () => {
     expect(
-      wrapper.find('TouchableOpacity').contains('CREATE REVISION'),
+      wrapper.find('TouchableOpacity').contains('Create Revision'),
     ).toBeTruthy();
   });
 });

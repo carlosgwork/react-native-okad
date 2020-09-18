@@ -43,6 +43,7 @@ export const AGREEMENTS_MOCKDATA = {
           qty: 1,
           id: 1093,
           order: null,
+          taxable: true,
           catalog_item: {
             name: 'Elan SRE-3050',
           },
@@ -56,6 +57,7 @@ export const AGREEMENTS_MOCKDATA = {
           qty: 1,
           id: 1094,
           order: null,
+          taxable: true,
           catalog_item: {
             name: 'Power-Assisted Swivel Seat',
           },
@@ -81,7 +83,26 @@ export const AGREEMENTS_MOCKDATA = {
       },
       user_id: 1,
       created: '2020-09-05T22:21:09.024666+00:00',
-      last_modified: null,
+      last_modified: '2020-09-18T11:33:52.536939+00:00',
+      agreement_template: {
+        name: 'Bruno Straight Stairlift',
+        opts: {
+          color: 'rgb(200, 170, 10)',
+          payment_schedule: [
+            {
+              type: 'percentage',
+              value: 0.1,
+              description: 'Deposit',
+            },
+            {
+              type: 'percentage',
+              value: 0.9,
+              description: 'Balance due upon installation',
+            },
+          ],
+        },
+        id: 1,
+      },
     },
     {
       id: 1003,
@@ -126,6 +147,7 @@ export const AGREEMENTS_MOCKDATA = {
           qty: 1,
           id: 1092,
           order: null,
+          taxable: true,
           catalog_item: {
             name: 'Elan SRE-3050',
           },
@@ -152,6 +174,25 @@ export const AGREEMENTS_MOCKDATA = {
       user_id: 1,
       created: '2020-09-05T22:08:46.032359+00:00',
       last_modified: null,
+      agreement_template: {
+        name: 'Bruno Straight Stairlift',
+        opts: {
+          color: 'rgb(200, 170, 10)',
+          payment_schedule: [
+            {
+              type: 'percentage',
+              value: 0.1,
+              description: 'Deposit',
+            },
+            {
+              type: 'percentage',
+              value: 0.9,
+              description: 'Balance due upon installation',
+            },
+          ],
+        },
+        id: 1,
+      },
     },
   ],
 };

@@ -115,6 +115,6 @@ describe('Contacts Details Page', () => {
     expect(dataTable.text()).toContain('NUMBER');
     expect(dataTable.text()).toContain('DATE');
     expect(dataTable.text()).toContain('AMOUNT');
-    expect(dataTable.text()).toContain('TYPE');
+    expect(dataTable.text()).toContain('TEMPLATE');
   });
 });
