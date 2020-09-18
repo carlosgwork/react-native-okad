@@ -27,7 +27,7 @@ function StatusIndicator(props: Props) {
             color={'textBlue'}
             font={'anSemiBold'}
             style={styles.statusText}>
-            OPEN&nbsp;
+            OPEN
           </AppText>
           <Image source={StatusOpenIcon} style={styles.symbolIcon} />
         </View>
@@ -39,7 +39,7 @@ function StatusIndicator(props: Props) {
             color={'lightBlueColor'}
             font={'anSemiBold'}
             style={styles.statusText}>
-            SENT&nbsp;
+            SENT
           </AppText>
           <Image source={StatusUpIcon} style={styles.symbolIcon} />
         </View>
@@ -51,7 +51,7 @@ function StatusIndicator(props: Props) {
             color={'lightBlueColor'}
             font={'anSemiBold'}
             style={styles.statusText}>
-            VIEWED&nbsp;
+            VIEWED
           </AppText>
           <Image
             source={StatusEyeIcon}
@@ -66,7 +66,7 @@ function StatusIndicator(props: Props) {
             color={'lightGreenColor'}
             font={'anSemiBold'}
             style={styles.statusText}>
-            ACCEPTED&nbsp;
+            ACCEPTED
           </AppText>
           <Image source={StatusTickIcon} style={styles.symbolIcon} />
         </View>
@@ -90,6 +90,7 @@ const getStyles = () => ({
   },
   statusText: {
     marginTop: 1,
+    marginRight: 5,
   },
   symbolIcon: {
     marginBottom: 2,

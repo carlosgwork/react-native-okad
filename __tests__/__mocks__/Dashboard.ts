@@ -217,6 +217,25 @@ export const TILE_MOCKDATA = {
       city: 'New Barrettport',
       us_state: 'MT',
     },
+    agreement_template: {
+      name: 'Bruno Straight Stairlift',
+      opts: {
+        color: 'rgb(200, 170, 10)',
+        payment_schedule: [
+          {
+            type: 'percentage',
+            value: 0.1,
+            description: 'Deposit',
+          },
+          {
+            type: 'percentage',
+            value: 0.9,
+            description: 'Balance due upon installation',
+          },
+        ],
+      },
+      id: 1,
+    },
   },
   color: '#ababab',
 };
