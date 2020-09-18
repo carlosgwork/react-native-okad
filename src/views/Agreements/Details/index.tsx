@@ -1,47 +1,74 @@
 import React, {useState, useEffect} from 'react';
 import {
   View,
-  Text,
   Switch,
   TouchableOpacity,
-  ListRenderItemInfo,
+  LayoutAnimation,
+  Modal,
+  Alert,
+  Image,
+  StatusBar,
+  Share,
 } from 'react-native';
 import {useMutation} from '@apollo/client';
-import {SwipeListView, SwipeRow, RowMap} from 'react-native-swipe-list-view';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
+import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import numeral from 'numeral';
 import Dialog from 'react-native-dialog';
 import moment from 'moment';
+import {useSelector} from 'react-redux';
+import DraggableFlatList, {
+  RenderItemParams,
+} from 'react-native-draggable-flatlist';
+import SwipeableItem from 'react-native-swipeable-item';
+import Animated from 'react-native-reanimated';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-
-import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppHeader, AppText, StatusIndicator} from '@root/components';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
   Agreement,
-  AgreementEvent,
   Contact,
   OfflineMutationType,
+  AgreementEvent,
+  Catalog,
 } from '@root/utils/types';
-import {UPDATE_AGREEMENT, UPDATE_LINE_ITEM, REMOVE_LINE_ITEM} from '../graphql';
-import {useSelector} from 'react-redux';
+import {
+  UPDATE_AGREEMENT,
+  UPDATE_LINE_ITEM,
+  REMOVE_LINE_ITEM,
+  CREATE_LINE_ITEM,
+  CREATE_AGREEMENT,
+  DELETE_AGREEMENT,
+} from '../graphql';
 import {setAction} from '@root/redux/actions';
+import {phoneFormat} from '@root/utils/functions';
+import LineItemModal from './LineItemModal';
+import {DeleteIcon, ShareIcon} from '@assets/assets';
+
+const {multiply, sub} = Animated;
+type SwipeRowType = {
+  item: AgreementLineItemType;
+  drag: () => void;
+};
 
 export default function AgreementDetails({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementDetails>) {
+}: AppNavProps<AppRouteEnum.AgreementDetails>) {
   const {styles} = useStyles(getStyles);
   const {
+    userInfo,
     prefix,
     agreements,
     contacts,
     offlineMutations,
     isOnline,
   } = useSelector((state: any) => ({
+    userInfo: state.user,
     prefix: state.user.prefix,
     agreements: state.agreements.agreements,
     contacts: state.contacts.contacts,
@@ -49,12 +76,11 @@ export default function AgreementDetails({
     isOnline: state.network.online,
   }));
 
-  const {parent = 'Contacts', contact, agreement} = route.params || {};
+  const {contact, agreement} = route.params || {};
   const [activeAgreement, updateActiveAgreement] = useState<Agreement>(
     agreement,
   );
   const [showDetails, setShowDetails] = useState<boolean>(false);
-
   const [listData, setListData] = useState<AgreementLineItemType[]>(
     activeAgreement.line_items || [],
   );
@@ -66,10 +92,35 @@ export default function AgreementDetails({
   const [salesTax, setSalesTax] = useState<string>('');
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const [totalCost, setTotalCost] = useState<number>(0);
-
+  const [lineItemModalVisible, setLineItemModalVisible] = useState<boolean>(
+    false,
+  );
+  const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
   const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
   const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+  const [delete_agreements] = useMutation(DELETE_AGREEMENT, {
+    onCompleted() {
+      navigation.pop();
+    },
+  });
+  const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM, {
+    onCompleted(data) {
+      const newData = [...listData];
+      newData.push(data.insert_line_items_one);
+      setListData(newData);
+      const newAgreement = Object.assign({}, activeAgreement);
+      newAgreement.line_items = newData;
+      updateActiveAgreement(newAgreement);
+      updateAgreementState(newAgreement);
+    },
+  });
+  const [insert_agreement] = useMutation(CREATE_AGREEMENT, {
+    onCompleted() {
+      // Update agreement number of current usr
+      Alert.alert('A Revision agreement is successfully created.');
+    },
+  });
 
   useEffect(() => {
     let total = 0;
@@ -145,10 +196,41 @@ export default function AgreementDetails({
 
   const updateAgreementRevision = () => {
     const newAgreement = Object.assign({}, activeAgreement);
-    newAgreement.revision = newAgreement.revision + 1;
-    updateActiveAgreement(newAgreement);
-    updateAgreementState(newAgreement);
-    runAgreementUpdateQuery(newAgreement);
+    agreements.unshift(newAgreement);
+    const newAgreements = agreements.slice();
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        ct.agreements?.push(agreement);
+      }
+      return ct;
+    });
+    setAction('contacts', {contacts: newContacts});
+    const line_items = newAgreement.line_items?.map(
+      (item: AgreementLineItemType) => {
+        return {
+          catalog_item_id: item.catalog_item_id,
+          current_cost: item.current_cost,
+          discount: item.discount,
+          price: item.price,
+          qty: item.qty,
+          taxable: item.taxable,
+        };
+      },
+    );
+    insert_agreement({
+      variables: {
+        billing_address_id: newAgreement.billing_address_id,
+        agreement_template_id: newAgreement.agreement_template_id,
+        contact_id: newAgreement.contact_id,
+        shipping_address_id: newAgreement.shipping_address_id,
+        line_items,
+        user_id: newAgreement.user_id,
+        sales_tax_rate: newAgreement.sales_tax_rate,
+        number: `${userInfo.lastAgreementNumber + 1}`,
+      },
+    });
   };
 
   const updateAgreement = (data: Agreement) => {
@@ -168,6 +250,42 @@ export default function AgreementDetails({
         id: activeAgreement.id,
       },
     });
+  };
+
+  const deleteAgreement = () => {
+    const newAgreements = JSON.parse(JSON.stringify(agreements));
+    const agIndex = newAgreements.findIndex(
+      (ag: Agreement) => ag.id === activeAgreement.id,
+    );
+    newAgreements.splice(agIndex, 1);
+    setAction('agreements', {agreements: newAgreements});
+    const contactsInStore = JSON.parse(JSON.stringify(contacts));
+    const newContacts = contactsInStore.map((ct: Contact) => {
+      if (ct.id === contact.id) {
+        const newCtAgreements = ct.agreements?.slice() || [];
+        const agIndex2 = newCtAgreements.findIndex(
+          (ag2: Agreement) => ag2.id === activeAgreement.id,
+        );
+        newCtAgreements.splice(agIndex2, 1);
+        ct.agreements = newCtAgreements;
+      }
+      return ct;
+    });
+    setAction('contacts', {contacts: newContacts});
+    if (isOnline) {
+      delete_agreements({
+        variables: {
+          id: activeAgreement.id,
+        },
+      });
+    } else {
+      const newMutations = offlineMutations.data;
+      newMutations.push({
+        type: 'DELETE_AGREEMENT',
+        itemId: activeAgreement.id, // agreement id
+      });
+      setAction('offlineMutations', {data: newMutations});
+    }
   };
 
   const runAgreementUpdateQuery = (data: Agreement) => {
@@ -222,6 +340,45 @@ export default function AgreementDetails({
     }
   };
 
+  const updateLineItemsOrder = (data: AgreementLineItemType[]) => {
+    const itemIndex = offlineMutations.data.findIndex(
+      (it: OfflineMutationType) =>
+        it.type === 'CREATE_AGREEMENT' && activeAgreement.id === it.itemId,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        data.forEach((it) => {
+          update_line_items({
+            variables: {
+              _set: {
+                order: it.order,
+              },
+              id: it.id,
+            },
+          });
+        });
+      } else {
+        const newMutations = offlineMutations.data;
+        data.map((it) => {
+          newMutations.push({
+            type: 'UPDATE_LINEITEM',
+            itemId: agreement.id, // agreement id
+            lineItemId: it.id, // lineItem id
+          });
+        });
+        setAction('offlineMutations', {data: newMutations});
+      }
+    }
+  };
+
+  const continueClicked = () => {
+    navigation.navigate(AppRouteEnum.AgreementSummary, {
+      itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
+      agreement: activeAgreement,
+      contact: contact,
+    });
+  };
+
   const removeLineItem = (item: AgreementLineItemType) => {
     const itemIndex = offlineMutations.data.findIndex(
       (it: OfflineMutationType) =>
@@ -244,138 +401,243 @@ export default function AgreementDetails({
         setAction('offlineMutations', {data: newMutations});
       }
     }
+    // Animate list to close gap when item is deleted
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   };
 
-  const continueClicked = () => {
-    navigation.navigate(AppRouteEnum.AgreementSummary, {
-      itemTitle: `Quote ${prefix}${numeral(agreement.number).format('00000')}`,
-      agreement: activeAgreement,
-      contact: contact,
-    });
+  const renderUnderlayRight = ({
+    item,
+    percentOpen,
+  }: {
+    item: any;
+    percentOpen: any;
+  }) => (
+    <Animated.View
+      style={[
+        styles.row,
+        styles.underlayRight,
+        {
+          transform: [{translateX: multiply(sub(1, percentOpen), -100)}], // Translate from left on open
+        },
+      ]}>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnLeft]}
+        onPress={() => {
+          setActiveRow(item.item.id);
+          setShowDiscount(true);
+        }}>
+        <LinearGradient
+          style={styles.gradientBtn}
+          start={{x: 0.1, y: 0.8}}
+          end={{x: 0.6, y: 1.0}}
+          locations={[0, 1]}
+          colors={['#7CB6C7', '#528DA4']}>
+          <AppText color={'white'} size={16} font={'anSemiBold'}>
+            Discount
+          </AppText>
+        </LinearGradient>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.backRightBtn, styles.backRightBtnRight]}
+        onPress={() => deleteRow(item.item.id)}>
+        <LinearGradient
+          style={styles.gradientBtn}
+          start={{x: 0.1, y: 0.9}}
+          end={{x: 1.0, y: 0.4}}
+          locations={[0, 1]}
+          colors={['#C05252', '#A33333']}>
+          <AppText color={'white'} size={16} font={'anSemiBold'}>
+            Delete
+          </AppText>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+
+  const renderItem = ({
+    item,
+    index,
+    drag,
+  }: RenderItemParams<AgreementLineItemType>) => {
+    return (
+      <SwipeableItem
+        key={index}
+        item={{item, drag}}
+        overSwipe={195}
+        renderUnderlayLeft={renderUnderlayRight}
+        renderOverlay={renderOverlay}
+        snapPointsLeft={[195]}
+      />
+    );
   };
 
-  const renderItem = (
-    rowData: ListRenderItemInfo<AgreementLineItemType>,
-    _: RowMap<AgreementLineItemType>,
-  ): Element => (
-    <SwipeRow
-      disableLeftSwipe={false}
-      disableRightSwipe={false}
-      leftOpenValue={0}
-      key={`swipe-row-${rowData.item.id}`}
-      rightOpenValue={-195}>
-      <View style={styles.rowBack}>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnLeft]}
-          onPress={() => {
-            setActiveRow(rowData.item.id);
-            setShowDiscount(true);
-          }}>
-          <LinearGradient
-            style={styles.gradientBtn}
-            start={{x: 0.1, y: 0.8}}
-            end={{x: 0.6, y: 1.0}}
-            locations={[0, 1]}
-            colors={['#7CB6C7', '#528DA4']}>
-            <AppText color={'white'} size={16} font={'anSemiBold'}>
-              Discount
-            </AppText>
-          </LinearGradient>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.backRightBtn, styles.backRightBtnRight]}
-          onPress={() => deleteRow(rowData.item.id)}>
-          <LinearGradient
-            style={styles.gradientBtn}
-            start={{x: 0.1, y: 0.9}}
-            end={{x: 1.0, y: 0.4}}
-            locations={[0, 1]}
-            colors={['#C05252', '#A33333']}>
-            <AppText color={'white'} size={16} font={'anSemiBold'}>
-              Delete
-            </AppText>
-          </LinearGradient>
-        </TouchableOpacity>
-      </View>
+  const renderOverlay = ({item}: {item: SwipeRowType}) => {
+    return (
       <View style={[styles.rowLayout, styles.rowFront]}>
+        <TouchableOpacity onLongPress={item.drag} style={styles.dragbarCell}>
+          <Icon name="reorder-three-outline" size={24} color="#a7a7a7" />
+        </TouchableOpacity>
         <View style={styles.qtyCell}>
           <AppText color={'lightPurple'} size={16} font={'anSemiBold'}>
-            {`${rowData.item.qty}`}
+            {`${item.item.qty}`}
           </AppText>
         </View>
         <View style={styles.descCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {rowData.item.catalog_item.name}
+            {item.item.catalog_item.name}
           </AppText>
         </View>
         <View style={styles.priceCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {`$${numeral(rowData.item.price / 100).format('0,0.00')}`}
+            {`$${numeral(item.item.price / 100).format('0,0.00')}`}
           </AppText>
         </View>
         <View style={styles.discountCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {rowData.item.discount
-              ? `$${numeral(rowData.item.discount / 100).format('0,0.00')}`
+            {item.item.discount
+              ? `$${numeral(item.item.discount / 100).format('0,0.00')}`
               : ''}
           </AppText>
         </View>
         <View style={styles.subTotalCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
             {`$${numeral(
-              (rowData.item.qty * rowData.item.price - rowData.item.discount) /
-                100,
+              (item.item.qty * item.item.price - item.item.discount) / 100,
             ).format('0,0.00')}`}
           </AppText>
         </View>
       </View>
-    </SwipeRow>
-  );
+    );
+  };
+
+  const dragEnded = ({data}: {data: AgreementLineItemType[]}) => {
+    const newData = data.map((it, index) => {
+      const it_copy = Object.assign({}, it);
+      it_copy.order = index;
+      return it_copy;
+    });
+    updateLineItemsOrder(newData);
+    setListData(newData);
+  };
+
+  const getAgreementStatus = () => {
+    const events: AgreementEvent[] = activeAgreement.agreement_events as AgreementEvent[];
+    if (events.length === 0) {
+      return {status: 'open', agreementEditable: true};
+    }
+    if (events.findIndex((e) => e.type === 'accepted') > -1) {
+      return {status: 'accepted', agreementEditable: false};
+    }
+    if (events.findIndex((e) => e.type === 'viewed') > -1) {
+      return {status: 'viewed', agreementEditable: false};
+    }
+    if (events.findIndex((e) => e.type === 'printed') > -1) {
+      return {status: 'printed', agreementEditable: false};
+    }
+    return {status: 'sent', agreementEditable: true};
+  };
+
+  const onAddItem = (item: Catalog) => {
+    insert_line_items_one({
+      variables: {
+        object: {
+          agreement_id: activeAgreement.id,
+          catalog_item_id: item.id,
+          current_cost: item.cost,
+          discount: 0,
+          order: activeAgreement.line_items
+            ? activeAgreement.line_items.length - 1
+            : 0,
+          price: item.price,
+          qty: 1,
+          taxable: item.taxable,
+        },
+      },
+    });
+  };
+
+  const onShare = async () => {
+    try {
+      const result = await Share.share({
+        message: 'Share content',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      Alert.alert(error.message);
+    }
+  };
+
+  const shippingAddress = activeAgreement.addressByShippingAddressId
+    ? activeAgreement.addressByShippingAddressId
+    : activeAgreement.address;
+  const phoneNum =
+    contact.phone_home || contact.phone_mobile || contact.phone_office;
+  const {status, agreementEditable} = getAgreementStatus();
 
   return (
     <View style={styles.container}>
+      <StatusBar
+        animated={false}
+        backgroundColor="transparent"
+        barStyle={'light-content'}
+        translucent={true}
+      />
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={parent}
-            onClick={() => {
-              navigation.pop();
-              navigation.navigate(AppRouteEnum.ContactDetails, {
-                parent: 'Contacts',
-                itemTitle: `${contact.name_first} ${contact.name_last}`,
-                itemId: contact.id,
-              });
-            }}
-          />
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <AppText size={16} color={'textLightPurple'} font="anMedium">
+              Close
+            </AppText>
+          </TouchableOpacity>
         }
         rightContent={
           <View style={styles.flexRow}>
-            <Text style={styles.switchText}>Show details</Text>
+            <AppText
+              color={'textLightPurple'}
+              size={12}
+              font={'anMedium'}
+              style={styles.switchText}>
+              Show details
+            </AppText>
             <Switch
-              ios_backgroundColor="#3e3e3e"
+              trackColor={{true: '#855C9C', false: '#f4f4f4'}}
               onValueChange={() => setShowDetails(!showDetails)}
               value={showDetails}
             />
           </View>
         }
-        pageTitle={`Quote ${prefix}${numeral(agreement.number).format(
-          '00000',
-        )}`}
+        pageTitle=""
+        toolbarLeftContent={
+          <View style={styles.toolbarLeftContent}>
+            <AppText color={'textBlack2'} size={34} font={'anSemiBold'}>
+              {`Quote ${prefix}${numeral(agreement.number).format('00000')}`}
+            </AppText>
+            {!agreementEditable && (
+              <FontAwesomeIcon
+                name="lock"
+                color="#55465F"
+                size={30}
+                style={styles.lockIcon}
+              />
+            )}
+          </View>
+        }
         toolbarCenterContent={null}
         toolbarRightContent={
           showDetails ? (
             <View style={styles.flexRow}>
-              <AppText size={14} color={'textBlack2'} font={'anRegular'}>
-                STATUS:
+              <AppText size={14} color={'textBlack2'} font={'anMedium'}>
+                STATUS:&nbsp;
               </AppText>
-              <AppText size={14} color={'textBlue'} font={'anSemiBold'}>
-                {` ${
-                  (activeAgreement.agreement_events as AgreementEvent[])[0]
-                    ?.type !== 'accepted'
-                    ? 'OPEN'
-                    : 'CLOSED'
-                }`}
-              </AppText>
+              <StatusIndicator status={status} />
             </View>
           ) : (
             <View />
@@ -390,14 +652,16 @@ export default function AgreementDetails({
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
                   BILLING ADDRESS
                 </AppText>
-                <TouchableOpacity onPress={() => {}}>
-                  <AppText
-                    color={'textLightPurple'}
-                    size={12}
-                    font={'anSemiBold'}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => {}}>
+                    <AppText
+                      color={'textLightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
               </View>
               <AppText
                 style={styles.lineHeight15}
@@ -406,56 +670,30 @@ export default function AgreementDetails({
                 font={'anRegular'}>
                 {activeAgreement.address?.line1}
               </AppText>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {activeAgreement.address?.line2}
-              </AppText>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state}`}
-              </AppText>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {activeAgreement.address?.postal_code}
-              </AppText>
-            </View>
-            <View style={styles.addressView}>
-              <View style={[styles.rowLayout, styles.bottomBorder]}>
-                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  PROJECT ADDRESS
-                </AppText>
-                <TouchableOpacity onPress={() => {}}>
-                  <AppText
-                    color={'textLightPurple'}
-                    size={12}
-                    font={'anSemiBold'}>
-                    Edit
-                  </AppText>
-                </TouchableOpacity>
-              </View>
-              <AppText
-                style={styles.lineHeight15}
-                color={'textBlack2'}
-                size={16}
-                font={'anRegular'}>
-                {activeAgreement.addressByShippingAddressId?.line1}
-              </AppText>
-              {activeAgreement.addressByShippingAddressId?.line2 && (
+              {activeAgreement.address?.line2 && (
                 <AppText
                   style={styles.lineHeight15}
                   color={'textBlack2'}
                   size={16}
                   font={'anRegular'}>
-                  {activeAgreement.addressByShippingAddressId?.line2}
+                  {activeAgreement.address?.line2}
+                </AppText>
+              )}
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                numberOfLines={1}
+                font={'anRegular'}>
+                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state} ${activeAgreement.address?.postal_code}`}
+              </AppText>
+              {phoneNum && (
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={16}
+                  font={'anRegular'}>
+                  {phoneFormat(phoneNum)}
                 </AppText>
               )}
               <AppText
@@ -463,59 +701,90 @@ export default function AgreementDetails({
                 color={'textBlack2'}
                 size={16}
                 font={'anRegular'}>
-                {`${activeAgreement.addressByShippingAddressId?.city}, ${activeAgreement.addressByShippingAddressId?.us_state}`}
+                {contact.email}
               </AppText>
+            </View>
+            <View style={styles.addressView}>
+              <View style={[styles.rowLayout, styles.bottomBorder]}>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  PROJECT ADDRESS
+                </AppText>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => {}}>
+                    <AppText
+                      color={'textLightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
               <AppText
                 style={styles.lineHeight15}
                 color={'textBlack2'}
                 size={16}
                 font={'anRegular'}>
-                {activeAgreement.addressByShippingAddressId?.postal_code}
+                {shippingAddress?.line1}
+              </AppText>
+              {shippingAddress?.line2 && (
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={16}
+                  font={'anRegular'}>
+                  {shippingAddress?.line2}
+                </AppText>
+              )}
+              <AppText
+                style={styles.lineHeight15}
+                color={'textBlack2'}
+                size={16}
+                numberOfLines={1}
+                font={'anRegular'}>
+                {`${shippingAddress?.city}, ${shippingAddress?.us_state} ${shippingAddress?.postal_code}`}
               </AppText>
             </View>
           </View>
-          <View style={styles.metaView}>
-            {showDetails && (
-              <>
-                <View style={styles.bottomBorder}>
-                  <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                    META
-                  </AppText>
-                </View>
-                <View style={styles.rowLayout}>
-                  <AppText
-                    style={styles.lineHeight15}
-                    color={'textBlack2'}
-                    size={14}
-                    font={'anRegular'}>
-                    Created
-                  </AppText>
-                  <AppText
-                    style={styles.lineHeight15}
-                    color={'textBlack2'}
-                    size={14}
-                    font={'anRegular'}>
-                    {moment(activeAgreement.created).format(
-                      'M/DD/YYYY, HH:mm A',
-                    )}
-                  </AppText>
-                </View>
-                <View style={[styles.lineHeight15, styles.rowLayout]}>
-                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
-                    First View
-                  </AppText>
-                  <AppText color={'textBlack2'} size={14} font={'anRegular'}>
-                    {moment(activeAgreement.created).format(
-                      'M/DD/YYYY, HH:mm A',
-                    )}
-                  </AppText>
-                </View>
-              </>
-            )}
-          </View>
+          {showDetails && (
+            <View style={styles.metaView}>
+              <View style={styles.bottomBorder}>
+                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                  META
+                </AppText>
+              </View>
+              <View style={styles.rowLayout}>
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={14}
+                  font={'anRegular'}>
+                  Created
+                </AppText>
+                <AppText
+                  style={styles.lineHeight15}
+                  color={'textBlack2'}
+                  size={14}
+                  font={'anRegular'}>
+                  {moment(activeAgreement.created).format('M/DD/YYYY, HH:mm A')}
+                </AppText>
+              </View>
+              <View style={[styles.lineHeight15, styles.rowLayout]}>
+                <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                  First View
+                </AppText>
+                <AppText color={'textBlack2'} size={14} font={'anRegular'}>
+                  {moment(activeAgreement.created).format('M/DD/YYYY, HH:mm A')}
+                </AppText>
+              </View>
+            </View>
+          )}
         </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.tableHeader]}>
+            <View style={styles.dragbarCell}>
+              <></>
+            </View>
             <View style={styles.qtyCell}>
               <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
                 QTY
@@ -542,100 +811,130 @@ export default function AgreementDetails({
               </AppText>
             </View>
           </View>
-          <SwipeListView
-            data={listData}
-            keyExtractor={(_, index) => index.toString()}
-            renderItem={renderItem as any}
-          />
-        </View>
-        <View style={styles.block}>
-          <View style={[styles.rowLayout, styles.totalRow]}>
-            <View style={styles.priceCell}>
-              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                SUBTOTAL
-              </AppText>
-            </View>
-            <View style={styles.priceCell}>
-              <View>
-                <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  SALES TAX
+          <View style={styles.rowLayout}>
+            <DraggableFlatList
+              activationDistance={15}
+              keyExtractor={(_, index) => index.toString()}
+              data={listData}
+              renderItem={renderItem}
+              onDragEnd={dragEnded}
+            />
+          </View>
+          {agreementEditable && (
+            <View style={styles.rowLayout}>
+              <TouchableOpacity
+                style={[styles.flexRow, styles.addLineItem]}
+                onPress={() => setLineItemModalVisible(true)}>
+                <AppText color={'textLightPurple'} size={14} font={'anMedium'}>
+                  Add Item
                 </AppText>
-              </View>
-              <TouchableOpacity onPress={() => setShowSalesTax(true)}>
-                <AppText color={'lightPurple'} size={12} font={'anSemiBold'}>
-                  Edit
-                </AppText>
+                <Icon
+                  color={'#855C9C'}
+                  name={'ios-add-outline'}
+                  size={26}
+                  style={styles.marginLeft5}
+                />
               </TouchableOpacity>
             </View>
-            <View style={styles.totalCell}>
-              <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                TOTAL
-              </AppText>
-            </View>
-          </View>
-          <View style={[styles.rowLayout, styles.totalRow]}>
-            <View style={styles.priceCell}>
-              <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                {`$${numeral(totalPrice / 100).format('0,0.00')}`}
-              </AppText>
-            </View>
-            <View style={[styles.priceCell, styles.editDiscountCell]}>
-              <View>
-                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`$${numeral(
-                    (totalPrice * activeAgreement.sales_tax_rate) / 100 / 100,
-                  ).format('0,0.00')}`}
-                </AppText>
-              </View>
-              <View>
-                <AppText color={'textBlack2'} size={18} font={'anRegular'}>
-                  {` @ ${activeAgreement.sales_tax_rate}%`}
-                </AppText>
-              </View>
-            </View>
-            <View style={styles.totalCell}>
-              <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
-                {`$${numeral(
-                  (totalPrice * (100 + activeAgreement.sales_tax_rate)) /
-                    100 /
-                    100,
-                ).format('0,0.00')}`}
-              </AppText>
-            </View>
-          </View>
+          )}
         </View>
-        {showDetails && (
+        <View style={styles.subInfoContainer}>
+          {showDetails && (
+            <>
+              <View style={[styles.block, styles.subInfoView]}>
+                <View style={[styles.rowLayout, styles.totalRow]}>
+                  <View style={styles.priceCell}>
+                    <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                      TOTAL COST
+                    </AppText>
+                  </View>
+                  <View style={styles.subInfoCell}>
+                    <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                      MARGIN
+                    </AppText>
+                  </View>
+                </View>
+                <View style={[styles.rowLayout, styles.totalRow]}>
+                  <View style={styles.priceCell}>
+                    <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                      {`$${numeral(totalCost / 100).format('0,0.00')}`}
+                    </AppText>
+                  </View>
+                  <View style={styles.subInfoCell}>
+                    <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                      {`${Math.round(
+                        ((totalPrice - totalCost) / totalPrice) * 100,
+                      )}%`}
+                    </AppText>
+                  </View>
+                </View>
+              </View>
+              <View style={[styles.block, styles.flex1, styles.rightBorder]} />
+              <View style={styles.flex1} />
+            </>
+          )}
           <View style={styles.block}>
             <View style={[styles.rowLayout, styles.totalRow]}>
               <View style={styles.priceCell}>
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  TOTAL COST
+                  SUBTOTAL
                 </AppText>
               </View>
               <View style={styles.priceCell}>
+                <View>
+                  <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
+                    SALES TAX
+                  </AppText>
+                </View>
+                {agreementEditable && (
+                  <TouchableOpacity onPress={() => setShowSalesTax(true)}>
+                    <AppText
+                      color={'lightPurple'}
+                      size={12}
+                      font={'anSemiBold'}>
+                      Edit
+                    </AppText>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <View style={styles.totalCell}>
                 <AppText color={'textBlack2'} size={12} font={'anSemiBold'}>
-                  MARGIN
+                  TOTAL
                 </AppText>
               </View>
-              <View style={styles.priceCell} />
             </View>
             <View style={[styles.rowLayout, styles.totalRow]}>
               <View style={styles.priceCell}>
                 <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`$${numeral(totalCost / 100).format('0,0.00')}`}
+                  {`$${numeral(totalPrice / 100).format('0,0.00')}`}
                 </AppText>
               </View>
-              <View style={styles.priceCell}>
-                <AppText color={'textBlack2'} size={24} font={'anRegular'}>
-                  {`${Math.round(
-                    ((totalPrice - totalCost) / totalPrice) * 100,
-                  )}%`}
+              <View style={[styles.priceCell, styles.editDiscountCell]}>
+                <View>
+                  <AppText color={'textBlack2'} size={24} font={'anRegular'}>
+                    {`$${numeral(
+                      (totalPrice * activeAgreement.sales_tax_rate) / 100 / 100,
+                    ).format('0,0.00')}`}
+                  </AppText>
+                </View>
+                <View>
+                  <AppText color={'textBlack2'} size={18} font={'anRegular'}>
+                    {` @ ${activeAgreement.sales_tax_rate}%`}
+                  </AppText>
+                </View>
+              </View>
+              <View style={styles.totalCell}>
+                <AppText color={'textBlack2'} size={24} font={'anSemiBold'}>
+                  {`$${numeral(
+                    (totalPrice * (100 + activeAgreement.sales_tax_rate)) /
+                      100 /
+                      100,
+                  ).format('0,0.00')}`}
                 </AppText>
               </View>
-              <View style={styles.priceCell} />
             </View>
           </View>
-        )}
+        </View>
         <View style={styles.block}>
           <View style={[styles.rowLayout, styles.totalRow]}>
             <TouchableOpacity
@@ -646,7 +945,7 @@ export default function AgreementDetails({
                 color={'textLightPurple'}
                 size={14}
                 font={'anSemiBold'}>
-                CONTINUE
+                REVIEW AND ACCEPT
               </AppText>
               <Icon
                 color={'#855C9C'}
@@ -658,14 +957,21 @@ export default function AgreementDetails({
           </View>
         </View>
         <View style={[styles.block, styles.revisionBtnView]}>
-          <AppGradButton
-            containerStyle={styles.revisionBtnContainer}
-            btnStyle={styles.revisionBtn}
-            textStyle={styles.revisionBtnText}
-            title={'CREATE REVISION'}
-            leftIconContent={<></>}
-            onPress={updateAgreementRevision}
-          />
+          <TouchableOpacity
+            style={[styles.flex1, styles.revisionText]}
+            onPress={updateAgreementRevision}>
+            <AppText color={'textLightPurple'} size={16} font={'anMedium'}>
+              Create Revision
+            </AppText>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.flex1} onPress={onShare}>
+            <Image source={ShareIcon} style={styles.shareIcon} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.flex1}
+            onPress={() => setShowDeletePrompt(true)}>
+            <Image source={DeleteIcon} style={styles.deleteIcon} />
+          </TouchableOpacity>
         </View>
       </View>
       <Dialog.Container key="set-discount-dialog" visible={showDiscount}>
@@ -721,6 +1027,37 @@ export default function AgreementDetails({
           }}
         />
       </Dialog.Container>
+      <Dialog.Container
+        key="delete-agreement-dialog"
+        visible={showDeletePrompt}>
+        <Dialog.Title>Delete Agreement</Dialog.Title>
+        <Dialog.Description>
+          Are you sure you want to delete this agreement?
+        </Dialog.Description>
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setShowDeletePrompt(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ok"
+          onPress={() => {
+            setShowDeletePrompt(false);
+            deleteAgreement();
+          }}
+        />
+      </Dialog.Container>
+      {lineItemModalVisible && <View style={styles.modalWrapper} />}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={lineItemModalVisible}>
+        <LineItemModal
+          onClose={() => setLineItemModalVisible(false)}
+          onAddItem={onAddItem}
+        />
+      </Modal>
     </View>
   );
 }
@@ -729,6 +1066,7 @@ const getStyles = (themeStyle: StyleType) => ({
   container: {
     flex: 1,
     backgroundColor: themeStyle.backgroundWhite,
+    position: 'relative',
   },
   logo: {
     resizeMode: 'stretch',
@@ -736,15 +1074,24 @@ const getStyles = (themeStyle: StyleType) => ({
     height: themeStyle.scale(24),
   },
   switchText: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(8),
   },
   flexRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'nowrap',
+    flex: 1,
   },
   rowLayout: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  subInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  subInfoCell: {
+    width: 70,
   },
   bottomBorder: {
     borderBottomColor: themeStyle.lightBorderColor,
@@ -755,7 +1102,9 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   addressView: {
     marginRight: 40,
+    flex: 1,
     alignSelf: 'flex-start',
+    maxWidth: '50%',
   },
   lineHeight15: {
     height: 24,
@@ -765,7 +1114,7 @@ const getStyles = (themeStyle: StyleType) => ({
     alignSelf: 'flex-start',
   },
   block: {
-    paddingTop: 40,
+    marginTop: 40,
     paddingHorizontal: 20,
   },
   tableHeader: {
@@ -830,6 +1179,9 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dragbarCell: {
+    width: 40,
+  },
   totalCell: {
     width: 180,
     alignItems: 'flex-end',
@@ -845,19 +1197,10 @@ const getStyles = (themeStyle: StyleType) => ({
     alignItems: 'center',
   },
   continueBtn: {
-    letterSpacing: 3.5,
+    letterSpacing: 3,
   },
   revisionBtnText: {
     color: themeStyle.textWhite,
-  },
-  revisionBtnView: {
-    position: 'absolute',
-    bottom: 20,
-    alignItems: 'center',
-    width: '100%',
-  },
-  revisionBtnContainer: {
-    width: 300,
   },
   revisionBtn: {
     paddingLeft: 50,
@@ -870,5 +1213,66 @@ const getStyles = (themeStyle: StyleType) => ({
     paddingHorizontal: 20,
     alignItems: 'center',
     paddingBottom: 10,
+  },
+  underlayRight: {
+    flex: 1,
+    justifyContent: 'flex-start',
+  },
+  addLineItem: {
+    justifyContent: 'flex-end',
+    marginVertical: 8,
+    marginRight: -5,
+  },
+  modalWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    zIndex: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  toolbarLeftContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lockIcon: {
+    height: 34,
+    marginLeft: 20,
+  },
+  rightBorder: {
+    borderRightWidth: 1,
+    borderRightColor: themeStyle.lightBorderColor,
+  },
+  flex1: {
+    flex: 1,
+    paddingHorizontal: 0,
+  },
+  shareIcon: {
+    height: 28,
+    alignSelf: 'center',
+    resizeMode: 'contain',
+  },
+  deleteIcon: {
+    height: 28,
+    alignSelf: 'flex-end',
+    resizeMode: 'contain',
+  },
+  revisionBtnView: {
+    position: 'absolute',
+    paddingBottom: 20,
+    height: 70,
+    bottom: 0,
+    alignItems: 'center',
+    width: '100%',
+    backgroundColor: 'rgb(249, 249, 249)',
+    borderTopWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderTopColor: themeStyle.lightBorderColor,
+  },
+  revisionText: {
+    height: 50,
+    justifyContent: 'center',
   },
 });

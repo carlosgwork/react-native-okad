@@ -8,10 +8,8 @@ import {useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
-
 import {Contact, TableHeaderType, TableSortOps} from '@utils/types';
 import {phoneFormat} from '@utils/functions';
-
 import {
   AppHeader,
   AppGradButton,
@@ -22,7 +20,7 @@ import {
   CircularLoading,
 } from '@root/components';
 import {FETCH_CONTACTS} from './graphql';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 220}},
@@ -37,7 +35,7 @@ const HEADERS: TableHeaderType[] = [
 ];
 
 const sortContact = (arr: Contact[], sortOp: TableSortOps) => {
-  const sorted = arr.sort((a: Contact, b: Contact) => {
+  const sorted = arr.slice().sort((a: Contact, b: Contact) => {
     let cmpA = '',
       cmpB = '';
     switch (sortOp.sortBy) {
@@ -148,10 +146,13 @@ const cellContent = (
         <AppTextButton
           style={{...styles.cellLayout, ...styles.agreementsBtn}}
           onPress={() =>
-            navigation.navigate('NewAgreement', {
-              parent: 'Contacts',
-              contact: row,
-              itemTitle: `${row.name_first} ${row.name_last}`,
+            navigation.navigate('NewAgreements', {
+              screen: 'NewAgreement',
+              params: {
+                parent: 'Contacts',
+                contact: row,
+                itemTitle: `${row.name_first} ${row.name_last}`,
+              },
             })
           }
           leftIconContent={
@@ -178,7 +179,7 @@ const cellContent = (
 
 export default function Contacts({
   navigation,
-}: ContactsNavProps<AppRouteEnum.MainContacts>) {
+}: AppNavProps<AppRouteEnum.MainContacts>) {
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 

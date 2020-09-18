@@ -5,21 +5,24 @@ import SignatureCapture, {
   SaveEventParams,
 } from 'react-native-signature-capture';
 import {useSelector} from 'react-redux';
+import {useMutation} from '@apollo/client';
+import Icon from 'react-native-vector-icons/Ionicons';
+
 import {setAction} from '@root/redux/actions';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {UPDATE_AGREEMENT} from '../graphql';
-
-import {AppHeader, NavBackBtn, AppText, AppGradButton} from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {ADD_AGREEMENT_EVENT, UPDATE_AGREEMENT} from '../graphql';
+import {AppHeader, AppText, AppGradButton} from '@root/components';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   AgreementLineItemType,
   OfflineMutationType,
   Agreement,
   Contact,
+  PaymentSchedule,
+  AgreementEvent,
 } from '@root/utils/types';
 import {SignBg} from '@root/assets/assets';
-import {useMutation} from '@apollo/client';
 
 type SignCaptureType = {
   current: any;
@@ -30,10 +33,9 @@ type SignCaptureType = {
 export default function AgreementSummary({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementSummary>) {
+}: AppNavProps<AppRouteEnum.AgreementSummary>) {
   const {styles} = useStyles(getStyles);
-  const {parent = 'Summary', itemTitle, agreement, contact} =
-    route.params || {};
+  const {itemTitle, agreement, contact} = route.params || {};
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const signRef = React.useRef<SignCaptureType>(null);
 
@@ -47,6 +49,7 @@ export default function AgreementSummary({
   );
 
   const [update_agreement] = useMutation(UPDATE_AGREEMENT);
+  const [insert_agreement_events_one] = useMutation(ADD_AGREEMENT_EVENT);
 
   const updateAgreement = () => {
     signRef.current?.saveImage();
@@ -69,6 +72,14 @@ export default function AgreementSummary({
     const data = {
       ...agreement,
       signature: result.encoded,
+      agreement_events: [
+        {
+          id: -1,
+          agreement_id: agreement.id,
+          created: new Date(),
+          type: 'accepted',
+        },
+      ] as AgreementEvent[],
       last_modified: new Date(),
     };
     const newAgreements = JSON.parse(JSON.stringify(agreements));
@@ -104,6 +115,12 @@ export default function AgreementSummary({
         last_modified: new Date(),
       };
       if (isOnline) {
+        insert_agreement_events_one({
+          variables: {
+            id: agreement.id,
+            event_type: 'accepted',
+          },
+        });
         update_agreement({
           variables: {
             _set: updatingAgreement,
@@ -116,6 +133,10 @@ export default function AgreementSummary({
           type: 'UPDATE_AGREEMENT',
           itemId: agreement.id,
         });
+        newMutations.push({
+          type: 'INSERT_ACCEPT_AGREEMENT_EVENT',
+          itemId: agreement.id,
+        });
         setAction('offlineMutations', {data: newMutations});
       }
     }
@@ -125,12 +146,11 @@ export default function AgreementSummary({
     <View style={styles.container}>
       <AppHeader
         leftContent={
-          <NavBackBtn
-            title={parent}
-            onClick={() => {
-              navigation.pop();
-            }}
-          />
+          <TouchableOpacity onPress={() => navigation.pop()}>
+            <AppText size={16} color={'textLightPurple'} font="anMedium">
+              Close
+            </AppText>
+          </TouchableOpacity>
         }
         rightContent={null}
         pageTitle={itemTitle || ''}
@@ -258,6 +278,59 @@ export default function AgreementSummary({
         </View>
         <View style={styles.block}>
           <AppText font={'anSemiBold'} size={20} color={'textBlack2'}>
+            Payment Schedule
+          </AppText>
+          <View style={styles.paymentScheduleRow}>
+            {agreement.agreement_template.opts.payment_schedule.map(
+              (schedule: PaymentSchedule, index: number) => (
+                <View
+                  style={[
+                    styles.rowLayout,
+                    styles.padding10,
+                    index !==
+                      agreement.agreement_template.opts.payment_schedule
+                        .length -
+                        1 && styles.bottomBorder,
+                  ]}
+                  key={index}>
+                  <AppText font={'anRegular'} size={14} color={'textBlack2'}>
+                    {schedule.description}
+                  </AppText>
+                  {schedule.type === 'fixed' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      ((totalPrice * (100 + agreement.sales_tax_rate)) / 100 -
+                        schedule.value) /
+                        100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                  {schedule.type === 'percentage' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      (((totalPrice * (100 + agreement.sales_tax_rate)) / 100) *
+                        schedule.value) /
+                        100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                  {schedule.type === 'balance' && (
+                    <AppText
+                      font={'anMedium'}
+                      size={14}
+                      color={'textBlack2'}>{`$${numeral(
+                      schedule.value / 100,
+                    ).format('0,0.00')}`}</AppText>
+                  )}
+                </View>
+              ),
+            )}
+          </View>
+        </View>
+        <View style={styles.block}>
+          <AppText font={'anSemiBold'} size={20} color={'textBlack2'}>
             Warranty
           </AppText>
           <View style={styles.subblock}>
@@ -355,6 +428,13 @@ export default function AgreementSummary({
           </View>
         </View>
         <View style={styles.block}>
+          <AppText
+            style={styles.signTitleText}
+            font={'anSemiBold'}
+            size={13}
+            color={'lightBorderColor'}>
+            Sign
+          </AppText>
           {!agreement.signature && (
             <View style={[styles.subblock, styles.signView]}>
               <SignatureCapture
@@ -372,31 +452,37 @@ export default function AgreementSummary({
               <TouchableOpacity
                 style={styles.resetBtnStyle}
                 onPress={resetSign}>
-                <AppText color={'textBlack2'} size={16} font={'anSemiBold'}>
-                  Clear
+                <Icon name="close" size={26} color={'#855C9C'} />
+                <AppText color={'textLightPurple'} size={16} font={'anMedium'}>
+                  &nbsp;Clear
                 </AppText>
               </TouchableOpacity>
             </View>
           )}
           {agreement.signature && (
             <View style={[styles.subblock, styles.signView]}>
+              <View pointerEvents="none" style={styles.signBg}>
+                <Image source={SignBg} style={styles.signBg} />
+              </View>
               <Image
                 source={{uri: `data:image/png;base64, ${agreement.signature}`}}
-                style={styles.signBg}
+                style={styles.signature}
               />
             </View>
           )}
         </View>
-        <View style={styles.bottomBtnView}>
-          <AppGradButton
-            containerStyle={styles.createBtnContainer}
-            textStyle={styles.createBtnText}
-            btnStyle={styles.createBtn}
-            title={'ACCEPT QUOTE'}
-            leftIconContent={<></>}
-            onPress={updateAgreement}
-          />
-        </View>
+        {!agreement.signature && (
+          <View style={styles.bottomBtnView}>
+            <AppGradButton
+              containerStyle={styles.createBtnContainer}
+              textStyle={styles.createBtnText}
+              btnStyle={styles.createBtn}
+              title={'ACCEPT QUOTE'}
+              leftIconContent={<></>}
+              onPress={updateAgreement}
+            />
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -483,11 +569,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   signature: {
     width: '100%',
-    borderColor: '#000033',
-    borderWidth: 1,
-    borderType: 'solid',
     height: 200,
-    backgroundColor: 'red',
   },
   signBg: {
     position: 'absolute',
@@ -505,6 +587,8 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   resetBtnStyle: {
     paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   bottomBtnView: {
     alignSelf: 'flex-end',
@@ -516,11 +600,33 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   createBtn: {
     borderTopLeftRadius: 0,
-    paddingVertical: 10,
+    paddingVertical: 11,
+    paddingLeft: 20,
     borderTopRightRadius: 0,
     borderRadius: 0,
   },
   createBtnText: {
+    textTransform: 'uppercase',
+    ...themeStyle.getTextStyle({
+      color: 'textWhite',
+      font: 'anSemiBold',
+      size: 16,
+    }),
+    letterSpacing: 2.91,
+  },
+  paymentScheduleRow: {
+    width: 320,
+    marginTop: 10,
+  },
+  bottomBorder: {
+    borderBottomWidth: 1,
+    borderBottomColor: themeStyle.lightBorderColor,
+  },
+  padding10: {
+    paddingVertical: 10,
+  },
+  signTitleText: {
+    letterSpacing: 2.64,
     textTransform: 'uppercase',
   },
 });

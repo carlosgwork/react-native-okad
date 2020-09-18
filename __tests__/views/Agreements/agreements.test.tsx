@@ -4,17 +4,19 @@
 
 import React from 'react';
 import {Alert} from 'react-native';
-import Agreements, {FETCH_AGREEMENTS} from '@root/views/Agreements';
+import Agreements from '@root/views/Agreements';
 import {Provider} from 'react-redux';
 import {createMockClient} from 'mock-apollo-client';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
+import configureStore from 'redux-mock-store';
+
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
-import configureStore from 'redux-mock-store';
 import {AGREEMENTS_MOCKDATA} from '../../__mocks__/Agreements';
 import {TouchElementProps} from '@root/utils/types';
+import {FETCH_AGREEMENTS} from '@root/views/Agreements/graphql';
 
 let wrapper: ReactWrapper;
 let queryHandler;

@@ -33,7 +33,7 @@ const GET_USERINFO = gql`
       organization_id
       prefix
       public_id
-      pres
+      prefs
     }
   }
 `;
@@ -77,7 +77,7 @@ export default function Login() {
           organization_id: data.users[0].organization_id,
           prefix: data.users[0].prefix,
           public_id: data.users[0].public_id,
-          pres: data.users[0].pres,
+          prefs: data.users[0].prefs,
         });
       }
     },
@@ -97,11 +97,11 @@ export default function Login() {
       return;
     }
     try {
-      await GoogleSignin.hasPlayServices();
-      const {idToken}: User = await GoogleSignin.signIn();
-      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-      // const userInfo = await firebase.auth().signInWithCredential(credential);
-      await firebase.auth().signInWithCredential(credential);
+      // await GoogleSignin.hasPlayServices();
+      // const {idToken}: User = await GoogleSignin.signIn();
+      // const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      // // const userInfo = await firebase.auth().signInWithCredential(credential);
+      // await firebase.auth().signInWithCredential(credential);
       setLoading(false);
       setUserId(1);
       navigateHome(replace);

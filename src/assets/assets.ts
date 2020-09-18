@@ -8,8 +8,14 @@ export const BurnoEliteCreImg180Turn = require('./images/bruno-elite-cre/180deg-
 export const BurnoEliteCreImgIL = require('./images/bruno-elite-cre/intermediate-landing.png');
 export const BurnoEliteCreImgRadius = require('./images/bruno-elite-cre/radius.png');
 export const BurnoEliteCreImgStraight = require('./images/bruno-elite-cre/straight-overrun.png');
-export const SignBg = require('./images/sign-bg.png');
+export const SignBg = require('./images/sign-bg2.png');
 
 export const MsgIcon = require('./images/icons/msg.png');
 export const CallIcon = require('./images/icons/call.png');
 export const EnvelopIcon = require('./images/icons/envelop-icon.png');
+export const StatusOpenIcon = require('./images/icons/status-open.png');
+export const StatusEyeIcon = require('./images/icons/status-eye.png');
+export const StatusUpIcon = require('./images/icons/status-up.png');
+export const StatusTickIcon = require('./images/icons/status-tick2.png');
+export const DeleteIcon = require('./images/icons/delete-icon.png');
+export const ShareIcon = require('./images/icons/upload-icon.png');

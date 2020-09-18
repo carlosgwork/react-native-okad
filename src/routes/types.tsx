@@ -1,9 +1,15 @@
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RouteProp} from '@react-navigation/native';
-import {Contact, Agreement} from '@root/utils/types';
+import {
+  Contact,
+  Agreement,
+  Catalog,
+  AgreementTemplate,
+} from '@root/utils/types';
 
 export enum AppRouteEnum {
   MAIN = 'MAIN',
+  NewAgreements = 'NewAgreements',
   MainContacts = 'MainContacts',
   ContactDetails = 'ContactDetails',
   NewContactModal = 'NewContactModal',
@@ -14,15 +20,19 @@ export enum AppRouteEnum {
   SETTINGS = 'SETTINGS',
   TEMPLATES = 'Templates',
   AgreementDetails = 'AgreementDetails',
+  ContactAgreementDetails = 'ContactAgreementDetails',
+  DashboardAgreementDetails = 'DashboardAgreementDetails',
   AgreementSummary = 'AgreementSummary',
   AgreementsMain = 'AgreementsMain',
+  Catalogs = 'Catalogs',
+  CatalogDetails = 'CatalogDetails',
 }
 
 type TemplatesParamsType = {
   parent: string;
   itemTitle: string;
   contact: Contact;
-  templateId: number;
+  template: AgreementTemplate;
 };
 
 export type ContactsStackParamList = {
@@ -49,6 +59,18 @@ export type ContactsStackParamList = {
     contact: Contact;
     agreement: Agreement;
   };
+  [AppRouteEnum.ContactAgreementDetails]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+    agreement: Agreement;
+  };
+  [AppRouteEnum.DashboardAgreementDetails]: {
+    parent?: string;
+    itemTitle?: string;
+    contact: Contact;
+    agreement: Agreement;
+  };
   [AppRouteEnum.AgreementSummary]: {
     parent?: string;
     itemTitle?: string;
@@ -56,13 +78,24 @@ export type ContactsStackParamList = {
     contact: Contact;
   };
   [AppRouteEnum.AgreementsMain]: {};
+  [AppRouteEnum.NewAgreements]: {};
+};
+
+export type CatalogsStackParamList = {
+  [AppRouteEnum.Catalogs]: {};
+  [AppRouteEnum.CatalogDetails]: {
+    data: Catalog;
+    vendor: string;
+  };
 };
 
 type SettingsStackParamList = {};
 
-type AppStackParamList = ContactsStackParamList & SettingsStackParamList;
+type AppStackParamList = ContactsStackParamList &
+  CatalogsStackParamList &
+  SettingsStackParamList;
 
-export type ContactsNavProps<T extends keyof AppStackParamList> = {
+export type AppNavProps<T extends keyof AppStackParamList> = {
   navigation: StackNavigationProp<
     AppStackParamList,
     AppRouteEnum.NewContactModal

@@ -1,18 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {View, NativeScrollEvent, Alert} from 'react-native';
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
 import numeral from 'numeral';
-
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import moment from 'moment';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
-import {Agreement, TableHeaderType, TableSortOps} from '@utils/types';
-
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {
   AppHeader,
   AppSearchInput,
@@ -21,6 +19,7 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
+import {FETCH_AGREEMENTS} from './graphql';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 120}},
@@ -33,86 +32,18 @@ const HEADERS: TableHeaderType[] = [
   },
   {
     label: 'Template',
-    value: 'agreement_template_id',
+    value: 'agreement_template_name',
     sortable: true,
     style: {flex: 1},
   },
   {label: 'Created', value: 'created', sortable: true, style: {width: 150}},
 ];
 
-const FETCH_COUNT = 20;
-
-export const FETCH_AGREEMENTS = gql`
-  query AgreementQuery($offset: Int!) {
-    agreements(limit: 20, offset: $offset, order_by: {id: desc}) {
-      id
-      agreement_template_id
-      agreement_events {
-        type
-        id
-      }
-      address {
-        city
-        county
-        id
-        line1
-        line2
-        us_state
-        postal_code
-      }
-      addressByShippingAddressId {
-        city
-        county
-        id
-        line2
-        line1
-        us_state
-        postal_code
-      }
-      contact {
-        name_first
-        name_last
-        id
-      }
-      contact_id
-      line_items {
-        agreement_id
-        catalog_item_id
-        current_cost
-        discount
-        price
-        qty
-        id
-        catalog_item {
-          name
-        }
-      }
-      number
-      revision
-      sales_tax_rate
-      shipping_address_id
-      signature
-      user {
-        prefix
-        pres
-        public_id
-        name_last
-        name_first
-        google_id
-        email
-        default_sales_tax_rate
-        organization_id
-      }
-      user_id
-      created
-      last_modified
-    }
-  }
-`;
+const FETCH_COUNT = 40;
 
 export default function Agreements({
   navigation,
-}: ContactsNavProps<AppRouteEnum.AgreementsMain>) {
+}: AppNavProps<AppRouteEnum.AgreementsMain>) {
   const {styles} = useStyles(getStyles);
 
   const agreements = useSelector((state: any) => state.agreements);
@@ -182,7 +113,7 @@ export default function Agreements({
 
   const renderCell = React.useCallback(
     (header: TableHeaderType, row: Agreement) =>
-      cellContent(header, row, styles),
+      cellContent(navigation, header, row, styles),
     [agreements],
   );
 
@@ -246,9 +177,9 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
           b.address?.us_state || ''
         }`.toUpperCase();
         break;
-      case 'agreement_template_id':
-        cmpA = a.agreement_template_id;
-        cmpB = b.agreement_template_id;
+      case 'agreement_template_name':
+        cmpA = a.agreement_template.name;
+        cmpB = b.agreement_template.name;
         break;
       case 'created':
         cmpA = `${a.created}`.toUpperCase();
@@ -272,11 +203,16 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
   return sorted;
 };
 
-const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
+const cellContent = (
+  navigation: any,
+  header: TableHeaderType,
+  row: Agreement,
+  styles: any,
+) => {
   switch (header.value) {
     case 'contact':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
             <>
               {row.contact?.name_first || ''} {row.contact?.name_last || ''}
@@ -286,7 +222,16 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
       );
     case 'name':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => {
+            const contact = row.contact as Contact;
+            navigation.navigate(AppRouteEnum.AgreementDetails, {
+              agreement: row,
+              contact: contact,
+              parent: `${contact.name_first} ${contact.name_last}`,
+            });
+          }}>
           <AppText
             style={styles.noSpacing}
             color={'textLightPurple'}
@@ -314,11 +259,11 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
           </AppText>
         </View>
       );
-    case 'agreement_template_id':
+    case 'agreement_template_name':
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {'Bruno Straight Stairlift'}
+            {row.agreement_template.name}
           </AppText>
         </View>
       );

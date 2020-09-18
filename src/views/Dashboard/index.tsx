@@ -1,45 +1,33 @@
 import React, {useState} from 'react';
 import {View, Text, Switch, Image, ScrollView, Alert} from 'react-native';
 import randomColor from 'randomcolor';
-import {Button} from 'react-native-elements';
 import {GoogleSignin} from '@react-native-community/google-signin';
-
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
+import {useNavigation} from '@react-navigation/native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {Agreement} from '@utils/types';
+import {Agreement, Contact} from '@utils/types';
 import {
   AppHeader,
   AppText,
   AppSearchInput,
   CircularLoading,
 } from '@root/components';
-import AgreementTile from './AgreementTile';
 import {logout} from '@redux/actions';
-import {useNavigation} from '@react-navigation/native';
+import AppGradButton from '@components/AppGradButton';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import AgreementTile from './AgreementTile';
+import {FETCH_10_AGREEMENTS} from './graphql';
 
-export const FETCH_AGREEMENTS = gql`
-  query AgreementsQuery($type: agreement_event!) {
-    agreements(limit: 10, order_by: {created: desc}) {
-      agreement_events(where: {type: {_neq: $type}}) {
-        type
-      }
-      contact {
-        name_first
-        name_last
-      }
-      created
-    }
-  }
-`;
-
-export default function Dashboard() {
+export default function Dashboard({
+  navigation,
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {replace} = useNavigation<any>();
 
   const [BgColors, setBgColors] = useState<string[]>([]);
-  const {error, loading} = useQuery(FETCH_AGREEMENTS, {
+  const {error, loading} = useQuery(FETCH_10_AGREEMENTS, {
     variables: {type: 'accepted'},
     onCompleted: (data) => {
       setSearchText('');
@@ -77,6 +65,15 @@ export default function Dashboard() {
     setSearchText(text);
   };
 
+  const navigateDetails = (agreement: Agreement) => {
+    const contact = agreement.contact as Contact;
+    navigation.navigate(AppRouteEnum.DashboardAgreementDetails, {
+      agreement,
+      contact: contact,
+      parent: `${contact.name_first} ${contact.name_last}`,
+    });
+  };
+
   if (error) {
     return (
       <View style={styles.emptyContainer}>
@@ -91,9 +88,15 @@ export default function Dashboard() {
         leftContent={null}
         rightContent={
           <View style={styles.flexRow}>
-            <Text style={styles.switchText}>Show details</Text>
+            <AppText
+              color={'textLightPurple'}
+              size={12}
+              font={'anMedium'}
+              style={styles.switchText}>
+              Show details
+            </AppText>
             <Switch
-              ios_backgroundColor="#3e3e3e"
+              trackColor={{true: '#855C9C', false: '#f4f4f4'}}
               onValueChange={() => setShowDetails(!showDetails)}
               value={showDetails}
             />
@@ -102,7 +105,11 @@ export default function Dashboard() {
         pageTitle={'Dashboard'}
         toolbarCenterContent={
           <View style={styles.searchContainer}>
-            <AppSearchInput value={searchText} onChange={onFilterAgreement} />
+            <AppSearchInput
+              value={searchText}
+              placeholderText="Search for anything"
+              onChange={onFilterAgreement}
+            />
           </View>
         }
         toolbarRightContent={
@@ -113,7 +120,7 @@ export default function Dashboard() {
         }
       />
       <ScrollView style={styles.mainContent}>
-        <AppText size={20} color={'textBlack2'} font={'anSemiBold'}>
+        <AppText size={22} color={'textBlack2'} font={'anSemiBold'}>
           Recent Open Agreements
         </AppText>
         <View style={styles.rowLayout} key={visibleAgreements.length}>
@@ -122,15 +129,19 @@ export default function Dashboard() {
               key={index}
               agreement={agreement}
               color={BgColors[index]}
+              onPress={() => navigateDetails(agreement)}
             />
           ))}
         </View>
         <CircularLoading loading={loading} />
       </ScrollView>
-      <Button
-        style={{marginTop: 100, height: 100}}
+      <AppGradButton
+        containerStyle={styles.logoutBtnContainer}
+        btnStyle={styles.logoutBtn}
+        textStyle={styles.logoutBtnText}
+        title={'LOG OUT'}
+        leftIconContent={<></>}
         onPress={onLogout}
-        title={'Logout'}
       />
     </View>
   );
@@ -152,7 +163,7 @@ const getStyles = (themeStyle: StyleType) => ({
     }),
   },
   switchText: {
-    marginRight: themeStyle.scale(10),
+    marginRight: themeStyle.scale(8),
   },
   logo: {
     resizeMode: 'stretch',
@@ -172,10 +183,22 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     paddingVertical: themeStyle.scale(30),
     paddingLeft: themeStyle.scale(20),
+    flex: 1,
   },
   emptyContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 250,
+  },
+  logoutBtnText: {
+    color: themeStyle.textWhite,
+  },
+  logoutBtnContainer: {
+    width: 300,
+    alignSelf: 'center',
+    marginBottom: 50,
+  },
+  logoutBtn: {
+    paddingLeft: 50,
   },
 });

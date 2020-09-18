@@ -48,6 +48,7 @@ const route: any = {
   params: {
     agreement: AGREEMENT_DETAILS_MOCKDATA,
     contact: CONTACT_DETAILS_MOCKDATA,
+    itemTitle: 'Quote LH0001',
   },
 };
 
@@ -68,7 +69,9 @@ describe('Agreement Summary Page', () => {
   it('renders successfully AppHeader.', () => {
     const appHeader = wrapper.find('Memo(AppHeader)');
     expect(appHeader).toHaveLength(1);
-    expect(appHeader.find('Text').contains('Summary')).toEqual(true);
+    expect(appHeader.find('Text').contains(route.params.itemTitle)).toEqual(
+      true,
+    );
   });
 
   it('should render "Sales Tax", "Subtotal" and "Total" section.', () => {

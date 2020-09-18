@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {View, Image, TouchableOpacity, Text, Dimensions} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Carousel from 'react-native-snap-carousel';
 import numeral from 'numeral';
 
@@ -14,7 +13,7 @@ import {
   AppGradButton,
 } from '@root/components';
 import {
-  ContactsNavProps,
+  AppNavProps,
   ContactsStackParamList,
   AppRouteEnum,
 } from '@root/routes/types';
@@ -24,15 +23,16 @@ import {setAction} from '@root/redux/actions';
 import {ProductItemProps} from '@root/utils/types';
 
 import {ELAN_PRODUCTS} from './data';
+import CustomIcon from '@root/components/CustomIcon';
 
 const {width: viewportWidth} = Dimensions.get('window');
 
 export default function BrunoStraightStairlift({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
-  const {contact, templateId, parent = ''} = route.params || {};
+  const {contact, template, parent = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
   const {themeStyle} = useTheme();
 
@@ -43,7 +43,7 @@ export default function BrunoStraightStairlift({
         itemTitle: item.name,
         parent: 'Bruno Straight Stairlift',
         contact,
-        templateId,
+        template,
       });
     };
 
@@ -61,7 +61,9 @@ export default function BrunoStraightStairlift({
 
     return (
       <View key={index} style={styles.slideItem}>
-        <Image style={styles.imageStyle} source={productImage} />
+        <View style={styles.imageContainer}>
+          <Image style={styles.imageStyle} source={productImage} />
+        </View>
         {item.name.indexOf('Reconditioned') > -1 && (
           <View style={styles.diagonalBox}>
             <AppText
@@ -75,26 +77,22 @@ export default function BrunoStraightStairlift({
         )}
         <View style={styles.rowLayout}>
           <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'images-outline'}
+            <CustomIcon
+              color={themeStyle.textLightPurple}
+              name="images-glyph"
               size={24}
               style={styles.marginRight15}
             />
           </TouchableOpacity>
           <TouchableOpacity>
-            <Icon
-              color={themeStyle.textPurple}
-              name={'ios-videocam-outline'}
-              size={28}
+            <CustomIcon
+              color={themeStyle.textLightPurple}
+              name={'camera-glyph'}
+              size={20}
               style={styles.marginRight15}
             />
           </TouchableOpacity>
-          <AppText
-            style={styles.uppercaseText}
-            color={'textBlack2'}
-            size={20}
-            font={'anSemiBold'}>
+          <AppText color={'textBlack2'} size={20} font={'anSemiBold'}>
             {item.name}
           </AppText>
         </View>
@@ -124,6 +122,7 @@ export default function BrunoStraightStairlift({
           <View style={styles.ctaBtn}>
             <AppGradButton
               btnStyle={styles.ctaInnerBtn}
+              textStyle={styles.ctaInnerBtnText}
               title={`Select ${category}`}
               onPress={selectProduct}
             />
@@ -167,6 +166,9 @@ export default function BrunoStraightStairlift({
             renderItem={_renderItem}
             sliderWidth={viewportWidth}
             itemWidth={viewportWidth / 2.2}
+            activeSlideAlignment={'start'}
+            inactiveSlideScale={1}
+            inactiveSlideOpacity={1}
           />
         </View>
       </View>
@@ -196,22 +198,26 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(30),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),
   },
   marginRight15: {
-    marginRight: themeStyle.scale(30),
+    marginRight: themeStyle.scale(25),
     paddingVertical: 20,
   },
+  imageContainer: {
+    paddingRight: 10,
+  },
   imageStyle: {
+    resizeMode: 'stretch',
     width: '100%',
-    resizeMode: 'contain',
     height: 400,
   },
   slideItem: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 0,
+    marginRight: 8,
     justifyContent: 'flex-start',
   },
   itemContent: {
@@ -228,20 +234,26 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   ctaBtnContainer: {
     alignItems: 'center',
+    marginTop: 10,
   },
   ctaBtn: {
     textAlign: 'center',
-    width: '40%',
+    width: 'auto',
   },
   ctaInnerBtn: {
     paddingRight: 0,
     paddingLeft: 20,
   },
+  ctaInnerBtnText: {
+    textTransform: 'uppercase',
+    letterSpacing: 3.27,
+    paddingHorizontal: 10,
+  },
   diagonalBox: {
     backgroundColor: themeStyle.backgroundWhite,
     paddingVertical: 10,
     paddingHorizontal: 50,
-    transform: [{rotate: '-45deg'}, {translateY: '15%'}, {translateX: '-65%'}],
+    transform: [{rotate: '-45deg'}, {translateY: '0%'}, {translateX: '-75%'}],
     position: 'absolute',
     top: 0,
     left: 0,

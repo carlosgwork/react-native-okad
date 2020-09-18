@@ -25,19 +25,70 @@ export const FETCH_CONTACTS = gql`
       }
       agreements {
         id
-        number
+        agreement_template_id
+        agreement_events {
+          type
+          id
+        }
+        address {
+          city
+          county
+          id
+          line1
+          line2
+          us_state
+          postal_code
+        }
+        addressByShippingAddressId {
+          city
+          county
+          id
+          line2
+          line1
+          us_state
+          postal_code
+        }
+        contact {
+          name_first
+          name_last
+          id
+        }
+        contact_id
         line_items {
+          agreement_id
+          catalog_item_id
+          current_cost
           discount
           price
           qty
-        }
-        sales_tax_rate
-        created
-        agreement_template_id
-        user {
-          email
+          order
           id
+          taxable
+          catalog_item {
+            name
+          }
+        }
+        number
+        revision
+        sales_tax_rate
+        shipping_address_id
+        signature
+        user {
           prefix
+          prefs
+          public_id
+          name_last
+          name_first
+          google_id
+          email
+          default_sales_tax_rate
+          organization_id
+        }
+        user_id
+        agreement_template {
+          name
+          opts
+          id
         }
       }
     }
@@ -104,11 +155,21 @@ export const CREATE_CONTACT = gql`
         }
         agreements {
           id
+          agreement_template_id
           number
           line_items {
+            agreement_id
+            catalog_item_id
+            current_cost
             discount
             price
             qty
+            order
+            id
+            taxable
+            catalog_item {
+              name
+            }
           }
           sales_tax_rate
           created
@@ -117,6 +178,11 @@ export const CREATE_CONTACT = gql`
             email
             id
             prefix
+          }
+          agreement_template {
+            name
+            opts
+            id
           }
         }
       }

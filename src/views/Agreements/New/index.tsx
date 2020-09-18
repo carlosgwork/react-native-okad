@@ -1,16 +1,19 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {View, Image, ScrollView, TouchableOpacity} from 'react-native';
+import {useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
 import {AppHeader, AppText, NavBackBtn} from '@root/components';
 import TemplateTile from './TemplateTile';
 import {
-  ContactsNavProps,
+  AppNavProps,
   ContactsStackParamList,
   AppRouteEnum,
 } from '@root/routes/types';
 import {setAction} from '@root/redux/actions';
+import {LOAD_AGREEMENT_TEMPLATES} from '../graphql';
+import {AgreementTemplate} from '@root/utils/types';
 
 const Templates = [
   {
@@ -30,16 +33,25 @@ const Templates = [
 export default function NewAgreement({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.NewAgreement>) {
+}: AppNavProps<AppRouteEnum.NewAgreement>) {
   const {styles} = useStyles(getStyles);
   const {contact, parent = '', itemTitle = ''} = route.params || {};
+  const [templatesData, setTemplatesData] = useState<AgreementTemplate[]>([]);
+
+  useQuery(LOAD_AGREEMENT_TEMPLATES, {
+    onCompleted: (data) => {
+      setAction('agreement_templates', {templates: data.agreement_templates});
+      setTemplatesData(data.agreement_templates);
+    },
+  });
+
   const navigateTemplate = (index: number) => {
     // Init Cart state
     setAction('cart', {product: {}, items: []});
     const templateName = Templates[index].name as keyof ContactsStackParamList;
     navigation.navigate(templateName, {
-      parent: 'NewAgreement',
-      templateId: 1,
+      parent: 'New Agreement',
+      template: templatesData[index],
       contact: contact,
     });
   };
@@ -57,7 +69,6 @@ export default function NewAgreement({
           <TouchableOpacity
             style={styles.switchText}
             onPress={() => {
-              navigation.pop();
               navigation.navigate(AppRouteEnum.ContactDetails, {
                 itemId: contact.id,
                 itemTitle,
@@ -86,6 +97,7 @@ export default function NewAgreement({
             <TemplateTile
               key={index}
               logo={template.logo}
+              disabled={index !== 0}
               onPress={() => navigateTemplate(index)}
             />
           ))}

@@ -42,6 +42,22 @@ export type Agreement = {
   agreement_events?: AgreementEvent[] | AgreementEvent;
   user?: UserType;
   amount?: number;
+  agreement_template: AgreementTemplate;
+};
+
+export type AgreementTemplate = {
+  id: number;
+  name: string;
+  opts: {
+    color: string;
+    payment_schedule: PaymentSchedule[];
+  };
+};
+
+export type PaymentSchedule = {
+  type: 'percentage' | 'fixed' | 'balance';
+  value: number;
+  description: string;
 };
 
 export type AgreementEvent = {
@@ -99,7 +115,9 @@ export type UserType = {
   organization_id: number;
   prefix: string;
   public_id?: string;
-  pres?: any;
+  prefs?: {
+    passcode?: string;
+  };
 };
 
 export type ReduxState = {
@@ -167,7 +185,9 @@ export type AgreementLineItemType = {
   discount: number;
   price: number;
   qty: number;
+  order?: number;
   catalog_item: any;
+  taxable?: boolean;
 };
 
 export type ProductItemProps = {

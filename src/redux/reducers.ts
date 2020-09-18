@@ -12,6 +12,10 @@ import {
   OfflineMutationsState,
 } from './reducers/offlineMutations';
 import {network, NetworkState} from './reducers/network';
+import {
+  agreement_templates,
+  AgreementTemplatesState,
+} from './reducers/agreement_templates';
 
 export const reducers = {
   toast,
@@ -24,6 +28,7 @@ export const reducers = {
   cart,
   offlineMutations,
   network,
+  agreement_templates,
 };
 
 export type ReducerKeys = keyof typeof reducers;
@@ -39,4 +44,5 @@ export type ReduxState = {
   cart: CartState;
   offlineMutations: OfflineMutationsState;
   network: NetworkState;
+  agreement_templates: AgreementTemplatesState;
 };

@@ -16,7 +16,7 @@ import {
   UpholsteryOption,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {LineItemType} from '@root/utils/types';
 import {
   BurnoEliteCreImg90Turn,
@@ -211,7 +211,7 @@ const ElanCatalogs = [
 export default function EliteCRE2110Template({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {parent = '', itemTitle = ''} = route.params || {};
 
   const {product, items} = useSelector((state: any) => state.cart);

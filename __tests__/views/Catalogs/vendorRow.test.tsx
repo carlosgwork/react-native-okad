@@ -49,12 +49,14 @@ const MockData = {
   } as TableSortOps,
 };
 const mockCallback = jest.fn();
+const navigation = {navigate: jest.fn()};
 
 describe('VendorRow Component in Catalogs page', () => {
   beforeEach(() => {
     wrapper = mount(
       <ThemeContext.Provider value={currentTheme}>
         <VendorRow
+          navigation={navigation}
           vendorName={MockData.name}
           catalogSortOps={MockData.sortOps}
           catalogs={MockData.catalog_items}

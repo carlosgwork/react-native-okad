@@ -1,14 +1,15 @@
 import * as React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {Icon} from 'react-native-elements';
+import CustomIcon from '@components/CustomIcon';
 
-import Home from '@root/views/Dashboard';
 import ContactsRoutes from './contacts';
-import Agreements from '@root/views/Agreements';
-import Catalog from '@root/views/Catalogs';
+import CatalogsRoutes from './catalogs';
+import AgreementsRoutes from './agreements';
+import DashboardRoutes from './dashboard';
+import {useTheme} from '@global/Hooks';
 
 const MainTab = createBottomTabNavigator();
-import {useTheme} from '@global/Hooks';
 export function MainTabRoutes() {
   const {themeStyle} = useTheme();
 
@@ -21,29 +22,40 @@ export function MainTabRoutes() {
           switch (route.name) {
             case 'Home':
               iconName = 'ios-home';
-              break;
+              return (
+                <Icon name={iconName} type="ionicon" color={color} size={24} />
+              );
             case 'Contacts':
               iconName = 'ios-people';
-              break;
+              return (
+                <Icon name={iconName} type="ionicon" color={color} size={26} />
+              );
             case 'Agreements':
-              iconName = 'ios-document';
-              break;
+              return (
+                <CustomIcon name="agreements-glyph" size={26} color={color} />
+              );
             case 'Catalog':
-              iconName = 'ios-pricetags';
-              break;
+              return (
+                <CustomIcon name="catalog-glyph" size={24} color={color} />
+              );
             default:
-              iconName = 'ios-people';
+              return (
+                <Icon
+                  name={'ios-people'}
+                  type="ionicon"
+                  color={color}
+                  size={26}
+                />
+              );
           }
-          return (
-            <Icon name={iconName} type="ionicon" color={color} size={26} />
-          );
         },
       })}
       tabBarOptions={{
         activeTintColor: themeStyle.textLightPurple,
         inactiveTintColor: themeStyle.gray,
         labelStyle: {
-          fontSize: 16,
+          fontSize: 13,
+          fontFamily: 'Metropolis-Medium',
           letterSpacing: 0.5,
           paddingVertical: 5,
         },
@@ -51,10 +63,10 @@ export function MainTabRoutes() {
           backgroundColor: 'rgb(249, 249, 249)',
         },
       }}>
-      <MainTab.Screen name="Home" component={Home} />
+      <MainTab.Screen name="Home" component={DashboardRoutes} />
       <MainTab.Screen name="Contacts" component={ContactsRoutes} />
-      <MainTab.Screen name="Agreements" component={Agreements} />
-      <MainTab.Screen name="Catalog" component={Catalog} />
+      <MainTab.Screen name="Agreements" component={AgreementsRoutes} />
+      <MainTab.Screen name="Catalog" component={CatalogsRoutes} />
     </MainTab.Navigator>
   );
 }

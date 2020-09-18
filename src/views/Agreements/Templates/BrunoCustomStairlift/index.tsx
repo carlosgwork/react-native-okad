@@ -13,7 +13,7 @@ import {
   IndoorOutdoorSwitch,
 } from '@root/components';
 import {
-  ContactsNavProps,
+  AppNavProps,
   ContactsStackParamList,
   AppRouteEnum,
 } from '@root/routes/types';
@@ -28,7 +28,7 @@ const {width: viewportWidth} = Dimensions.get('window');
 export default function BrunoCustomStairlift({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {contact, templateId, parent = '', itemTitle = ''} = route.params || {};
   const [isIndoor, setIsIndoor] = useState<boolean>(true);
@@ -185,7 +185,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(30),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),

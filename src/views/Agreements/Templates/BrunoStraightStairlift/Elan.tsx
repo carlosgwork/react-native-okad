@@ -1,9 +1,10 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {useMutation} from '@apollo/client';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -15,7 +16,7 @@ import {
   LineItem,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   LineItemType,
   Agreement,
@@ -30,11 +31,11 @@ const ElanCatalogs = [
     items: [
       {
         id: 7,
-        cost: 36740,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Power-Assisted Swivel Seat',
-        price: 72900,
+        name: 'Manual Swivel Seat',
+        price: 0,
         sku: 'SRE-30528',
         taxable: true,
         vendor_id: 1,
@@ -59,11 +60,11 @@ const ElanCatalogs = [
     items: [
       {
         id: 6,
-        cost: 29260,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Automatic Folding Footrest',
-        price: 50000,
+        name: 'Manual Folding Footrest',
+        price: 0,
         sku: 'SRE-30525',
         taxable: true,
         vendor_id: 1,
@@ -88,14 +89,15 @@ const ElanCatalogs = [
     items: [
       {
         id: 4,
-        cost: 73040,
+        cost: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
-        name: 'Power Folding Rail',
-        price: 140000,
+        name: 'Fixed Rail',
+        price: 0,
         sku: 'SRE-30529',
         taxable: true,
         vendor_id: 1,
+        image: true,
         subcategory: 'Rail',
       },
       {
@@ -106,18 +108,6 @@ const ElanCatalogs = [
         name: 'Manual Folding Rail',
         price: 70000,
         sku: 'SRE-30530',
-        taxable: true,
-        vendor_id: 1,
-        subcategory: 'Rail',
-      },
-      {
-        id: 9,
-        cost: 36740,
-        category: 'Stairlifts',
-        description: 'For SRE-2010',
-        name: 'Manual Folding Rail',
-        price: 70000,
-        sku: 'SRE-30379',
         taxable: true,
         vendor_id: 1,
         subcategory: 'Rail',
@@ -158,8 +148,8 @@ const ElanCatalogs = [
 export default function ElanTemplate({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.TEMPLATES>) {
-  const {parent = '', itemTitle = '', contact, templateId} = route.params || {};
+}: AppNavProps<AppRouteEnum.TEMPLATES>) {
+  const {parent = '', itemTitle = '', contact, template} = route.params || {};
   const {
     userInfo,
     items: cartItems,
@@ -192,13 +182,21 @@ export default function ElanTemplate({
       });
       setAction('contacts', {contacts: newContacts});
       navigation.popToTop();
-      navigation.navigate(AppRouteEnum.AgreementDetails, {
+      navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
         agreement,
         contact: contact,
         parent: `${contact.name_first} ${contact.name_last}`,
       });
     },
   });
+
+  useEffect(() => {
+    if (cartItems.length === 1) {
+      const newItems = cartItems.slice();
+      ElanCatalogs.forEach((catalog) => newItems.push(catalog.items[0]));
+      setAction('cart', {items: newItems});
+    }
+  }, [cartItems]);
 
   const updateQty = (item: LineItemType, qty: number) => {
     const itemIndex = cartItems.findIndex(
@@ -252,7 +250,7 @@ export default function ElanTemplate({
       inset_agreement({
         variables: {
           billing_address_id: contact.address_id,
-          agreement_template_id: templateId,
+          agreement_template_id: template.id,
           contact_id: contact.id,
           shipping_address_id: contact.address_id,
           line_items: lineItems,
@@ -285,7 +283,8 @@ export default function ElanTemplate({
       setAction('offlineMutations', {data: newMutations});
       const agreement: Agreement = {
         billing_address_id: contact.address_id,
-        agreement_template_id: templateId,
+        agreement_template_id: template.id,
+        agreement_template: template,
         contact_id: contact.id,
         created: new Date(),
         id: lastAgreement.id + 1,
@@ -381,7 +380,7 @@ export default function ElanTemplate({
                         cartItems.findIndex(
                           (it: LineItemType) => it.id === item.id,
                         )
-                      ]?.quantity || 0
+                      ]?.qty || 0
                     }
                     setQty={(num) => updateQty(item, num)}
                   />
@@ -410,7 +409,9 @@ export default function ElanTemplate({
           title={`$${numeral(totalPrice / 100).format('0,0.00')} or $${numeral(
             totalPrice / 100 / 60,
           ).format('0,0.00')}/month`}
-          leftIconContent={<></>}
+          rightIconContent={
+            <Icon color={'#fff'} name={'ios-arrow-forward-sharp'} size={20} />
+          }
           onPress={createQuote}
         />
       </View>
@@ -440,7 +441,7 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   mainContent: {
     paddingVertical: themeStyle.scale(50),
-    paddingHorizontal: themeStyle.scale(20),
+    paddingHorizontal: themeStyle.scale(15),
   },
   galleryContainer: {
     marginTop: themeStyle.scale(30),
@@ -507,13 +508,16 @@ const getStyles = (themeStyle: StyleType) => ({
   },
   createBtn: {
     borderTopLeftRadius: 0,
-    paddingVertical: 10,
+    paddingVertical: 14,
     borderTopRightRadius: 0,
     borderBottomLeftRadius: 0,
     borderBottomRightRadius: 0,
-    fontSize: 30,
   },
   createBtnText: {
-    textTransform: 'uppercase',
+    ...themeStyle.getTextStyle({
+      color: 'textWhite',
+      font: 'anSemiBold',
+      size: 18,
+    }),
   },
 });

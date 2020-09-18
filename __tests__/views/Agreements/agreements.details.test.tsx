@@ -32,6 +32,9 @@ const store = mockStore({
   contacts: {
     contacts: [],
   },
+  vendors: {
+    vendors: [],
+  },
   offlineMutations: {
     data: [],
   },
@@ -72,7 +75,9 @@ describe('Agreement Details Page', () => {
     expect(appHeader).toHaveLength(1);
     expect(appHeader.find('Text').contains('Quote LH00013')).toEqual(true);
     expect(appHeader.find('Switch')).toHaveLength(1);
-    expect(appHeader.find('Text').contains('Show details')).toBeTruthy();
+    expect(
+      appHeader.find('Memo(AppText)').contains('Show details'),
+    ).toBeTruthy();
   });
 
   it('should render Billing Address section.', () => {
@@ -94,13 +99,8 @@ describe('Agreement Details Page', () => {
       billingAddressEle
         .find('Memo(AppText)')
         .contains(
-          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state}`,
+          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.address?.postal_code}`,
         ),
-    ).toBeTruthy();
-    expect(
-      billingAddressEle
-        .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.address?.postal_code),
     ).toBeTruthy();
   });
 
@@ -123,23 +123,18 @@ describe('Agreement Details Page', () => {
       projectAddressEle
         .find('Memo(AppText)')
         .contains(
-          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state}`,
+          `${AGREEMENT_DETAILS_MOCKDATA.address?.city}, ${AGREEMENT_DETAILS_MOCKDATA.address?.us_state} ${AGREEMENT_DETAILS_MOCKDATA.address?.postal_code}`,
         ),
-    ).toBeTruthy();
-    expect(
-      projectAddressEle
-        .find('Memo(AppText)')
-        .contains(AGREEMENT_DETAILS_MOCKDATA.address?.postal_code),
     ).toBeTruthy();
   });
 
   it('should render Line Items list section.', () => {
-    const swipeListEle = wrapper.find('SwipeListView');
+    const swipeListEle = wrapper.find('DraggableFlatList');
     expect(swipeListEle).toHaveLength(1);
-    expect(swipeListEle.find('SwipeRow')).toHaveLength(
+    expect(swipeListEle.find('SwipeableItem')).toHaveLength(
       AGREEMENT_DETAILS_MOCKDATA.line_items.length,
     );
-    const swipeRow = swipeListEle.find('SwipeRow');
+    const swipeRow = swipeListEle.find('SwipeableItem');
     expect(swipeRow.find('Memo(AppText)').contains('Discount')).toBeTruthy();
     expect(swipeRow.find('Memo(AppText)').contains('Delete')).toBeTruthy();
   });
@@ -155,12 +150,14 @@ describe('Agreement Details Page', () => {
   });
 
   it('should render "continue" button.', () => {
-    expect(wrapper.find('TouchableOpacity').contains('CONTINUE')).toBeTruthy();
+    expect(
+      wrapper.find('TouchableOpacity').contains('REVIEW AND ACCEPT'),
+    ).toBeTruthy();
   });
 
   it('should render "Create Revision" button.', () => {
     expect(
-      wrapper.find('TouchableOpacity').contains('CREATE REVISION'),
+      wrapper.find('TouchableOpacity').contains('Create Revision'),
     ).toBeTruthy();
   });
 });

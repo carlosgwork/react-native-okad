@@ -1,59 +1,55 @@
-import React, {useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useState, useEffect} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
-import {gql, useQuery} from '@apollo/client';
+import {useQuery} from '@apollo/client';
 import {setAction} from '@redux/actions';
 import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@utils/styles';
 import {useStyles} from '@global/Hooks';
-import {TableSortOps, Vendor} from '@utils/types';
+import {TableSortOps, Vendor, Catalog} from '@utils/types';
 import {emptyTableSortOption} from '@utils/constants';
 import VendorRow from './vendorRow';
 import {VendorsState} from '@redux/reducers/vendors';
 import {AppHeader, AppSearchInput, CircularLoading} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import {FETCH_VENDORS} from './graphql';
 
 const FETCH_COUNT = 20;
 
-export const FETCH_VENDORS = gql`
-  query Vendors($offset: Int!) {
-    vendors(limit: 20, offset: $offset) {
-      id
-      logo_uri
-      name
-      short_name
-      catalog_items {
-        cost
-        id
-        price
-        sku
-        taxable
-        name
-      }
-    }
-  }
-`;
-
-export default function Catalogs() {
+export default function Catalogs({
+  navigation,
+}: AppNavProps<AppRouteEnum.Catalogs>) {
   const {styles} = useStyles(getStyles);
-  const {vendors, sortOptions} = useSelector(
+  const {vendors, searchText: vendorSearchText, sortOptions} = useSelector(
     (state: any): VendorsState => state.vendors,
   );
   const [offset, setOffset] = useState<number>(0);
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
+  const [loadingData, setLoadingData] = useState<boolean>(true);
 
-  const {loading, error} = useQuery(FETCH_VENDORS, {
+  useEffect(() => {
+    onFilterCatalog(vendorSearchText);
+  }, [vendorSearchText]);
+
+  const {error} = useQuery(FETCH_VENDORS, {
     variables: {offset},
     onCompleted: (data) => {
       const newData = vendors.concat(data.vendors);
       setAction('vendors', {
         vendors: newData,
+        searchText: '',
       });
       setSearchText('');
       sortVendors(newData);
       setFilteredVendors(newData);
+      setLoadingData(false);
+    },
+    onError: () => {
+      setLoadingData(false);
     },
   });
 
@@ -62,36 +58,54 @@ export default function Catalogs() {
     setFilteredVendors(filtered);
     sortVendors(filtered);
     setSearchText(text);
+    setAction('vendors', {searchText: text});
   };
 
   const onSortChanged = (sortOp: TableSortOps, index: number) => {
     const newVendorSortOps = vendorsSortOps.slice();
     newVendorSortOps[index].sortOps = sortOp;
     setVendorsSortOps(newVendorSortOps);
-    setAction('catalogs', {sortOptions: newVendorSortOps});
+    setAction('vendors', {sortOptions: newVendorSortOps});
   };
 
   const filterVendors = (text: string, v: Vendor[]) => {
-    if (searchText) {
-      const filtered = v.filter(
+    if (text) {
+      const filteredVendor = v.filter(
         (vendor: Vendor) =>
           vendor.name.toLowerCase().indexOf(text.toLowerCase()) > -1,
       );
-      return filtered;
+      v.forEach((item) => {
+        const matchItems = item.catalog_items.filter(
+          (catalog: Catalog) =>
+            catalog.name.toLowerCase().indexOf(text.toLowerCase()) > -1 ||
+            catalog.sku.toLowerCase().indexOf(text.toLowerCase()) > -1,
+        );
+        if (matchItems.length > 0) {
+          if (filteredVendor.findIndex((it) => it.id === item.id) < 0) {
+            const newV = Object.assign({}, item);
+            newV.catalog_items = matchItems;
+            filteredVendor.push(newV);
+          }
+        }
+      });
+      return filteredVendor;
     }
-    return [];
+    return v;
   };
 
   const sortVendors = (v: Vendor[]) => {
     const sortOps: SortOpsByVendor[] = v.map((vendor) => {
-      const opt = sortOptions.filter(
+      const index = sortOptions.findIndex(
         (option) => option.vendor_id === vendor.id,
       );
+      if (index > -1) {
+        return sortOptions[index];
+      }
       const newSortOpt: SortOpsByVendor = {
         sortOps: emptyTableSortOption,
         vendor_id: vendor.id,
       };
-      return opt.length > 0 ? opt[0] : newSortOpt;
+      return newSortOpt;
     });
     setVendorsSortOps(sortOps);
   };
@@ -102,7 +116,7 @@ export default function Catalogs() {
     nativeEvent: NativeScrollEvent;
   }): void => {
     const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
-    if (loading) {
+    if (loadingData) {
       return;
     }
     if (layoutMeasurement.height > contentSize.height) {
@@ -145,7 +159,8 @@ export default function Catalogs() {
           style={styles.container}>
           {filteredVendors.map((item, index) => (
             <VendorRow
-              key={index}
+              key={`vendor-row-${index}-${item.catalog_items.length}`}
+              navigation={navigation}
               vendorName={item.name}
               catalogs={item.catalog_items}
               catalogSortOps={vendorsSortOps[index].sortOps}
@@ -154,7 +169,10 @@ export default function Catalogs() {
               }
             />
           ))}
-          <CircularLoading loading={loading || !vendorsSortOps.length} />
+          {!loadingData && filteredVendors.length === 0 && (
+            <Text style={styles.centerText}>No Result</Text>
+          )}
+          <CircularLoading loading={loadingData} />
         </ScrollView>
       </View>
     </View>
@@ -188,5 +206,9 @@ const getStyles = (themeStyle: StyleType) => ({
   mainContent: {
     flex: 1,
     marginTop: 10,
+  },
+  centerText: {
+    textAlign: 'center',
+    marginTop: 20,
   },
 });

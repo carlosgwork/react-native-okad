@@ -52,7 +52,7 @@ export default function Splash() {
   React.useEffect(() => {
     cleanAction('loading');
     if (storeReady) {
-      if (user && user.name) {
+      if (user && user.name_first) {
         navigateHome(replace);
       } else {
         replace('Auth');

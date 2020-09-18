@@ -5,10 +5,10 @@ import MapView from 'react-native-maps';
 import {Icon} from 'react-native-elements';
 import moment from 'moment';
 import numeral from 'numeral';
+import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
-
 import {
   AppHeader,
   NavBackBtn,
@@ -17,11 +17,10 @@ import {
   AppDataTable,
   AppGradButton,
 } from '@root/components';
-import {ContactsNavProps, AppRouteEnum} from '@root/routes/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {Agreement, TableHeaderType, TableSortOps, Contact} from '@utils/types';
 import {emptyContact} from '@root/utils/constants';
 import {MsgIcon, CallIcon, EnvelopIcon} from '@root/assets/assets';
-import {useSelector} from 'react-redux';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'NUMBER', value: 'number', sortable: true, style: {width: 200}},
@@ -33,18 +32,32 @@ const HEADERS: TableHeaderType[] = [
     style: {width: 200},
   },
   {
-    label: 'TYPE',
-    value: 'agreement_template_id',
+    label: 'TEMPLATE',
+    value: 'agreement_template_name',
     sortable: true,
     style: {flex: 1},
   },
 ];
 
-const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
+const cellContent = (
+  navigation: any,
+  header: TableHeaderType,
+  row: Agreement,
+  contact: Contact,
+  styles: any,
+) => {
   switch (header.value) {
     case 'number':
       return (
-        <AppTextButton style={styles.cellLayout} onPress={() => {}}>
+        <AppTextButton
+          style={styles.cellLayout}
+          onPress={() => {
+            navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
+              agreement: row,
+              contact: contact,
+              parent: `${contact.name_first} ${contact.name_last}`,
+            });
+          }}>
           <AppText
             style={styles.noSpacing}
             color={'textLightPurple'}
@@ -70,11 +83,11 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
           </AppText>
         </View>
       );
-    case 'agreement_template_id':
+    case 'agreement_template_name':
       return (
         <View style={styles.cellLayout}>
           <AppText style={styles.noSpacing} size={16}>
-            {'Bruno Straight Stairlift'}
+            {row.agreement_template.name}
           </AppText>
         </View>
       );
@@ -86,7 +99,7 @@ const cellContent = (header: TableHeaderType, row: Agreement, styles: any) => {
 export default function ContactDetails({
   route,
   navigation,
-}: ContactsNavProps<AppRouteEnum.ContactDetails>) {
+}: AppNavProps<AppRouteEnum.ContactDetails>) {
   const {styles} = useStyles(getStyles);
   const {themeStyle} = useTheme();
   const [contactData, setContactData] = useState<Contact>(emptyContact);
@@ -135,7 +148,7 @@ export default function ContactDetails({
   }, [contacts, itemId]);
 
   const renderCell = (header: TableHeaderType, row: Agreement) =>
-    cellContent(header, row, styles);
+    cellContent(navigation, header, row, contactData, styles);
 
   const onSortChanged = (sortOp: TableSortOps) => {
     setAgreementsSortOps(sortOp);
@@ -228,10 +241,13 @@ export default function ContactDetails({
           <AppTextButton
             style={{...styles.cellLayout, ...styles.agreementsBtn}}
             onPress={() => {
-              navigation.navigate(AppRouteEnum.NewAgreement, {
-                parent: `${contactData.name_first} ${contactData.name_last}`,
-                contact: contactData,
-                itemTitle: `${contactData.name_first} ${contactData.name_last}`,
+              navigation.navigate(AppRouteEnum.NewAgreements, {
+                screen: 'NewAgreement',
+                params: {
+                  parent: `${contactData.name_first} ${contactData.name_last}`,
+                  contact: contactData,
+                  itemTitle: `${contactData.name_first} ${contactData.name_last}`,
+                },
               });
             }}
             leftIconContent={
@@ -274,9 +290,9 @@ const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
         cmpA = `${a.amount}`.toUpperCase();
         cmpB = `${b.amount}`.toUpperCase();
         break;
-      case 'agreement_template_id':
-        cmpA = a.agreement_template_id;
-        cmpB = b.agreement_template_id;
+      case 'agreement_template_name':
+        cmpA = a.agreement_template.name;
+        cmpB = b.agreement_template.name;
         break;
       case 'created':
         cmpA = `${a.created}`.toUpperCase();

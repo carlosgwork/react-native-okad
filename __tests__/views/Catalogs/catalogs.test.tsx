@@ -3,15 +3,18 @@
  */
 
 import React from 'react';
-import Catalogs, {FETCH_VENDORS} from '@root/views/Catalogs';
 import {Provider} from 'react-redux';
 import {createMockClient} from 'mock-apollo-client';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
+import configureStore from 'redux-mock-store';
+
+import Catalogs from '@root/views/Catalogs';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
-import configureStore from 'redux-mock-store';
+import {VENDORS_MOCKDATA} from '../../__mocks__/Vendors';
+import {FETCH_VENDORS} from '@root/views/Catalogs/graphql';
 
 let wrapper: ReactWrapper;
 let queryHandler;
@@ -26,46 +29,19 @@ const currentTheme = {
 const store = mockStore({
   vendors: {
     vendors: [],
+    searchText: '',
     sortOptions: [],
   },
 });
 
 let mockClient: any;
+const navigation = {navigate: jest.fn()};
 
 describe('Catalogs Page Component', () => {
   beforeEach(() => {
     mockClient = createMockClient();
     queryHandler = jest.fn().mockResolvedValue({
-      data: {
-        vendors: [
-          {
-            id: 1,
-            logo_uri: null,
-            name: 'Bruno Independent Living Aids, Inc.',
-            short_name: 'Bruno',
-            catalog_items: [
-              {
-                id: 1,
-                name: 'Elan SRE-3050',
-                price: 270000,
-                sku: 'SRE-3050',
-                cost: 155000,
-                category: 'Stairlifts',
-                taxable: true,
-              },
-              {
-                id: 2,
-                name: 'Elite SRE-2010',
-                price: 430000,
-                sku: 'SRE-2010',
-                cost: 239400,
-                category: 'Stairlifts',
-                taxable: true,
-              },
-            ],
-          },
-        ],
-      },
+      data: VENDORS_MOCKDATA,
     });
     mockClient.setRequestHandler(FETCH_VENDORS, queryHandler);
   });
@@ -75,7 +51,7 @@ describe('Catalogs Page Component', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Catalogs />
+            <Catalogs navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -94,7 +70,7 @@ describe('Catalogs Page Component', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Catalogs />
+            <Catalogs navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -109,7 +85,7 @@ describe('Catalogs Page Component', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Catalogs />
+            <Catalogs navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -126,7 +102,7 @@ describe('Catalogs Page Component', () => {
       <ApolloProvider client={mockClient as any}>
         <Provider store={store}>
           <ThemeContext.Provider value={currentTheme}>
-            <Catalogs />
+            <Catalogs navigation={navigation as any} route={{} as any} />
           </ThemeContext.Provider>
         </Provider>
       </ApolloProvider>,
@@ -138,24 +114,9 @@ describe('Catalogs Page Component', () => {
     expect(vendorRowEle.prop('vendorName')).toEqual(
       'Bruno Independent Living Aids, Inc.',
     );
-    expect(vendorRowEle.prop('catalogs')).toEqual([
-      {
-        cost: 155000,
-        id: 1,
-        name: 'Elan SRE-3050',
-        price: 270000,
-        sku: 'SRE-3050',
-        taxable: true,
-      },
-      {
-        cost: 239400,
-        id: 2,
-        name: 'Elite SRE-2010',
-        price: 430000,
-        sku: 'SRE-2010',
-        taxable: true,
-      },
-    ]);
+    expect(vendorRowEle.prop('catalogs')).toEqual(
+      VENDORS_MOCKDATA.vendors[0].catalog_items,
+    );
     expect(vendorRowEle.prop('catalogSortOps')).toEqual({
       sortBy: '',
       sortOrder: 'ASC',
