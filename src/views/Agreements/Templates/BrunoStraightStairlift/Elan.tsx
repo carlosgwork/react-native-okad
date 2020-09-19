@@ -166,7 +166,7 @@ export default function ElanTemplate({
     isOnline: state.network.online,
   }));
   const {styles} = useStyles(getStyles);
-  const [inset_agreement] = useMutation(CREATE_AGREEMENT, {
+  const [insert_agreement] = useMutation(CREATE_AGREEMENT, {
     onCompleted(data) {
       // Update agreement number of current usr
       const agreement: Agreement = data.insert_agreements.returning[0];
@@ -181,7 +181,6 @@ export default function ElanTemplate({
         return ct;
       });
       setAction('contacts', {contacts: newContacts});
-      navigation.popToTop();
       navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
         agreement,
         contact: contact,
@@ -247,7 +246,7 @@ export default function ElanTemplate({
         taxable: item.taxable,
         discount: 0,
       }));
-      inset_agreement({
+      insert_agreement({
         variables: {
           billing_address_id: contact.address_id,
           agreement_template_id: template.id,
@@ -313,8 +312,7 @@ export default function ElanTemplate({
         return ct;
       });
       setAction('contacts', {contacts: newContacts});
-      navigation.popToTop();
-      navigation.navigate(AppRouteEnum.AgreementDetails, {
+      navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
         agreement,
         contact: contact,
         parent: `${contact.name_first} ${contact.name_last}`,

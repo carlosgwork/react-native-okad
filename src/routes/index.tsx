@@ -9,7 +9,6 @@ import Splash from '@root/views/Splash';
 import Login from '@root/views/Login';
 
 import {useBackHandler} from '@global/Hooks';
-import NewAgreementNavigationStack from './newAgreement';
 
 import {MainTabRoutes} from './main';
 import {
@@ -204,10 +203,6 @@ export default function Routes() {
         <Stack.Screen name="Splash" component={SplashRoutes} />
         <Stack.Screen name="Auth" component={AuthRoutes} />
         <Stack.Screen name="Main" component={MainTabRoutes} />
-        <Stack.Screen
-          name="NewAgreements"
-          component={NewAgreementNavigationStack}
-        />
       </Stack.Navigator>
     </NavigationContainer>
   );

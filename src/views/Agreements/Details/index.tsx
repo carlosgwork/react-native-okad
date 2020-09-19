@@ -137,11 +137,13 @@ export default function AgreementDetails({
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
-      const agIndex = agreements.findIndex(
-        (ag: Agreement) => ag.id === activeAgreement.id,
-      );
-      const newAgreement = agreements[agIndex];
-      updateActiveAgreement(newAgreement);
+      if (agreements.length > 0) {
+        const agIndex = agreements.findIndex(
+          (ag: Agreement) => ag.id === activeAgreement.id,
+        );
+        const newAgreement = agreements[agIndex];
+        updateActiveAgreement(newAgreement);
+      }
     });
     return unsubscribe;
   }, [navigation, activeAgreement, agreements]);
@@ -592,8 +594,6 @@ export default function AgreementDetails({
   const phoneNum =
     contact.phone_home || contact.phone_mobile || contact.phone_office;
   const {status, agreementEditable} = getAgreementStatus();
-
-  console.log('--- active agreement page: ', activeAgreement.agreement_events);
 
   return (
     <View style={styles.container}>
