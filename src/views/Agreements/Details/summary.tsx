@@ -53,7 +53,6 @@ export default function AgreementSummary({
 
   const updateAgreement = () => {
     signRef.current?.saveImage();
-    navigation.pop();
   };
 
   useEffect(() => {
@@ -140,6 +139,7 @@ export default function AgreementSummary({
         setAction('offlineMutations', {data: newMutations});
       }
     }
+    navigation.pop();
   };
 
   return (

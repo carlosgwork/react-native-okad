@@ -135,6 +135,17 @@ export default function AgreementDetails({
     setTotalCost(cost);
   }, [activeAgreement.line_items]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      const agIndex = agreements.findIndex(
+        (ag: Agreement) => ag.id === activeAgreement.id,
+      );
+      const newAgreement = agreements[agIndex];
+      updateActiveAgreement(newAgreement);
+    });
+    return unsubscribe;
+  }, [navigation, activeAgreement, agreements]);
+
   const deleteRow = (rowKey: number) => {
     const newData = [...listData];
     const prevIndex = listData.findIndex(
@@ -581,6 +592,8 @@ export default function AgreementDetails({
   const phoneNum =
     contact.phone_home || contact.phone_mobile || contact.phone_office;
   const {status, agreementEditable} = getAgreementStatus();
+
+  console.log('--- active agreement page: ', activeAgreement.agreement_events);
 
   return (
     <View style={styles.container}>
