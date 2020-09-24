@@ -9,7 +9,7 @@ export const initialAgreements: {
   [_: string]: any;
 } = {
   agreements: [],
-  sortOp: {sortBy: 'phoneNumber', sortOrder: 'ASC'},
+  sortOp: {sortBy: 'id', sortOrder: 'DESC'},
 };
 
 const emptyPayload = {

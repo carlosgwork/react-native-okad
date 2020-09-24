@@ -174,11 +174,12 @@ export type LineItemType = {
   color?: string;
   taxable: boolean;
   subcategory: string;
+  installation_fee?: number;
 };
 
 export type AgreementLineItemType = {
   id: number;
-  name: string;
+  name?: string;
   agreement_id: number;
   catalog_item_id: number;
   current_cost: number;

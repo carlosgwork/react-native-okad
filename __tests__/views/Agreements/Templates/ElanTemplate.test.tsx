@@ -44,7 +44,7 @@ const store = mockStore({
       sortOrder: 'ASC',
     },
   },
-  offlineMutations: {
+  offline_mutations: {
     data: [],
   },
   network: {

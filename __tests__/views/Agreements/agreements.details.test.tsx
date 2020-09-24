@@ -35,7 +35,7 @@ const store = mockStore({
   vendors: {
     vendors: [],
   },
-  offlineMutations: {
+  offline_mutations: {
     data: [],
   },
   user: {

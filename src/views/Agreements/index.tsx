@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {View, NativeScrollEvent, Alert} from 'react-native';
-import {useQuery} from '@apollo/client';
+import {View, NativeScrollEvent} from 'react-native';
 import numeral from 'numeral';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
@@ -19,7 +18,6 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
-import {FETCH_AGREEMENTS} from './graphql';
 
 const HEADERS: TableHeaderType[] = [
   {label: 'Name', value: 'name', sortable: true, style: {width: 120}},
@@ -46,39 +44,35 @@ export default function Agreements({
 }: AppNavProps<AppRouteEnum.AgreementsMain>) {
   const {styles} = useStyles(getStyles);
 
-  const agreements = useSelector((state: any) => state.agreements);
-  const agreementsSortOps = agreements.sortOp;
+  const {agreements, agreementsSortOps} = useSelector((state: any) => ({
+    agreements: state.agreements.agreements,
+    agreementsSortOps: state.agreements.sortOp,
+  }));
   const [offset, setOffset] = useState<number>(0);
-  const [showError, setShowError] = useState<boolean>(false);
-  const {loading, error} = useQuery(FETCH_AGREEMENTS, {
-    variables: {offset},
-    onCompleted: (data) => {
-      const newData = agreements.agreements.concat(data.agreements);
-      setAction('agreements', {
-        agreements: newData,
-      });
-    },
-    onError: (err) => {
-      Alert.alert(err.message);
-    },
-  });
-  const [searchText, setSearchText] = useState<string | undefined>('');
-  const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>(
-    agreements.agreements,
-  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchText, setSearchText] = useState<string>('');
+  const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
 
   useEffect(() => {
-    setVisibleAgreements(agreements.agreements);
-  }, [agreements, navigation]);
+    const filtered = filterAgreement(searchText);
+    const newData = filtered.slice(offset, offset + FETCH_COUNT);
+    let ags: Agreement[] = [];
+    if (offset > 0) {
+      ags = visibleAgreements.slice();
+    }
+    ags = ags.concat(newData);
+    setVisibleAgreements(ags);
+    setLoading(false);
+  }, [offset, agreements]);
 
   const onSortChanged = (sortOp: TableSortOps) => {
-    let sorted = sortAgreement(agreements.agreements, sortOp);
+    let sorted = sortAgreement(agreements, sortOp);
     setVisibleAgreements(sorted);
     setAction('agreements', {sortOp});
   };
 
-  const onFilterAgreement = (text: string) => {
-    const filteredAgreements = agreements.agreements.filter(
+  const filterAgreement = (text: string) => {
+    const filteredAgreements = agreements.filter(
       (agreement: Agreement) =>
         `${agreement.contact?.name_first || ''} ${
           agreement.contact?.name_last || ''
@@ -87,6 +81,11 @@ export default function Agreements({
           .indexOf(text.toLowerCase()) > -1,
     );
     let sorted = sortAgreement(filteredAgreements, agreementsSortOps);
+    return sorted;
+  };
+
+  const onFilterAgreement = (text: string) => {
+    const sorted = filterAgreement(text);
     setVisibleAgreements(sorted);
     setSearchText(text);
   };
@@ -100,6 +99,7 @@ export default function Agreements({
     if (layoutMeasurement.height > contentSize.height) {
       if (contentOffset.y > 60) {
         setOffset(offset + FETCH_COUNT);
+        setLoading(true);
       }
     } else {
       if (
@@ -107,6 +107,7 @@ export default function Agreements({
         contentSize.height + 60
       ) {
         setOffset(offset + FETCH_COUNT);
+        setLoading(true);
       }
     }
   };
@@ -116,11 +117,6 @@ export default function Agreements({
       cellContent(navigation, header, row, styles),
     [agreements],
   );
-
-  if (loading && error && !showError) {
-    setShowError(true);
-    Alert.alert(error.message);
-  }
 
   return (
     <View style={styles.container}>
@@ -143,14 +139,14 @@ export default function Agreements({
           onSortChanged={onSortChanged}
           onScroll={onContainerScroll}
         />
-        <CircularLoading loading={loading && !error} />
+        <CircularLoading loading={loading} />
       </View>
     </View>
   );
 }
 
 const sortAgreement = (arr: Agreement[], sortOp: TableSortOps) => {
-  const sorted = arr.sort((a: Agreement, b: Agreement) => {
+  const sorted = arr.slice().sort((a: Agreement, b: Agreement) => {
     let cmpA, cmpB;
     switch (sortOp.sortBy) {
       case 'contact':

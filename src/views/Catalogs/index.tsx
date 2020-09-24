@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
 import {View, Text, ScrollView, NativeScrollEvent} from 'react-native';
-import {useQuery} from '@apollo/client';
 import {setAction} from '@redux/actions';
 import {useSelector} from 'react-redux';
 
@@ -14,7 +13,6 @@ import {VendorsState} from '@redux/reducers/vendors';
 import {AppHeader, AppSearchInput, CircularLoading} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
-import {FETCH_VENDORS} from './graphql';
 
 const FETCH_COUNT = 20;
 
@@ -29,29 +27,24 @@ export default function Catalogs({
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
-  const [loadingData, setLoadingData] = useState<boolean>(true);
+  const [loadingData, setLoadingData] = useState<boolean>(false);
 
   useEffect(() => {
     onFilterCatalog(vendorSearchText);
   }, [vendorSearchText]);
 
-  const {error} = useQuery(FETCH_VENDORS, {
-    variables: {offset},
-    onCompleted: (data) => {
-      const newData = vendors.concat(data.vendors);
-      setAction('vendors', {
-        vendors: newData,
-        searchText: '',
-      });
-      setSearchText('');
-      sortVendors(newData);
-      setFilteredVendors(newData);
-      setLoadingData(false);
-    },
-    onError: () => {
-      setLoadingData(false);
-    },
-  });
+  useEffect(() => {
+    const filtered = filterVendors(vendorSearchText, vendors);
+    const newData = filtered.slice(offset, offset + FETCH_COUNT);
+    let newVendors: Vendor[] = [];
+    if (offset > 0) {
+      newVendors = filteredVendors.slice();
+    }
+    newVendors = newVendors.concat(newData);
+    setFilteredVendors(newVendors);
+    sortVendors(newVendors);
+    setLoadingData(false);
+  }, [offset]);
 
   const onFilterCatalog = (text: string) => {
     const filtered = filterVendors(text, vendors);
@@ -59,6 +52,7 @@ export default function Catalogs({
     sortVendors(filtered);
     setSearchText(text);
     setAction('vendors', {searchText: text});
+    setOffset(0);
   };
 
   const onSortChanged = (sortOp: TableSortOps, index: number) => {
@@ -107,7 +101,8 @@ export default function Catalogs({
       };
       return newSortOpt;
     });
-    setVendorsSortOps(sortOps);
+    setVendorsSortOps(sortOps.slice());
+    setAction('vendors', {sortOptions: sortOps.slice()});
   };
 
   const onContainerScroll = ({
@@ -122,6 +117,7 @@ export default function Catalogs({
     if (layoutMeasurement.height > contentSize.height) {
       if (contentOffset.y > 60) {
         setOffset(offset + FETCH_COUNT);
+        setLoadingData(true);
       }
     } else {
       if (
@@ -129,17 +125,10 @@ export default function Catalogs({
         contentSize.height + 60
       ) {
         setOffset(offset + FETCH_COUNT);
+        setLoadingData(true);
       }
     }
   };
-
-  if (error) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>Loading Error</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -159,7 +148,7 @@ export default function Catalogs({
           style={styles.container}>
           {filteredVendors.map((item, index) => (
             <VendorRow
-              key={`vendor-row-${index}-${item.catalog_items.length}`}
+              key={`vendor-row-${item.id}-${vendorsSortOps.length}`}
               navigation={navigation}
               vendorName={item.name}
               catalogs={item.catalog_items}

@@ -1,6 +1,6 @@
 import {OfflineMutationType} from '@root/utils/types';
 
-export type OfflineMutationsState = {
+export type offline_mutationsState = {
   data: OfflineMutationType[];
   active: boolean;
 };
@@ -16,7 +16,7 @@ const emptyPayload = {
   key: undefined,
 };
 
-export const offlineMutations = (
+export const offline_mutations = (
   state: {
     [_: string]: any;
   } = initialOfflineMutation,
@@ -24,7 +24,7 @@ export const offlineMutations = (
 ) => {
   const {payload = emptyPayload, type} = action;
   switch (type) {
-    case 'clean_offlineMutations':
+    case 'clean_offline_mutations':
       if (!payload.key) {
         return initialOfflineMutation;
       } else {
@@ -33,7 +33,7 @@ export const offlineMutations = (
           [payload.key]: initialOfflineMutation[payload.key],
         };
       }
-    case 'set_offlineMutations':
+    case 'set_offline_mutations':
       return {
         ...state,
         ...payload,

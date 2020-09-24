@@ -38,7 +38,16 @@ export default function BrunoStraightStairlift({
 
   const _renderItem = ({item, index}: ProductItemProps) => {
     const selectProduct = () => {
-      setAction('cart', {items: [item]});
+      const items = [item];
+      if (item.installation_fee > 0) {
+        // Add installation_fee as a lineItem;
+        items.push({
+          ...item,
+          price: item.installation_fee,
+          cost: 0,
+        });
+      }
+      setAction('cart', {items});
       navigation.navigate('ElanTemplate' as keyof ContactsStackParamList, {
         itemTitle: item.name,
         parent: 'Bruno Straight Stairlift',

@@ -1,10 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, {useState, useEffect} from 'react';
-import {TouchableOpacity, View, Alert} from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {setAction} from '@redux/actions';
 import {Icon} from 'react-native-elements';
-import {useQuery} from '@apollo/client';
 
 import type {ThemeStyle as StyleType, ThemeStyle} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -19,7 +18,6 @@ import {
   AppDataTable,
   CircularLoading,
 } from '@root/components';
-import {FETCH_CONTACTS} from './graphql';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 
 const HEADERS: TableHeaderType[] = [
@@ -180,39 +178,39 @@ export default function Contacts({
   const {themeStyle} = useTheme();
   const {styles} = useStyles(getStyles);
 
-  const contacts = useSelector((state: any) => state.contacts);
-  const contactsSortOps = contacts.sortOp;
+  const {contacts, contactsSortOps} = useSelector((state: any) => ({
+    contacts: state.contacts.contacts,
+    contactsSortOps: state.contacts.sortOp,
+  }));
   const [loading, setLoading] = React.useState<boolean>(true);
-  const {error} = useQuery(FETCH_CONTACTS, {
-    onCompleted: (data) => {
-      setLoading(false);
-      const newData = data.contacts;
-      setAction('contacts', {
-        contacts: newData,
-      });
-    },
-    onError: () => {
-      setLoading(false);
-    },
-  });
-  const [searchText, setSearchText] = useState<string | undefined>('');
-  const [visibleContacts, setVisibleContacts] = useState<Contact[]>(
-    contacts.contacts,
-  );
+  const [searchText, setSearchText] = useState<string>('');
+  const [visibleContacts, setVisibleContacts] = useState<Contact[]>([]);
 
   useEffect(() => {
-    setVisibleContacts(contacts.contacts);
-    setSearchText('');
-  }, [contacts]);
+    const filtered = filterContacts(searchText);
+    setVisibleContacts(filtered);
+    setLoading(false);
+  }, [contacts, searchText]);
 
   const onSortChanged = (sortOp: TableSortOps) => {
-    let sorted = sortContact(contacts.contacts, sortOp);
+    let sorted = sortContact(visibleContacts, sortOp);
     setVisibleContacts(sorted);
     setAction('contacts', {sortOp});
   };
 
+  const filterContacts = (text: string) => {
+    const filteredContacts = contacts.filter(
+      (contact: Contact) =>
+        `${contact.name_first} ${contact.name_last}`
+          .toLowerCase()
+          .indexOf(text.toLowerCase()) > -1,
+    );
+    const sorted = sortContact(filteredContacts, contactsSortOps);
+    return sorted;
+  };
+
   const onFilterContact = (text: string) => {
-    const filteredContacts = contacts.contacts.filter(
+    const filteredContacts = contacts.filter(
       (contact: Contact) =>
         `${contact.name_first} ${contact.name_last}`
           .toLowerCase()
@@ -228,11 +226,6 @@ export default function Contacts({
       cellContent(header, row, styles, themeStyle, navigation),
     [contacts],
   );
-
-  if (loading && error) {
-    setLoading(false);
-    Alert.alert(error.message);
-  }
 
   return (
     <View style={styles.container}>

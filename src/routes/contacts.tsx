@@ -51,6 +51,7 @@ export default function RootStackScreen({navigation, route}: NavigationProps) {
       tabBarVisible: false,
     });
   } else if (
+    route.state &&
     route.state.routes &&
     route.state.routes[0].state &&
     route.state.routes[0].state.index > 1

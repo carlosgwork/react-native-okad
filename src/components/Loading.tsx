@@ -1,25 +1,23 @@
 //@flow
 
 import React from 'react';
-import {Text, Image, View} from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 import {useSelector} from 'react-redux';
 import {useStyles} from '@global/Hooks';
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
-import {Logo} from '@assets/assets';
 
 type Props = {};
 
 export default React.memo<Props>(function Loading() {
   const {styles} = useStyles(getStyles);
-  const loading = useSelector((state: any) => state.loading);
+  const loading = useSelector((state: any) => state.loading.state);
 
   if (!loading) {
     return null;
   }
   return (
     <View style={styles.main}>
-      <Image source={Logo} style={styles.logo} />
-      <Text style={styles.byline}>Loading...</Text>
+      <ActivityIndicator animating size="large" style={styles.loader} />
     </View>
   );
 });
@@ -27,7 +25,7 @@ export default React.memo<Props>(function Loading() {
 const getStyles = (themeStyle: StyleType) => ({
   main: {
     position: 'absolute',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     top: 0,
     left: 0,
     right: 0,

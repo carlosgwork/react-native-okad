@@ -29,16 +29,24 @@ export default function NewContact({
 }: AppNavProps<AppRouteEnum.NewContactModal>) {
   const {styles} = useStyles(getStyles);
   const {themeStyle} = useTheme();
-  const {contacts, offlineMutations, isOnline} = useSelector((state: any) => ({
+  const {contacts, offline_mutations, isOnline} = useSelector((state: any) => ({
     contacts: state.contacts.contacts,
-    offlineMutations: state.offlineMutations,
+    offline_mutations: state.offline_mutations,
     isOnline: state.network.online,
   }));
 
   const [insert_contacts] = useMutation(CREATE_CONTACT, {
-    onCompleted() {
+    onCompleted(data) {
+      const newContacts = contacts.slice();
+      const createdContact = data.insert_contacts.returning[0];
+      createdContact.offlineAgreements = [];
+      newContacts.unshift(createdContact);
+      setAction('contacts', {contacts: newContacts});
       Alert.alert('New contact was successfully created.');
-      setTimeout(() => navigation.pop(), 2000);
+      navigation.pop();
+    },
+    onError(error) {
+      Alert.alert(error.message);
     },
   });
   const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
@@ -118,6 +126,9 @@ export default function NewContact({
       newError.name_last = 'Required';
       valid = false;
     }
+    if (!form.title) {
+      newForm.title = '';
+    }
     if (form.phone_mobile && phone(form.phone_mobile).length === 0) {
       newError.phone_mobile = 'Invalid Phone number';
       valid = false;
@@ -170,12 +181,6 @@ export default function NewContact({
   };
 
   const createContact = (formData: Contact) => {
-    const newContacts = contacts.slice();
-    const createdContact = formData;
-    createdContact.agreements = [];
-    createdContact.offlineAgreements = [];
-    newContacts.push(createdContact);
-    setAction('contacts', {contacts: newContacts});
     if (isOnline) {
       insert_contacts({
         variables: {
@@ -195,13 +200,21 @@ export default function NewContact({
         },
       });
     } else {
-      const lastContact = contacts[contacts.length - 1];
-      const newMutations = offlineMutations.data;
+      const newContacts = contacts.slice();
+      const lastContact = contacts[0];
+      const createdContact = formData;
+      createdContact.agreements = [];
+      createdContact.offlineAgreements = [];
+      createdContact.id = lastContact.id + 1;
+      newContacts.unshift(createdContact);
+      setAction('contacts', {contacts: newContacts});
+      const newMutations = offline_mutations.data;
       newMutations.push({
         type: 'CREATE_CONTACT',
-        itemId: lastContact.id + 1,
+        itemId: createdContact.id,
       });
-      setAction('offlineMutations', {data: newMutations});
+      setAction('offline_mutations', {data: newMutations});
+      navigation.pop();
     }
   };
 

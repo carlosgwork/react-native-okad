@@ -21,7 +21,7 @@ const store = mockStore({
   contacts: {
     contacts: [],
   },
-  offlineMutations: {
+  offline_mutations: {
     data: [],
   },
   network: {

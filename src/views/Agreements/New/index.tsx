@@ -1,6 +1,6 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {View, Image, ScrollView, TouchableOpacity} from 'react-native';
-import {useQuery} from '@apollo/client';
+import {useSelector} from 'react-redux';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
@@ -12,8 +12,6 @@ import {
   AppRouteEnum,
 } from '@root/routes/types';
 import {setAction} from '@root/redux/actions';
-import {LOAD_AGREEMENT_TEMPLATES} from '../graphql';
-import {AgreementTemplate} from '@root/utils/types';
 
 const Templates = [
   {
@@ -36,14 +34,9 @@ export default function NewAgreement({
 }: AppNavProps<AppRouteEnum.NewAgreement>) {
   const {styles} = useStyles(getStyles);
   const {contact, parent = '', itemTitle = ''} = route.params || {};
-  const [templatesData, setTemplatesData] = useState<AgreementTemplate[]>([]);
-
-  useQuery(LOAD_AGREEMENT_TEMPLATES, {
-    onCompleted: (data) => {
-      setAction('agreement_templates', {templates: data.agreement_templates});
-      setTemplatesData(data.agreement_templates);
-    },
-  });
+  const templatesData = useSelector(
+    (state: any) => state.agreement_templates.templates,
+  );
 
   const navigateTemplate = (index: number) => {
     // Init Cart state
@@ -69,6 +62,7 @@ export default function NewAgreement({
           <TouchableOpacity
             style={styles.switchText}
             onPress={() => {
+              navigation.pop();
               navigation.navigate(AppRouteEnum.ContactDetails, {
                 itemId: contact.id,
                 itemTitle,
@@ -97,7 +91,7 @@ export default function NewAgreement({
             <TemplateTile
               key={index}
               logo={template.logo}
-              disabled={index !== 0}
+              disabled={!templatesData[index]}
               onPress={() => navigateTemplate(index)}
             />
           ))}

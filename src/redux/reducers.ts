@@ -8,14 +8,15 @@ import {UserType} from '../utils/types';
 import {agreements, AgreementsState} from './reducers/agreements';
 import {cart, CartState} from './reducers/cart';
 import {
-  offlineMutations,
-  OfflineMutationsState,
-} from './reducers/offlineMutations';
+  offline_mutations,
+  offline_mutationsState,
+} from './reducers/offline_mutations';
 import {network, NetworkState} from './reducers/network';
 import {
   agreement_templates,
   AgreementTemplatesState,
 } from './reducers/agreement_templates';
+import {sync, SyncState} from './reducers/sync';
 
 export const reducers = {
   toast,
@@ -26,9 +27,10 @@ export const reducers = {
   vendors,
   agreements,
   cart,
-  offlineMutations,
+  offline_mutations,
   network,
   agreement_templates,
+  sync,
 };
 
 export type ReducerKeys = keyof typeof reducers;
@@ -42,7 +44,8 @@ export type ReduxState = {
   vendors: VendorsState;
   agreements: AgreementsState;
   cart: CartState;
-  offlineMutations: OfflineMutationsState;
+  offline_mutations: offline_mutationsState;
   network: NetworkState;
   agreement_templates: AgreementTemplatesState;
+  sync: SyncState;
 };

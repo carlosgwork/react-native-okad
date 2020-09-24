@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {useEffect} from 'react';
 import {View, Image, TouchableOpacity} from 'react-native';
 import numeral from 'numeral';
@@ -20,8 +21,8 @@ import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import {
   LineItemType,
   Agreement,
-  AgreementEvent,
   Contact,
+  AgreementLineItemType,
 } from '@root/utils/types';
 import {CREATE_AGREEMENT} from '../../graphql';
 
@@ -32,6 +33,7 @@ const ElanCatalogs = [
       {
         id: 7,
         cost: 0,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
         name: 'Manual Swivel Seat',
@@ -44,6 +46,7 @@ const ElanCatalogs = [
       {
         id: 11,
         cost: 36740,
+        installation_fee: 5000,
         category: 'Stairlifts',
         description: 'For SRE-2010',
         name: 'Power-Assisted Swivel Seat',
@@ -61,6 +64,7 @@ const ElanCatalogs = [
       {
         id: 6,
         cost: 0,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
         name: 'Manual Folding Footrest',
@@ -73,6 +77,7 @@ const ElanCatalogs = [
       {
         id: 12,
         cost: 23320,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-2010',
         name: 'Automatic Folding Footrest',
@@ -90,6 +95,7 @@ const ElanCatalogs = [
       {
         id: 4,
         cost: 0,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
         name: 'Fixed Rail',
@@ -103,6 +109,7 @@ const ElanCatalogs = [
       {
         id: 5,
         cost: 36740,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
         name: 'Manual Folding Rail',
@@ -115,6 +122,7 @@ const ElanCatalogs = [
       {
         id: 10,
         cost: 73040,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-2010',
         name: 'Power Folding Rail',
@@ -132,6 +140,7 @@ const ElanCatalogs = [
       {
         id: 3,
         cost: 13420,
+        installation_fee: 0,
         category: 'Stairlifts',
         description: 'For SRE-3050',
         name: "20' Rail Installation Kit",
@@ -154,14 +163,14 @@ export default function ElanTemplate({
     userInfo,
     items: cartItems,
     agreements,
-    offlineMutations,
+    offline_mutations,
     contacts,
     isOnline,
   } = useSelector((state: any) => ({
     userInfo: state.user,
     items: state.cart.items,
     agreements: state.agreements,
-    offlineMutations: state.offlineMutations,
+    offline_mutations: state.offline_mutations,
     contacts: state.contacts,
     isOnline: state.network.online,
   }));
@@ -181,6 +190,9 @@ export default function ElanTemplate({
         return ct;
       });
       setAction('contacts', {contacts: newContacts});
+      setAction('user', {
+        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
+      });
       navigation.navigate(AppRouteEnum.ContactAgreementDetails, {
         agreement,
         contact: contact,
@@ -190,12 +202,14 @@ export default function ElanTemplate({
   });
 
   useEffect(() => {
-    if (cartItems.length === 1) {
-      const newItems = cartItems.slice();
-      ElanCatalogs.forEach((catalog) => newItems.push(catalog.items[0]));
-      setAction('cart', {items: newItems});
-    }
-  }, [cartItems]);
+    const newItems = cartItems.slice();
+    ElanCatalogs.forEach(
+      (catalog) =>
+        catalog.title !== 'Additional Rail Options' &&
+        newItems.push(catalog.items[0]),
+    );
+    setAction('cart', {items: newItems});
+  }, []);
 
   const updateQty = (item: LineItemType, qty: number) => {
     const itemIndex = cartItems.findIndex(
@@ -229,8 +243,14 @@ export default function ElanTemplate({
         );
       }
       newItems.push(item);
-    } else {
-      newItems.splice(itemIndex, 1);
+      if (item.installation_fee !== undefined && item.installation_fee > 0) {
+        // Add installation_fee as a lineItem;
+        newItems.push({
+          ...item,
+          price: item.installation_fee,
+          cost: 0,
+        });
+      }
     }
     setAction('cart', {items: newItems});
   };
@@ -238,14 +258,19 @@ export default function ElanTemplate({
   const createQuote = () => {
     // Create an agreement
     if (isOnline) {
-      const lineItems = cartItems.map((item: LineItemType) => ({
-        catalog_item_id: item.id,
-        current_cost: item.cost,
-        price: item.price,
-        qty: item.qty ? item.qty : 1,
-        taxable: item.taxable,
-        discount: 0,
-      }));
+      const lineItems: Partial<AgreementLineItemType>[] = [];
+      cartItems.forEach((item: LineItemType) => {
+        if (item.price !== 0) {
+          lineItems.push({
+            catalog_item_id: item.id,
+            current_cost: item.cost,
+            price: item.price,
+            qty: item.qty ? item.qty : 1,
+            taxable: item.taxable,
+            discount: 0,
+          });
+        }
+      });
       insert_agreement({
         variables: {
           billing_address_id: contact.address_id,
@@ -259,27 +284,34 @@ export default function ElanTemplate({
         },
       });
     } else {
-      const lineItems = cartItems.map((item: LineItemType, index: number) => ({
-        catalog_item_id: item.id,
-        current_cost: item.cost,
-        price: item.price,
-        qty: item.qty ? item.qty : 1,
-        taxable: item.taxable,
-        discount: 0,
-        catalog_item: {
-          name: item.name,
-        },
-        id: index,
-      }));
+      const lineItems: AgreementLineItemType[] = [];
+      cartItems.forEach((item: LineItemType, index: number) => {
+        if (item.cost !== 0) {
+          lineItems.push({
+            name: '',
+            agreement_id: -1,
+            catalog_item_id: item.id,
+            current_cost: item.cost,
+            price: item.price,
+            qty: item.qty ? item.qty : 1,
+            taxable: item.taxable,
+            discount: 0,
+            catalog_item: {
+              name: item.name,
+            },
+            id: index,
+          });
+        }
+      });
 
       const newAgreements = agreements.agreements.slice();
       const lastAgreement = newAgreements[0] || {id: 0};
-      const newMutations = offlineMutations.data;
+      const newMutations = offline_mutations.data;
       newMutations.push({
         type: 'CREATE_AGREEMENT',
         itemId: lastAgreement.id + 1,
       });
-      setAction('offlineMutations', {data: newMutations});
+      setAction('offline_mutations', {data: newMutations});
       const agreement: Agreement = {
         billing_address_id: contact.address_id,
         agreement_template_id: template.id,
@@ -292,9 +324,6 @@ export default function ElanTemplate({
         line_items: lineItems,
         sales_tax_rate: userInfo.default_sales_tax_rate,
         number: `${userInfo.lastAgreementNumber + 1}`,
-        agreement_events: {
-          type: 'texted',
-        } as AgreementEvent,
         address: contact.address,
         addressByShippingAddressId: contact.address,
         revision: 0,
@@ -317,11 +346,10 @@ export default function ElanTemplate({
         contact: contact,
         parent: `${contact.name_first} ${contact.name_last}`,
       });
+      setAction('user', {
+        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
+      });
     }
-    setAction('user', {
-      lastAgreementNumber: userInfo.lastAgreementNumber + 1,
-    });
-    setAction('cart', {items: []});
   };
 
   // Calculate Total Price
@@ -505,6 +533,7 @@ const getStyles = (themeStyle: StyleType) => ({
     width: '100%',
   },
   createBtn: {
+    paddingLeft: 30,
     borderTopLeftRadius: 0,
     paddingVertical: 14,
     borderTopRightRadius: 0,

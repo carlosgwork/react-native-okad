@@ -1,47 +1,51 @@
-import React, {useState} from 'react';
-import {View, Text, Switch, Image, ScrollView, Alert} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {View, Switch, Image, ScrollView, Alert} from 'react-native';
 import randomColor from 'randomcolor';
 import {GoogleSignin} from '@react-native-community/google-signin';
-import {useQuery} from '@apollo/client';
+import {useSelector} from 'react-redux';
 import {useNavigation} from '@react-navigation/native';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles} from '@global/Hooks';
-import {Agreement, Contact} from '@utils/types';
-import {
-  AppHeader,
-  AppText,
-  AppSearchInput,
-  CircularLoading,
-} from '@root/components';
+import {Agreement, AgreementEvent, Contact} from '@utils/types';
+import {AppHeader, AppText, AppSearchInput} from '@root/components';
 import {logout} from '@redux/actions';
 import AppGradButton from '@components/AppGradButton';
 import {AppNavProps, AppRouteEnum} from '@root/routes/types';
 import AgreementTile from './AgreementTile';
-import {FETCH_10_AGREEMENTS} from './graphql';
 
 export default function Dashboard({
   navigation,
 }: AppNavProps<AppRouteEnum.TEMPLATES>) {
   const {styles} = useStyles(getStyles);
   const {replace} = useNavigation<any>();
-
+  const {agreements} = useSelector((state: any) => ({
+    agreements: state.agreements.agreements,
+  }));
   const [BgColors, setBgColors] = useState<string[]>([]);
-  const {error, loading} = useQuery(FETCH_10_AGREEMENTS, {
-    variables: {type: 'accepted'},
-    onCompleted: (data) => {
-      setSearchText('');
-      setAgreements(data.agreements as Agreement[]);
-      setBgColors(
-        randomColor({luminosity: 'dark', count: data.agreements.length}),
-      );
-      setVisibleAgreements(data.agreements);
-    },
-  });
-  const [agreements, setAgreements] = useState<Agreement[]>([]);
   const [searchText, setSearchText] = useState<string | undefined>('');
   const [visibleAgreements, setVisibleAgreements] = useState<Agreement[]>([]);
+  const [openAgreements, setOpenAgreements] = useState<Agreement[]>([]);
   const [showDetails, setShowDetails] = useState<boolean>(false);
+
+  useEffect(() => {
+    setSearchText('');
+    const ags = [];
+    let i = 0;
+    while (ags.length < 10) {
+      const ag = agreements[i];
+      const index = ag?.agreement_events.findIndex(
+        (event: AgreementEvent) => event.type === 'accepted',
+      );
+      if (index < 0) {
+        ags.push(ag);
+      }
+      i++;
+    }
+    setOpenAgreements(ags);
+    setVisibleAgreements(ags);
+    setBgColors(randomColor({luminosity: 'dark', count: ags.length}));
+  }, [agreements]);
 
   const onLogout = async () => {
     try {
@@ -55,7 +59,7 @@ export default function Dashboard({
   };
 
   const onFilterAgreement = (text: string) => {
-    const filteredAgreements = agreements.filter(
+    const filteredAgreements = openAgreements.filter(
       (agreement: Agreement) =>
         `${agreement.contact?.name_first} ${agreement.contact?.name_last}`
           .toLowerCase()
@@ -73,14 +77,6 @@ export default function Dashboard({
       parent: `${contact.name_first} ${contact.name_last}`,
     });
   };
-
-  if (error) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text>Loading Error</Text>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -133,7 +129,6 @@ export default function Dashboard({
             />
           ))}
         </View>
-        <CircularLoading loading={loading} />
       </ScrollView>
       <AppGradButton
         containerStyle={styles.logoutBtnContainer}

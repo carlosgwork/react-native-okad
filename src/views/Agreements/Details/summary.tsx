@@ -1,5 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {View, Image, ScrollView, Text, TouchableOpacity} from 'react-native';
+import {
+  View,
+  Image,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  Alert,
+} from 'react-native';
 import numeral from 'numeral';
 import SignatureCapture, {
   SaveEventParams,
@@ -39,16 +46,24 @@ export default function AgreementSummary({
   const [totalPrice, setTotalPrice] = useState<number>(0);
   const signRef = React.useRef<SignCaptureType>(null);
 
-  const {offlineMutations, agreements, contacts, isOnline} = useSelector(
+  const {offline_mutations, agreements, contacts, isOnline} = useSelector(
     (state: any) => ({
-      offlineMutations: state.offlineMutations,
+      offline_mutations: state.offline_mutations,
       agreements: state.agreements.agreements,
       contacts: state.contacts.contacts,
       isOnline: state.network.online,
     }),
   );
 
-  const [update_agreement] = useMutation(UPDATE_AGREEMENT);
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
+    onCompleted: (data) => {
+      updateAgreementInStore(data.update_agreements.returning[0]);
+      navigation.pop();
+    },
+    onError: (error) => {
+      Alert.alert(error.message);
+    },
+  });
   const [insert_agreement_events_one] = useMutation(ADD_AGREEMENT_EVENT);
 
   const updateAgreement = () => {
@@ -67,20 +82,7 @@ export default function AgreementSummary({
     signRef.current?.resetImage();
   };
 
-  const onSignatureSaved = (result: SaveEventParams) => {
-    const data = {
-      ...agreement,
-      signature: result.encoded,
-      agreement_events: [
-        {
-          id: -1,
-          agreement_id: agreement.id,
-          created: new Date(),
-          type: 'accepted',
-        },
-      ] as AgreementEvent[],
-      last_modified: new Date(),
-    };
+  const updateAgreementInStore = (data: Agreement) => {
     const newAgreements = JSON.parse(JSON.stringify(agreements));
     const agIndex = newAgreements.findIndex(
       (ag: Agreement) => ag.id === agreement.id,
@@ -100,13 +102,15 @@ export default function AgreementSummary({
       return ct;
     });
     setAction('contacts', {contacts: newContacts});
+  };
 
-    // Check if itemId already exists in offlineMutations list
-    const itemIndex = offlineMutations.data.findIndex(
+  const onSignatureSaved = (result: SaveEventParams) => {
+    // Check if itemId already exists in offline_mutations list
+    const itemIndex = offline_mutations.data.findIndex(
       (item: OfflineMutationType) =>
         (item.type === 'CREATE_AGREEMENT' ||
           item.type === 'UPDATE_AGREEMENT') &&
-        item.itemId === data.id,
+        item.itemId === agreement.id,
     );
     if (itemIndex < 0) {
       const updatingAgreement = {
@@ -127,7 +131,21 @@ export default function AgreementSummary({
           },
         });
       } else {
-        const newMutations = offlineMutations.data;
+        const data = {
+          ...agreement,
+          signature: result.encoded,
+          agreement_events: [
+            {
+              id: -1,
+              agreement_id: agreement.id,
+              created: new Date(),
+              type: 'accepted',
+            },
+          ] as AgreementEvent[],
+          last_modified: new Date(),
+        };
+        updateAgreementInStore(data);
+        const newMutations = offline_mutations.data;
         newMutations.push({
           type: 'UPDATE_AGREEMENT',
           itemId: agreement.id,
@@ -136,10 +154,10 @@ export default function AgreementSummary({
           type: 'INSERT_ACCEPT_AGREEMENT_EVENT',
           itemId: agreement.id,
         });
-        setAction('offlineMutations', {data: newMutations});
+        setAction('offline_mutations', {data: newMutations});
+        navigation.pop();
       }
     }
-    navigation.pop();
   };
 
   return (
@@ -435,7 +453,7 @@ export default function AgreementSummary({
             color={'lightBorderColor'}>
             Sign
           </AppText>
-          {!agreement.signature && (
+          {!agreement.signature ? (
             <View style={[styles.subblock, styles.signView]}>
               <SignatureCapture
                 ref={signRef as any}
@@ -458,8 +476,7 @@ export default function AgreementSummary({
                 </AppText>
               </TouchableOpacity>
             </View>
-          )}
-          {agreement.signature && (
+          ) : (
             <View style={[styles.subblock, styles.signView]}>
               <View pointerEvents="none" style={styles.signBg}>
                 <Image source={SignBg} style={styles.signBg} />

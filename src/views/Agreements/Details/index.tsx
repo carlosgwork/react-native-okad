@@ -65,14 +65,14 @@ export default function AgreementDetails({
     prefix,
     agreements,
     contacts,
-    offlineMutations,
+    offline_mutations,
     isOnline,
   } = useSelector((state: any) => ({
     userInfo: state.user,
     prefix: state.user.prefix,
     agreements: state.agreements.agreements,
     contacts: state.contacts.contacts,
-    offlineMutations: state.offlineMutations,
+    offline_mutations: state.offline_mutations,
     isOnline: state.network.online,
   }));
 
@@ -96,12 +96,41 @@ export default function AgreementDetails({
     false,
   );
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
-  const [update_agreement] = useMutation(UPDATE_AGREEMENT);
-  const [update_line_items] = useMutation(UPDATE_LINE_ITEM);
-  const [delete_line_items] = useMutation(REMOVE_LINE_ITEM);
+  const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
+    onError(error) {
+      Alert.alert(error.message);
+    },
+  });
+  const [update_line_items] = useMutation(UPDATE_LINE_ITEM, {
+    onError: (error) => {
+      Alert.alert(error.message);
+    },
+  });
+  const [delete_line_items] = useMutation(REMOVE_LINE_ITEM, {
+    onCompleted: (data) => {
+      const newData = [...listData];
+      const prevIndex = listData.findIndex(
+        (item: AgreementLineItemType) =>
+          item.id === data.delete_line_items.returning[0].id,
+      );
+      newData.splice(prevIndex, 1);
+      setListData(newData);
+      const newAgreement = Object.assign({}, activeAgreement);
+      newAgreement.line_items = newData;
+      updateActiveAgreement(newAgreement);
+      updateAgreementState(newAgreement);
+    },
+    onError: (error) => {
+      Alert.alert(error.message);
+    },
+  });
   const [delete_agreements] = useMutation(DELETE_AGREEMENT, {
     onCompleted() {
+      deleteAgreementFromStore();
       navigation.pop();
+    },
+    onError(error) {
+      Alert.alert(error.message);
     },
   });
   const [insert_line_items_one] = useMutation(CREATE_LINE_ITEM, {
@@ -114,11 +143,29 @@ export default function AgreementDetails({
       updateActiveAgreement(newAgreement);
       updateAgreementState(newAgreement);
     },
+    onError(error) {
+      Alert.alert(error.message);
+    },
   });
   const [insert_agreement] = useMutation(CREATE_AGREEMENT, {
-    onCompleted() {
+    onCompleted(data) {
       // Update agreement number of current usr
+      const newAgreement: Agreement = data.insert_agreements.returning[0];
+      const newAgreements = agreements.slice();
+      newAgreements.unshift(newAgreement);
+      const contactsInStore = JSON.parse(JSON.stringify(contacts));
+      const newContacts = contactsInStore.map((ct: Contact) => {
+        if (ct.id === contact.id) {
+          ct.agreements?.push(agreement);
+        }
+        return ct;
+      });
+      setAction('agreements', {agreements: newAgreements});
+      setAction('contacts', {contacts: newContacts});
       Alert.alert('A Revision agreement is successfully created.');
+    },
+    onError(error) {
+      Alert.alert(error.message);
     },
   });
 
@@ -153,13 +200,7 @@ export default function AgreementDetails({
     const prevIndex = listData.findIndex(
       (item: AgreementLineItemType) => item.id === rowKey,
     );
-    removeLineItem(newData[prevIndex]);
-    newData.splice(prevIndex, 1);
-    setListData(newData);
-    const newAgreement = Object.assign({}, activeAgreement);
-    newAgreement.line_items = newData;
-    updateActiveAgreement(newAgreement);
-    updateAgreementState(newAgreement);
+    removeLineItem(newData[prevIndex], rowKey);
   };
 
   const updateAgreementState = (data: Agreement) => {
@@ -203,24 +244,11 @@ export default function AgreementDetails({
     const newAgreement = Object.assign({}, activeAgreement);
     newAgreement.sales_tax_rate = parseFloat(salesTax);
     updateActiveAgreement(newAgreement);
-    updateAgreementState(newAgreement);
     runAgreementUpdateQuery(newAgreement);
   };
 
   const updateAgreementRevision = () => {
-    const newAgreement = Object.assign({}, activeAgreement);
-    agreements.unshift(newAgreement);
-    const newAgreements = agreements.slice();
-    setAction('agreements', {agreements: newAgreements});
-    const contactsInStore = JSON.parse(JSON.stringify(contacts));
-    const newContacts = contactsInStore.map((ct: Contact) => {
-      if (ct.id === contact.id) {
-        ct.agreements?.push(agreement);
-      }
-      return ct;
-    });
-    setAction('contacts', {contacts: newContacts});
-    const line_items = newAgreement.line_items?.map(
+    const line_items = activeAgreement.line_items?.map(
       (item: AgreementLineItemType) => {
         return {
           catalog_item_id: item.catalog_item_id,
@@ -232,18 +260,40 @@ export default function AgreementDetails({
         };
       },
     );
-    insert_agreement({
-      variables: {
-        billing_address_id: newAgreement.billing_address_id,
-        agreement_template_id: newAgreement.agreement_template_id,
-        contact_id: newAgreement.contact_id,
-        shipping_address_id: newAgreement.shipping_address_id,
-        line_items,
-        user_id: newAgreement.user_id,
-        sales_tax_rate: newAgreement.sales_tax_rate,
-        number: `${userInfo.lastAgreementNumber + 1}`,
-      },
-    });
+    if (isOnline) {
+      insert_agreement({
+        variables: {
+          billing_address_id: activeAgreement.billing_address_id,
+          agreement_template_id: activeAgreement.agreement_template_id,
+          contact_id: activeAgreement.contact_id,
+          shipping_address_id: activeAgreement.shipping_address_id,
+          line_items,
+          user_id: activeAgreement.user_id,
+          sales_tax_rate: activeAgreement.sales_tax_rate,
+          number: `${userInfo.lastAgreementNumber + 1}`,
+        },
+      });
+    } else {
+      const newAgreement = Object.assign({}, activeAgreement);
+      agreements.unshift(newAgreement);
+      const newAgreements = agreements.slice();
+      const contactsInStore = JSON.parse(JSON.stringify(contacts));
+      const newContacts = contactsInStore.map((ct: Contact) => {
+        if (ct.id === contact.id) {
+          ct.agreements?.push(agreement);
+        }
+        return ct;
+      });
+      setAction('agreements', {agreements: newAgreements});
+      setAction('contacts', {contacts: newContacts});
+      const lastAgreement = agreements[0];
+      const newMutations = offline_mutations.data;
+      newMutations.push({
+        type: 'CREATE_AGREEMENT',
+        itemId: lastAgreement.id + 1,
+      });
+      setAction('offline_mutations', {data: newMutations});
+    }
   };
 
   const updateAgreement = (data: Agreement) => {
@@ -266,6 +316,37 @@ export default function AgreementDetails({
   };
 
   const deleteAgreement = () => {
+    const itemIndex = offline_mutations.data.findIndex(
+      (item: OfflineMutationType) =>
+        item.type === 'CREATE_AGREEMENT' && item.itemId === activeAgreement.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        delete_agreements({
+          variables: {
+            id: activeAgreement.id,
+          },
+        });
+      } else {
+        deleteAgreementFromStore();
+        const newMutations = offline_mutations.data;
+        newMutations.push({
+          type: 'DELETE_AGREEMENT',
+          itemId: activeAgreement.id, // agreement id
+        });
+        setAction('offline_mutations', {data: newMutations});
+        navigation.pop();
+      }
+    } else {
+      deleteAgreementFromStore();
+      const newMutations = offline_mutations.data;
+      newMutations.splice(itemIndex, 1);
+      setAction('offline_mutations', {data: newMutations});
+      navigation.pop();
+    }
+  };
+
+  const deleteAgreementFromStore = () => {
     const newAgreements = JSON.parse(JSON.stringify(agreements));
     const agIndex = newAgreements.findIndex(
       (ag: Agreement) => ag.id === activeAgreement.id,
@@ -285,25 +366,12 @@ export default function AgreementDetails({
       return ct;
     });
     setAction('contacts', {contacts: newContacts});
-    if (isOnline) {
-      delete_agreements({
-        variables: {
-          id: activeAgreement.id,
-        },
-      });
-    } else {
-      const newMutations = offlineMutations.data;
-      newMutations.push({
-        type: 'DELETE_AGREEMENT',
-        itemId: activeAgreement.id, // agreement id
-      });
-      setAction('offlineMutations', {data: newMutations});
-    }
   };
 
   const runAgreementUpdateQuery = (data: Agreement) => {
-    // Check if itemId already exists in offlineMutations list
-    const itemIndex = offlineMutations.data.findIndex(
+    updateAgreementState(data);
+    // Check if itemId already exists in offline_mutations list
+    const itemIndex = offline_mutations.data.findIndex(
       (item: OfflineMutationType) =>
         (item.type === 'CREATE_AGREEMENT' ||
           item.type === 'UPDATE_AGREEMENT') &&
@@ -313,18 +381,18 @@ export default function AgreementDetails({
       if (isOnline) {
         updateAgreement(data);
       } else {
-        const newMutations = offlineMutations.data;
+        const newMutations = offline_mutations.data;
         newMutations.push({
           type: 'UPDATE_AGREEMENT',
           itemId: data.id,
         });
-        setAction('offlineMutations', {data: newMutations});
+        setAction('offline_mutations', {data: newMutations});
       }
     }
   };
 
   const updateLineItem = (item: AgreementLineItemType) => {
-    const itemIndex = offlineMutations.data.findIndex(
+    const itemIndex = offline_mutations.data.findIndex(
       (it: OfflineMutationType) =>
         it.type === 'UPDATE_LINEITEM' && it.itemId === item.id,
     );
@@ -342,19 +410,19 @@ export default function AgreementDetails({
           },
         });
       } else {
-        const newMutations = offlineMutations.data;
+        const newMutations = offline_mutations.data;
         newMutations.push({
           type: 'UPDATE_LINEITEM',
           itemId: agreement.id, // agreement id
           lineItemId: item.id, // lineItem id
         });
-        setAction('offlineMutations', {data: newMutations});
+        setAction('offline_mutations', {data: newMutations});
       }
     }
   };
 
   const updateLineItemsOrder = (data: AgreementLineItemType[]) => {
-    const itemIndex = offlineMutations.data.findIndex(
+    const itemIndex = offline_mutations.data.findIndex(
       (it: OfflineMutationType) =>
         it.type === 'CREATE_AGREEMENT' && activeAgreement.id === it.itemId,
     );
@@ -371,7 +439,7 @@ export default function AgreementDetails({
           });
         });
       } else {
-        const newMutations = offlineMutations.data;
+        const newMutations = offline_mutations.data;
         data.map((it) => {
           newMutations.push({
             type: 'UPDATE_LINEITEM',
@@ -379,7 +447,7 @@ export default function AgreementDetails({
             lineItemId: it.id, // lineItem id
           });
         });
-        setAction('offlineMutations', {data: newMutations});
+        setAction('offline_mutations', {data: newMutations});
       }
     }
   };
@@ -392,8 +460,8 @@ export default function AgreementDetails({
     });
   };
 
-  const removeLineItem = (item: AgreementLineItemType) => {
-    const itemIndex = offlineMutations.data.findIndex(
+  const removeLineItem = (item: AgreementLineItemType, rowKey: number) => {
+    const itemIndex = offline_mutations.data.findIndex(
       (it: OfflineMutationType) =>
         it.type === 'DELETE_LINEITEM' && it.itemId === item.id,
     );
@@ -405,13 +473,23 @@ export default function AgreementDetails({
           },
         });
       } else {
-        const newMutations = offlineMutations.data;
+        const newData = [...listData];
+        const prevIndex = listData.findIndex(
+          (it: AgreementLineItemType) => it.id === rowKey,
+        );
+        newData.splice(prevIndex, 1);
+        setListData(newData);
+        const newAgreement = Object.assign({}, activeAgreement);
+        newAgreement.line_items = newData;
+        updateActiveAgreement(newAgreement);
+        updateAgreementState(newAgreement);
+        const newMutations = offline_mutations.data;
         newMutations.push({
           type: 'DELETE_LINEITEM',
           itemId: agreement.id, // agreement id
           lineItemId: item.id, // lineItem id
         });
-        setAction('offlineMutations', {data: newMutations});
+        setAction('offline_mutations', {data: newMutations});
       }
     }
     // Animate list to close gap when item is deleted
@@ -497,7 +575,9 @@ export default function AgreementDetails({
         </View>
         <View style={styles.descCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
-            {item.item.catalog_item.name}
+            {item.item.current_cost === 0
+              ? `${item.item.catalog_item.name} Installation`
+              : item.item.catalog_item.name}
           </AppText>
         </View>
         <View style={styles.priceCell}>
@@ -534,7 +614,8 @@ export default function AgreementDetails({
   };
 
   const getAgreementStatus = () => {
-    const events: AgreementEvent[] = activeAgreement.agreement_events as AgreementEvent[];
+    const events: AgreementEvent[] =
+      (activeAgreement.agreement_events as AgreementEvent[]) || [];
     if (events.length === 0) {
       return {status: 'open', agreementEditable: true};
     }
@@ -551,9 +632,33 @@ export default function AgreementDetails({
   };
 
   const onAddItem = (item: Catalog) => {
-    insert_line_items_one({
-      variables: {
-        object: {
+    // Check if itemId already exists in offline_mutations list
+    const itemIndex = offline_mutations.data.findIndex(
+      (it: OfflineMutationType) =>
+        (it.type === 'CREATE_AGREEMENT' || it.type === 'UPDATE_AGREEMENT') &&
+        it.itemId === activeAgreement.id,
+    );
+    if (itemIndex < 0) {
+      if (isOnline) {
+        insert_line_items_one({
+          variables: {
+            object: {
+              agreement_id: activeAgreement.id,
+              catalog_item_id: item.id,
+              current_cost: item.cost,
+              discount: 0,
+              order: activeAgreement.line_items
+                ? activeAgreement.line_items.length - 1
+                : 0,
+              price: item.price,
+              qty: 1,
+              taxable: item.taxable,
+            },
+          },
+        });
+      } else {
+        const newData = [...listData];
+        const newLineItem: AgreementLineItemType = {
           agreement_id: activeAgreement.id,
           catalog_item_id: item.id,
           current_cost: item.cost,
@@ -564,9 +669,50 @@ export default function AgreementDetails({
           price: item.price,
           qty: 1,
           taxable: item.taxable,
-        },
-      },
-    });
+          catalog_item: item,
+          id: newData[newData.length - 1]
+            ? newData[newData.length - 1].id + 1
+            : 1,
+        };
+        newData.push(newLineItem);
+        setListData(newData);
+        const newAgreement = Object.assign({}, activeAgreement);
+        newAgreement.line_items = newData;
+        updateActiveAgreement(newAgreement);
+        updateAgreementState(newAgreement);
+        const newMutations = offline_mutations.data;
+        newMutations.push({
+          type: 'CREATE_LINEITEM',
+          itemId: agreement.id, // agreement id
+          lineItemId: newLineItem.id, // lineItem id
+        });
+        setAction('offline_mutations', {data: newMutations});
+      }
+    } else {
+      const newData = [...listData];
+      const newLineItem: AgreementLineItemType = {
+        agreement_id: activeAgreement.id,
+        catalog_item_id: item.id,
+        current_cost: item.cost,
+        discount: 0,
+        order: activeAgreement.line_items
+          ? activeAgreement.line_items.length - 1
+          : 0,
+        price: item.price,
+        qty: 1,
+        taxable: item.taxable,
+        catalog_item: item,
+        id: newData[newData.length - 1]
+          ? newData[newData.length - 1].id + 1
+          : 1,
+      };
+      newData.push(newLineItem);
+      setListData(newData);
+      const newAgreement = Object.assign({}, activeAgreement);
+      newAgreement.line_items = newData;
+      updateActiveAgreement(newAgreement);
+      updateAgreementState(newAgreement);
+    }
   };
 
   const onShare = async () => {
@@ -683,7 +829,7 @@ export default function AgreementDetails({
                 font={'anRegular'}>
                 {activeAgreement.address?.line1}
               </AppText>
-              {activeAgreement.address?.line2 && (
+              {activeAgreement.address?.line2 ? (
                 <AppText
                   style={styles.lineHeight15}
                   color={'textBlack2'}
@@ -691,6 +837,8 @@ export default function AgreementDetails({
                   font={'anRegular'}>
                   {activeAgreement.address?.line2}
                 </AppText>
+              ) : (
+                <View />
               )}
               <AppText
                 style={styles.lineHeight15}
@@ -698,7 +846,9 @@ export default function AgreementDetails({
                 size={16}
                 numberOfLines={1}
                 font={'anRegular'}>
-                {`${activeAgreement.address?.city}, ${activeAgreement.address?.us_state} ${activeAgreement.address?.postal_code}`}
+                {`${activeAgreement.address?.city || ''}, ${
+                  activeAgreement.address?.us_state || ''
+                } ${activeAgreement.address?.postal_code || ''}`}
               </AppText>
               {phoneNum && (
                 <AppText
@@ -740,7 +890,7 @@ export default function AgreementDetails({
                 font={'anRegular'}>
                 {shippingAddress?.line1}
               </AppText>
-              {shippingAddress?.line2 && (
+              {shippingAddress?.line2 ? (
                 <AppText
                   style={styles.lineHeight15}
                   color={'textBlack2'}
@@ -748,6 +898,8 @@ export default function AgreementDetails({
                   font={'anRegular'}>
                   {shippingAddress?.line2}
                 </AppText>
+              ) : (
+                <View />
               )}
               <AppText
                 style={styles.lineHeight15}
@@ -755,7 +907,9 @@ export default function AgreementDetails({
                 size={16}
                 numberOfLines={1}
                 font={'anRegular'}>
-                {`${shippingAddress?.city}, ${shippingAddress?.us_state} ${shippingAddress?.postal_code}`}
+                {`${shippingAddress?.city || ''}, ${
+                  shippingAddress?.us_state || ''
+                } ${shippingAddress?.postal_code || ''}`}
               </AppText>
             </View>
           </View>
@@ -992,6 +1146,7 @@ export default function AgreementDetails({
         <Dialog.Input
           keyboardType="numeric"
           value={discount}
+          style={styles.dialogInput}
           onChangeText={(text: string) => {
             const value = text.replace(/[^0-9]/g, '');
             setDiscount(value);
@@ -1020,6 +1175,7 @@ export default function AgreementDetails({
         <Dialog.Input
           keyboardType="numeric"
           value={salesTax}
+          style={styles.dialogInput}
           onChangeText={(text: string) => {
             const value = text.replace(/[^0-9.]/g, '');
             setSalesTax(value);
@@ -1287,5 +1443,8 @@ const getStyles = (themeStyle: StyleType) => ({
   revisionText: {
     height: 50,
     justifyContent: 'center',
+  },
+  dialogInput: {
+    color: themeStyle.black,
   },
 });

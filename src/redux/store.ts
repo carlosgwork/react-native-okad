@@ -12,7 +12,15 @@ const storage = createSensitiveStorage({
 const config = {
   key: 'primary',
   storage,
-  whitelist: ['user'],
+  whitelist: [
+    'user',
+    'contacts',
+    'agreements',
+    'catalogs',
+    'vendors',
+    'offline_mutations',
+    'agreement_templates',
+  ],
 };
 
 const combinedReducers = combineReducers(reducers);

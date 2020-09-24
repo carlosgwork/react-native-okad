@@ -1,4 +1,5 @@
-import React, {useState} from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   TouchableOpacity,
@@ -7,15 +8,13 @@ import {
   ScrollView,
 } from 'react-native';
 import {useSelector} from 'react-redux';
-import {useQuery} from '@apollo/client';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {TableSortOps, Vendor, Catalog} from '@utils/types';
 import {emptyTableSortOption} from '@utils/constants';
 import {VendorsState} from '@redux/reducers/vendors';
-import {AppText, AppSearchInput, CircularLoading} from '@root/components';
+import {AppText, AppSearchInput} from '@root/components';
 import {SortOpsByVendor} from '@root/redux/reducers/catalogs';
-import {FETCH_VENDORS} from '@root/views/Catalogs/graphql';
 import {setAction} from '@root/redux/actions';
 import VendorRow from './vendorRow';
 import {useStyles} from '@global/Hooks';
@@ -34,23 +33,21 @@ const LineItemModal = ({
     (state: any): VendorsState => state.vendors,
   );
   const [offset, setOffset] = useState<number>(0);
-  const [searchText, setSearchText] = useState<string | undefined>('');
+  const [searchText, setSearchText] = useState<string>('');
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [vendorsSortOps, setVendorsSortOps] = useState<SortOpsByVendor[]>([]);
 
-  const {loading, error} = useQuery(FETCH_VENDORS, {
-    variables: {offset},
-    onCompleted: (data) => {
-      const newData = vendors.concat(data.vendors);
-      setAction('vendors', {
-        vendors: newData,
-      });
-      setSearchText('');
-      setAction('vendors', {searchText: ''});
-      sortVendors(newData);
-      setFilteredVendors(newData);
-    },
-  });
+  useEffect(() => {
+    const filtered = filterVendors(searchText, vendors);
+    const newData = filtered.slice(offset, offset + FETCH_COUNT);
+    let newVendors: Vendor[] = [];
+    if (offset > 0) {
+      newVendors = filteredVendors.slice();
+    }
+    newVendors = newVendors.concat(newData);
+    setFilteredVendors(newVendors);
+    sortVendors(newVendors);
+  }, [offset, searchText]);
 
   const onFilterCatalog = (text: string) => {
     const filtered = filterVendors(text, vendors);
@@ -117,9 +114,6 @@ const LineItemModal = ({
     nativeEvent: NativeScrollEvent;
   }): void => {
     const {layoutMeasurement, contentOffset, contentSize} = nativeEvent;
-    if (loading) {
-      return;
-    }
     if (layoutMeasurement.height > contentSize.height) {
       if (contentOffset.y > 60) {
         setOffset(offset + FETCH_COUNT);
@@ -133,16 +127,6 @@ const LineItemModal = ({
       }
     }
   };
-
-  if (error) {
-    return (
-      <View style={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Text>Loading Error</Text>
-        </View>
-      </View>
-    );
-  }
 
   return (
     <View style={styles.centeredView}>
@@ -175,12 +159,11 @@ const LineItemModal = ({
                 }
               />
             ))}
-            {!loading && filteredVendors.length === 0 && (
+            {filteredVendors.length === 0 && (
               <View style={styles.centerText}>
                 <Text>No Result</Text>
               </View>
             )}
-            <CircularLoading loading={loading} />
           </ScrollView>
         </View>
       </View>

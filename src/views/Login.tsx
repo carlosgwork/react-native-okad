@@ -4,7 +4,7 @@ import {firebase} from '@react-native-firebase/auth';
 import {setAction} from '@redux/actions';
 import {Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {useQuery, gql} from '@apollo/client';
+import {gql, useLazyQuery} from '@apollo/client';
 
 import {
   GoogleSignin,
@@ -16,7 +16,6 @@ import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
 import {navigateHome} from '@utils/functions';
 import {CircularLoading} from '@root/components';
-import {GET_LAST_AGREEMENT_OF_USER} from './Agreements/graphql';
 
 const GET_USERINFO = gql`
   query GetCurrentUser($user_id: Int) {
@@ -42,27 +41,11 @@ export default function Login() {
   const {themeStyle} = useTheme();
   const {replace} = useNavigation<any>();
   const {styles} = useStyles(getStyles);
-  const [userId, setUserId] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(false);
 
-  useQuery(GET_LAST_AGREEMENT_OF_USER, {
-    variables: {user_id: userId},
+  const [userQuery] = useLazyQuery(GET_USERINFO, {
     onCompleted: (data) => {
-      if (data && data.agreements?.length > 0) {
-        setAction('user', {
-          lastAgreementNumber: parseInt(data.agreements[0].number, 10),
-        });
-      } else {
-        setAction('user', {
-          lastAgreementNumber: 0,
-        });
-      }
-    },
-  });
-
-  useQuery(GET_USERINFO, {
-    variables: {user_id: userId},
-    onCompleted: (data) => {
+      console.log('----------fetch useinfo', data);
       if (data && data.users?.length > 0) {
         setAction('user', {
           deleted: data.users[0].deleted,
@@ -79,6 +62,7 @@ export default function Login() {
           public_id: data.users[0].public_id,
           prefs: data.users[0].prefs,
         });
+        navigateHome(replace);
       }
     },
   });
@@ -97,14 +81,17 @@ export default function Login() {
       return;
     }
     try {
-      // await GoogleSignin.hasPlayServices();
-      // const {idToken}: User = await GoogleSignin.signIn();
-      // const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
-      // // const userInfo = await firebase.auth().signInWithCredential(credential);
-      // await firebase.auth().signInWithCredential(credential);
+      await GoogleSignin.hasPlayServices();
+      const {idToken}: User = await GoogleSignin.signIn();
+      const credential = firebase.auth.GoogleAuthProvider.credential(idToken);
+      // const userInfo = await firebase.auth().signInWithCredential(credential);
+      await firebase.auth().signInWithCredential(credential);
       setLoading(false);
-      setUserId(1);
-      navigateHome(replace);
+      userQuery({
+        variables: {
+          user_id: 1,
+        },
+      });
     } catch (error) {
       setLoading(false);
       if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
