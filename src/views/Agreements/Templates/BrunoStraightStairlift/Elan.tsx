@@ -179,8 +179,8 @@ export default function ElanTemplate({
     onCompleted(data) {
       // Update agreement number of current usr
       const agreement: Agreement = data.insert_agreements.returning[0];
-      agreements.agreements.unshift(agreement);
       const newAgreements = agreements.agreements.slice();
+      newAgreements.unshift(agreement);
       setAction('agreements', {agreements: newAgreements});
       const contactsInStore = JSON.parse(JSON.stringify(contacts.contacts));
       const newContacts = contactsInStore.map((ct: Contact) => {
@@ -271,6 +271,7 @@ export default function ElanTemplate({
           });
         }
       });
+      console.log('------------ creating quote:, ', contact);
       insert_agreement({
         variables: {
           billing_address_id: contact.address_id,
