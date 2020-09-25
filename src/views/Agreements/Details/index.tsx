@@ -96,6 +96,11 @@ export default function AgreementDetails({
     false,
   );
   const [showDeletePrompt, setShowDeletePrompt] = useState<boolean>(false);
+  const [showQtyAdjustDialog, setShowQtyAdjustDialog] = useState<boolean>(
+    false,
+  );
+  const [qtyValue, setQtyValue] = useState<string>('');
+
   const [update_agreement] = useMutation(UPDATE_AGREEMENT, {
     onError(error) {
       Alert.alert(error.message);
@@ -230,7 +235,9 @@ export default function AgreementDetails({
     const prevIndex = listData.findIndex(
       (item: AgreementLineItemType) => item.id === activeRow,
     );
-    newData[prevIndex].discount = parseInt(discount, 10) * 100;
+    const dt = Object.assign({}, newData[prevIndex]);
+    dt.discount = parseInt(discount, 10) * 100;
+    newData[prevIndex] = dt;
     setListData(newData);
     setDiscount('');
     const newAgreement = Object.assign({}, activeAgreement);
@@ -245,6 +252,22 @@ export default function AgreementDetails({
     newAgreement.sales_tax_rate = parseFloat(salesTax);
     updateActiveAgreement(newAgreement);
     runAgreementUpdateQuery(newAgreement);
+  };
+
+  const changeQty = () => {
+    const newData = listData.slice();
+    const prevIndex = listData.findIndex(
+      (item: AgreementLineItemType) => item.id === activeRow,
+    );
+    const dt = Object.assign({}, newData[prevIndex]);
+    dt.qty = parseInt(qtyValue, 10);
+    newData[prevIndex] = dt;
+    setListData(newData);
+    const newAgreement = Object.assign({}, activeAgreement);
+    newAgreement.line_items = newData;
+    updateActiveAgreement(newAgreement);
+    updateAgreementState(newAgreement);
+    updateLineItem(newData[prevIndex]);
   };
 
   const updateAgreementRevision = () => {
@@ -568,11 +591,17 @@ export default function AgreementDetails({
         <TouchableOpacity onLongPress={item.drag} style={styles.dragbarCell}>
           <Icon name="reorder-three-outline" size={24} color="#a7a7a7" />
         </TouchableOpacity>
-        <View style={styles.qtyCell}>
+        <TouchableOpacity
+          style={styles.qtyCell}
+          onPress={() => {
+            setActiveRow(item.item.id);
+            setQtyValue(`${item.item.qty}`);
+            setShowQtyAdjustDialog(true);
+          }}>
           <AppText color={'lightPurple'} size={16} font={'anSemiBold'}>
             {`${item.item.qty}`}
           </AppText>
-        </View>
+        </TouchableOpacity>
         <View style={styles.descCell}>
           <AppText color={'textBlack1'} size={16} font={'anRegular'}>
             {item.item.current_cost === 0
@@ -1217,6 +1246,35 @@ export default function AgreementDetails({
           }}
         />
       </Dialog.Container>
+      <Dialog.Container key="set-qty-dialog" visible={showQtyAdjustDialog}>
+        <Dialog.Title>Set Quantity</Dialog.Title>
+        <Dialog.Input
+          keyboardType="numeric"
+          value={qtyValue}
+          style={styles.dialogInput}
+          onChangeText={(text: string) => {
+            let value = text.replace(/[^0-9.]/g, '');
+            if (parseInt(value, 10) < 1) {
+              value = '1';
+            }
+            setQtyValue(value.toString());
+          }}
+        />
+        <Dialog.Button
+          label="Cancel"
+          onPress={() => {
+            setQtyValue('1');
+            setShowQtyAdjustDialog(false);
+          }}
+        />
+        <Dialog.Button
+          label="Ok"
+          onPress={() => {
+            setShowQtyAdjustDialog(false);
+            changeQty();
+          }}
+        />
+      </Dialog.Container>
       {lineItemModalVisible && <View style={styles.modalWrapper} />}
       <Modal
         animationType="slide"
@@ -1349,7 +1407,7 @@ const getStyles = (themeStyle: StyleType) => ({
     justifyContent: 'center',
   },
   dragbarCell: {
-    width: 40,
+    width: 70,
   },
   totalCell: {
     width: 180,
