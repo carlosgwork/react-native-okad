@@ -668,65 +668,78 @@ export default function AgreementDetails({
         it.itemId === activeAgreement.id,
     );
     if (itemIndex < 0) {
-      if (isOnline) {
-        insert_line_items_one({
-          variables: {
-            object: {
-              agreement_id: activeAgreement.id,
-              catalog_item_id: item.id,
-              current_cost: item.cost,
-              discount: 0,
-              order: activeAgreement.line_items
-                ? activeAgreement.line_items.length - 1
-                : 0,
-              price: item.price,
-              qty: 1,
-              taxable: item.taxable,
+      const lineItIndex = listData
+        ? listData.findIndex((it2) => it2.catalog_item_id === item.id)
+        : -1;
+      if (lineItIndex < 0) {
+        if (isOnline) {
+          const lastOrder = listData[listData.length - 1].order || -1;
+          insert_line_items_one({
+            variables: {
+              object: {
+                agreement_id: activeAgreement.id,
+                catalog_item_id: item.id,
+                current_cost: item.cost,
+                discount: 0,
+                order: lastOrder + 1,
+                price: item.price,
+                qty: 1,
+                taxable: item.taxable,
+              },
             },
-          },
-        });
+          });
+        } else {
+          const newData = [...listData];
+          const lastOrder = listData[listData.length - 1].order || -1;
+          const newLineItem: AgreementLineItemType = {
+            agreement_id: activeAgreement.id,
+            catalog_item_id: item.id,
+            current_cost: item.cost,
+            discount: 0,
+            order: lastOrder + 1,
+            price: item.price,
+            qty: 1,
+            taxable: item.taxable,
+            catalog_item: item,
+            id: newData[newData.length - 1]
+              ? newData[newData.length - 1].id + 1
+              : 1,
+          };
+          newData.push(newLineItem);
+          setListData(newData);
+          const newAgreement = Object.assign({}, activeAgreement);
+          newAgreement.line_items = newData;
+          updateActiveAgreement(newAgreement);
+          updateAgreementState(newAgreement);
+          const newMutations = offline_mutations.data;
+          newMutations.push({
+            type: 'CREATE_LINEITEM',
+            itemId: agreement.id, // agreement id
+            lineItemId: newLineItem.id, // lineItem id
+          });
+          setAction('offline_mutations', {data: newMutations});
+        }
       } else {
-        const newData = [...listData];
-        const newLineItem: AgreementLineItemType = {
-          agreement_id: activeAgreement.id,
-          catalog_item_id: item.id,
-          current_cost: item.cost,
-          discount: 0,
-          order: activeAgreement.line_items
-            ? activeAgreement.line_items.length - 1
-            : 0,
-          price: item.price,
-          qty: 1,
-          taxable: item.taxable,
-          catalog_item: item,
-          id: newData[newData.length - 1]
-            ? newData[newData.length - 1].id + 1
-            : 1,
-        };
-        newData.push(newLineItem);
+        const newData = listData.slice();
+        const dt = Object.assign({}, newData[lineItIndex]);
+        dt.qty = listData[lineItIndex].qty + 1;
+        newData[lineItIndex] = dt;
         setListData(newData);
         const newAgreement = Object.assign({}, activeAgreement);
         newAgreement.line_items = newData;
         updateActiveAgreement(newAgreement);
         updateAgreementState(newAgreement);
-        const newMutations = offline_mutations.data;
-        newMutations.push({
-          type: 'CREATE_LINEITEM',
-          itemId: agreement.id, // agreement id
-          lineItemId: newLineItem.id, // lineItem id
-        });
-        setAction('offline_mutations', {data: newMutations});
+        updateLineItem(newData[lineItIndex]);
       }
     } else {
       const newData = [...listData];
+      const lastOrder = listData[listData.length - 1].order || -1;
       const newLineItem: AgreementLineItemType = {
         agreement_id: activeAgreement.id,
         catalog_item_id: item.id,
         current_cost: item.cost,
         discount: 0,
-        order: activeAgreement.line_items
-          ? activeAgreement.line_items.length - 1
-          : 0,
+        order: lastOrder + 1,
         price: item.price,
         qty: 1,
         taxable: item.taxable,

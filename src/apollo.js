@@ -8,12 +8,25 @@ const makeApolloClient = (token) => {
       'x-hasura-admin-secret': `${token}`,
     },
   });
+
+  const defaultOptions = {
+    watchQuery: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'ignore',
+    },
+    query: {
+      fetchPolicy: 'no-cache',
+      errorPolicy: 'all',
+    },
+  };
+
   // create an inmemory cache instance for caching graphql data
   const cache = new InMemoryCache();
   // instantiate apollo client with apollo link instance and cache instance
   const client = new ApolloClient({
     link,
     cache,
+    defaultOptions,
   });
   return client;
 };

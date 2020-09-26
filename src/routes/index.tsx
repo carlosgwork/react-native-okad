@@ -291,6 +291,7 @@ export default function Routes() {
         setMutationIndex(mutationIndex + 1);
         break;
       case 'CREATE_LINEITEM':
+        console.log('-------- creating line item');
         const lineItIndex3 = data.line_items.findIndex(
           (lineItem: LineItemType) => lineItem.id === mutation.lineItemId,
         );
@@ -341,6 +342,7 @@ export default function Routes() {
         setMutationIndex(mutationIndex + 1);
         break;
       case 'UPDATE_LINEITEM':
+        console.log('---------- updating line item');
         const lineItIndex = data.line_items.findIndex(
           (lineItem: LineItemType) => lineItem.id === mutation.lineItemId,
         );
@@ -349,11 +351,12 @@ export default function Routes() {
           qty: updatingLineItem.qty,
           last_modified: new Date(),
           discount: updatingLineItem.discount,
+          order: updatingLineItem.order,
         };
         await update_line_items({
           variables: {
             _set: lineItem,
-            id: data.id,
+            id: mutation.lineItemId,
           },
         });
         setMutationIndex(mutationIndex + 1);
@@ -432,10 +435,12 @@ export default function Routes() {
       if (mutationIndex < offline_mutations.length) {
         runOfflineMutation();
       } else {
-        setMutationIndex(0);
-        setAction('offline_mutations', {data: []});
-        setAction('loading', {state: true});
-        setAction('sync', {status: false});
+        setTimeout(() => {
+          setMutationIndex(0);
+          setAction('offline_mutations', {data: []});
+          setAction('loading', {state: true});
+          setAction('sync', {status: false});
+        }, 3000);
       }
     }
   }, [network.online, mutationIndex]);

@@ -4,7 +4,7 @@ import {firebase} from '@react-native-firebase/auth';
 import {setAction} from '@redux/actions';
 import {Alert} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import {gql, useLazyQuery} from '@apollo/client';
+import {gql, useApolloClient} from '@apollo/client';
 
 import {
   GoogleSignin,
@@ -42,30 +42,7 @@ export default function Login() {
   const {replace} = useNavigation<any>();
   const {styles} = useStyles(getStyles);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const [userQuery] = useLazyQuery(GET_USERINFO, {
-    onCompleted: (data) => {
-      console.log('----------fetch useinfo', data);
-      if (data && data.users?.length > 0) {
-        setAction('user', {
-          deleted: data.users[0].deleted,
-          default_sales_tax_rate: data.users[0].default_sales_tax_rate,
-          created: data.users[0].created,
-          email: data.users[0].email,
-          google_id: data.users[0].google_id,
-          id: data.users[0].id,
-          last_modified: data.users[0].last_modified,
-          name_first: data.users[0].name_first,
-          name_last: data.users[0].name_last,
-          organization_id: data.users[0].organization_id,
-          prefix: data.users[0].prefix,
-          public_id: data.users[0].public_id,
-          prefs: data.users[0].prefs,
-        });
-        navigateHome(replace);
-      }
-    },
-  });
+  const client = useApolloClient();
 
   useEffect(() => {
     GoogleSignin.configure({
@@ -87,11 +64,30 @@ export default function Login() {
       // const userInfo = await firebase.auth().signInWithCredential(credential);
       await firebase.auth().signInWithCredential(credential);
       setLoading(false);
-      userQuery({
+      const {data} = await client.query({
+        query: GET_USERINFO,
         variables: {
           user_id: 1,
         },
       });
+      if (data && data.users?.length > 0) {
+        setAction('user', {
+          deleted: data.users[0].deleted,
+          default_sales_tax_rate: data.users[0].default_sales_tax_rate,
+          created: data.users[0].created,
+          email: data.users[0].email,
+          google_id: data.users[0].google_id,
+          id: data.users[0].id,
+          last_modified: data.users[0].last_modified,
+          name_first: data.users[0].name_first,
+          name_last: data.users[0].name_last,
+          organization_id: data.users[0].organization_id,
+          prefix: data.users[0].prefix,
+          public_id: data.users[0].public_id,
+          prefs: data.users[0].prefs,
+        });
+        navigateHome(replace);
+      }
     } catch (error) {
       setLoading(false);
       if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
