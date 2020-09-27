@@ -30,17 +30,21 @@ export default function Dashboard({
 
   useEffect(() => {
     setSearchText('');
-    const ags = [];
+    let ags = [];
     let i = 0;
-    while (ags.length < 10) {
-      const ag = agreements[i];
-      const index = ag?.agreement_events.findIndex(
-        (event: AgreementEvent) => event.type === 'accepted',
-      );
-      if (index < 0) {
-        ags.push(ag);
+    if (agreements.length > 10) {
+      while (ags.length < 10) {
+        const ag = agreements[i];
+        const index = ag?.agreement_events.findIndex(
+          (event: AgreementEvent) => event.type === 'accepted',
+        );
+        if (index < 0) {
+          ags.push(ag);
+        }
+        i++;
       }
-      i++;
+    } else {
+      ags = agreements.slice();
     }
     setOpenAgreements(ags);
     setVisibleAgreements(ags);

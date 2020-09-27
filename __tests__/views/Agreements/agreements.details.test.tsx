@@ -47,7 +47,10 @@ const store = mockStore({
 });
 
 let mockClient: any;
-const navigation = {navigate: jest.fn()};
+const navigation = {
+  navigate: jest.fn(),
+  addListener: jest.fn(),
+};
 const route: any = {
   params: {
     agreement: AGREEMENT_DETAILS_MOCKDATA,

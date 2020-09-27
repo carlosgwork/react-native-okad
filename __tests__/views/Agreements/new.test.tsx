@@ -6,12 +6,34 @@ import React from 'react';
 import {createMockClient} from 'mock-apollo-client';
 import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
+import configureStore from 'redux-mock-store';
+import {Provider} from 'react-redux';
 
 import NewAgreement from '@root/views/Agreements/New';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
+import {AGREEMENT_TEMPLATES_MOCKDATA} from '../../__mocks__/AgreementTemplates';
 
 let wrapper: ReactWrapper;
+const mockStore = configureStore([]);
+const store = mockStore({
+  agreements: {
+    agreements: [],
+  },
+  agreement_templates: AGREEMENT_TEMPLATES_MOCKDATA,
+  contacts: {
+    contacts: [],
+  },
+  offline_mutations: {
+    data: [],
+  },
+  user: {
+    prefix: 'LH',
+  },
+  network: {
+    online: true,
+  },
+});
 
 const theme = 'normal';
 const currentTheme = {
@@ -28,9 +50,11 @@ describe('New Agreement Page', () => {
   beforeEach(() => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
-        <ThemeContext.Provider value={currentTheme}>
-          <NewAgreement navigation={navigation as any} route={{} as any} />
-        </ThemeContext.Provider>
+        <Provider store={store}>
+          <ThemeContext.Provider value={currentTheme}>
+            <NewAgreement navigation={navigation as any} route={{} as any} />
+          </ThemeContext.Provider>
+        </Provider>
       </ApolloProvider>,
     );
     wrapper.update();

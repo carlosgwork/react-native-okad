@@ -17,6 +17,7 @@ import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
 import {DASHBOARD_MOCKDATA} from '../../__mocks__/Dashboard';
 import {FETCH_10_AGREEMENTS} from '@root/views/Dashboard/graphql';
+import {AGREEMENTS_MOCKDATA} from '../../__mocks__/Agreements';
 
 let wrapper: ReactWrapper;
 let queryHandler;
@@ -30,7 +31,7 @@ const currentTheme = {
 } as ThemeContextType;
 const store = mockStore({
   agreements: {
-    agreements: [],
+    agreements: AGREEMENTS_MOCKDATA.agreements,
     sortOp: {
       sortBy: '',
       sortOrder: 'ASC',
@@ -50,48 +51,6 @@ describe('Dashboard Page', () => {
     mockClient.setRequestHandler(FETCH_10_AGREEMENTS, queryHandler);
   });
 
-  it('renders Loading component while fetching data', () => {
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <NavigationContainer>
-              <MainTab.Navigator>
-                <MainTab.Screen name="Home" component={Dashboard} />
-              </MainTab.Navigator>
-            </NavigationContainer>
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(true);
-  });
-
-  it('renders Loading Error text if Data Fetch is failed', async () => {
-    mockClient = createMockClient();
-    mockClient.setRequestHandler(FETCH_10_AGREEMENTS, () =>
-      Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
-    );
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <NavigationContainer>
-              <MainTab.Navigator>
-                <MainTab.Screen name="Home" component={Dashboard} />
-              </MainTab.Navigator>
-            </NavigationContainer>
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    await wait(0);
-    wrapper.update();
-    expect(wrapper.text()).toContain('Loading Error');
-  });
-
   it('renders successfully', async () => {
     wrapper = mount(
       <ApolloProvider client={mockClient as any}>
@@ -108,9 +67,9 @@ describe('Dashboard Page', () => {
     );
     await wait(0);
     wrapper.update();
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(false);
+    const appHeader = wrapper.find('Memo(AppHeader)');
+    expect(appHeader).toHaveLength(1);
+    expect(appHeader.find('Memo(AppSearchInput)')).toHaveLength(1);
   });
 
   it('should have 2 AgreementTiles', async () => {

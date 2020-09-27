@@ -6,20 +6,15 @@ import React from 'react';
 import {Alert} from 'react-native';
 import Agreements from '@root/views/Agreements';
 import {Provider} from 'react-redux';
-import {createMockClient} from 'mock-apollo-client';
-import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
 import configureStore from 'redux-mock-store';
 
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
-import {AGREEMENTS_MOCKDATA} from '../../__mocks__/Agreements';
 import {TouchElementProps} from '@root/utils/types';
-import {FETCH_AGREEMENTS} from '@root/views/Agreements/graphql';
 
 let wrapper: ReactWrapper;
-let queryHandler;
 
 const mockStore = configureStore([]);
 const theme = 'normal';
@@ -47,65 +42,32 @@ const store2 = mockStore({
   },
 });
 
-let mockClient: any;
 const navigation = {navigate: jest.fn()};
 jest.spyOn(Alert, 'alert');
 
 describe('Agreements Page', () => {
-  beforeEach(() => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: AGREEMENTS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, queryHandler);
-  });
-
-  it('renders Loading component while fetching data', () => {
+  it('renders successfully', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(true);
-  });
-
-  it('shows an Alert and hides Loading Indicator if Data Fetch is failed', async () => {
-    mockClient = createMockClient();
-    mockClient.setRequestHandler(FETCH_AGREEMENTS, () =>
-      Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
-    );
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Agreements navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();
-    expect(Alert.alert).toHaveBeenCalled();
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(false);
+    const appHeader = wrapper.find('Memo(AppHeader)');
+    expect(appHeader).toHaveLength(1);
+    expect(appHeader.find('Memo(AppSearchInput)')).toHaveLength(1);
   });
 
   it('should have one Table component with 5 columns', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Agreements navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();
@@ -124,13 +86,11 @@ describe('Agreements Page', () => {
 
   it('sorts rows by Contact/Shipping Address/Template/Created fields', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Agreements navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();
@@ -152,13 +112,11 @@ describe('Agreements Page', () => {
 
   it('update table rows when state.sortOp is changed', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store2}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Agreements navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store2}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Agreements navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();

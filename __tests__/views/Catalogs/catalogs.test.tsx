@@ -4,8 +4,6 @@
 
 import React from 'react';
 import {Provider} from 'react-redux';
-import {createMockClient} from 'mock-apollo-client';
-import {ApolloProvider} from '@apollo/client';
 import {mount, ReactWrapper} from 'enzyme';
 import wait from 'waait';
 import configureStore from 'redux-mock-store';
@@ -14,10 +12,8 @@ import Catalogs from '@root/views/Catalogs';
 import {ThemeContext, ThemeContextType} from '@global/Context';
 import getThemeStyle from '@root/utils/styles';
 import {VENDORS_MOCKDATA} from '../../__mocks__/Vendors';
-import {FETCH_VENDORS} from '@root/views/Catalogs/graphql';
 
 let wrapper: ReactWrapper;
-let queryHandler;
 
 const mockStore = configureStore([]);
 const theme = 'normal';
@@ -28,84 +24,37 @@ const currentTheme = {
 } as ThemeContextType;
 const store = mockStore({
   vendors: {
-    vendors: [],
+    vendors: VENDORS_MOCKDATA.vendors,
     searchText: '',
     sortOptions: [],
   },
 });
 
-let mockClient: any;
 const navigation = {navigate: jest.fn()};
 
 describe('Catalogs Page Component', () => {
-  beforeEach(() => {
-    mockClient = createMockClient();
-    queryHandler = jest.fn().mockResolvedValue({
-      data: VENDORS_MOCKDATA,
-    });
-    mockClient.setRequestHandler(FETCH_VENDORS, queryHandler);
-  });
-
-  it('renders Loading component while fetching data', () => {
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Catalogs navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(true);
-  });
-
-  it('renders Loading Error text if Data Fetch is failed', async () => {
-    mockClient = createMockClient();
-    mockClient.setRequestHandler(FETCH_VENDORS, () =>
-      Promise.resolve({errors: [{message: 'GraphQL Error'}]}),
-    );
-    wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Catalogs navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
-    );
-    await wait(0);
-    wrapper.update();
-    expect(wrapper.text()).toContain('Loading Error');
-  });
-
   it('renders successfully', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Catalogs navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Catalogs navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();
-    const loadingEle = wrapper.find('Memo(CircularLoading)');
-    expect(loadingEle).toHaveLength(1);
-    expect(loadingEle.prop('loading')).toEqual(false);
+    const header = wrapper.find('Memo(AppHeader)');
+    expect(header).toHaveLength(1);
+    expect(header.find('Memo(AppSearchInput)')).toHaveLength(1);
   });
 
   it('should have one vendorRow component and valid props', async () => {
     wrapper = mount(
-      <ApolloProvider client={mockClient as any}>
-        <Provider store={store}>
-          <ThemeContext.Provider value={currentTheme}>
-            <Catalogs navigation={navigation as any} route={{} as any} />
-          </ThemeContext.Provider>
-        </Provider>
-      </ApolloProvider>,
+      <Provider store={store}>
+        <ThemeContext.Provider value={currentTheme}>
+          <Catalogs navigation={navigation as any} route={{} as any} />
+        </ThemeContext.Provider>
+      </Provider>,
     );
     await wait(0);
     wrapper.update();
