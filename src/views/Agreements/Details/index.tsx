@@ -167,6 +167,9 @@ export default function AgreementDetails({
       });
       setAction('agreements', {agreements: newAgreements});
       setAction('contacts', {contacts: newContacts});
+      setAction('user', {
+        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
+      });
       Alert.alert('A Revision agreement is successfully created.');
     },
     onError(error) {
@@ -297,7 +300,11 @@ export default function AgreementDetails({
         },
       });
     } else {
+      const lastAgreement = agreements[0];
       const newAgreement = Object.assign({}, activeAgreement);
+      newAgreement.id = lastAgreement.id + 1;
+      newAgreement.number = `${userInfo.lastAgreementNumber + 1}`;
+      newAgreement.line_items = line_items as AgreementLineItemType[];
       agreements.unshift(newAgreement);
       const newAgreements = agreements.slice();
       const contactsInStore = JSON.parse(JSON.stringify(contacts));
@@ -309,11 +316,13 @@ export default function AgreementDetails({
       });
       setAction('agreements', {agreements: newAgreements});
       setAction('contacts', {contacts: newContacts});
-      const lastAgreement = agreements[0];
       const newMutations = offline_mutations.data;
       newMutations.push({
         type: 'CREATE_AGREEMENT',
         itemId: lastAgreement.id + 1,
+      });
+      setAction('user', {
+        lastAgreementNumber: userInfo.lastAgreementNumber + 1,
       });
       setAction('offline_mutations', {data: newMutations});
     }

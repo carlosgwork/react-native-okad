@@ -184,6 +184,7 @@ export default function Routes() {
   ]);
 
   const runOfflineMutation = async () => {
+    console.log('------- run offline mutation ');
     const mutation = offline_mutations[mutationIndex];
     let data: any;
     if (mutation.type !== 'CREATE_CONTACT') {
@@ -435,11 +436,11 @@ export default function Routes() {
       if (mutationIndex < offline_mutations.length) {
         runOfflineMutation();
       } else {
+        setAction('offline_mutations', {data: []});
         setTimeout(() => {
-          setMutationIndex(0);
-          setAction('offline_mutations', {data: []});
           setAction('loading', {state: true});
           setAction('sync', {status: false});
+          setMutationIndex(0);
         }, 3000);
       }
     }

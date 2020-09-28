@@ -27,6 +27,7 @@ export const FETCH_All_AGREEMENTS = gql`
         us_state
         postal_code
       }
+      billing_address_id
       contact {
         name_first
         name_last
@@ -102,6 +103,7 @@ export const FETCH_AGREEMENTS = gql`
         us_state
         postal_code
       }
+      billing_address_id
       contact {
         name_first
         name_last
@@ -203,6 +205,7 @@ export const CREATE_AGREEMENT = gql`
           name_last
           id
         }
+        billing_address_id
         contact_id
         line_items {
           agreement_id
@@ -273,6 +276,7 @@ export const UPDATE_AGREEMENT = gql`
           us_state
           postal_code
         }
+        billing_address_id
         contact {
           name_first
           name_last
