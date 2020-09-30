@@ -1,13 +1,17 @@
 import React, {useState} from 'react';
-import {View, TouchableOpacity, Alert, StatusBar} from 'react-native';
-import {Input} from 'react-native-elements';
+
 import Geolocation, {
   GeolocationResponse,
 } from '@react-native-community/geolocation';
-import phone from 'phone';
-import {useMutation} from '@apollo/client';
+import NetInfo from '@react-native-community/netinfo';
+
+import {View, TouchableOpacity, Alert, StatusBar} from 'react-native';
+import {Input} from 'react-native-elements';
 import Icon from 'react-native-vector-icons/Ionicons';
+
+import {useMutation} from '@apollo/client';
 import {useSelector} from 'react-redux';
+import {setAction} from '@root/redux/actions';
 
 import type {ThemeStyle as StyleType} from '@root/utils/styles';
 import {useStyles, useTheme} from '@global/Hooks';
@@ -17,18 +21,21 @@ import {
   AppGradButton,
   CircularLoading,
 } from '@root/components';
+
 import {Contact, Address} from '@root/utils/types';
+import {AppNavProps, AppRouteEnum} from '@root/routes/types';
+import phone from 'phone';
 import {fetchAddressFromLocation} from '@root/utils/apis';
+
 import {emptyContact} from '@root/utils/constants';
 import {CREATE_CONTACT} from '../graphql';
-import {AppNavProps, AppRouteEnum} from '@root/routes/types';
-import {setAction} from '@root/redux/actions';
 
 export default function NewContact({
   navigation,
 }: AppNavProps<AppRouteEnum.NewContactModal>) {
   const {styles} = useStyles(getStyles);
   const {themeStyle} = useTheme();
+
   const {contacts, offline_mutations, isOnline} = useSelector((state: any) => ({
     contacts: state.contacts.contacts,
     offline_mutations: state.offline_mutations,
@@ -49,17 +56,21 @@ export default function NewContact({
       Alert.alert(error.message);
     },
   });
+
   const [loadingLocation, setLoadingLocation] = useState<boolean>(false);
   const [error, setError] = useState<Contact>(emptyContact);
   const [form, setForm] = useState<Contact>(emptyContact);
+
   const changeForm = (field: keyof Contact, value: string) => {
     const newForm: Contact = Object.assign({}, form);
+
     if (
       field === 'phone_home' ||
       field === 'phone_office' ||
       field === 'phone_mobile'
     ) {
       const cleaned = ('' + value).replace(/\D/g, '');
+
       const match = cleaned.match(/^(1|)?(\d{3})(\d{3})(\d{4})$/);
       if (match) {
         const intlCode = match[1] ? '+1 ' : '',
@@ -79,25 +90,30 @@ export default function NewContact({
     } else {
       newForm[field] = value as never;
     }
+
     setForm(newForm);
   };
+
   const changeAddress = (field: keyof Address, value: string) => {
-    const newAddress: Address = Object.assign({}, form.address);
+    const newAddress: Address = {...form.address};
     newAddress[field] = value as never;
-    const newForm = Object.assign({}, form);
+    const newForm = {...form};
     newForm.address = newAddress;
     setForm(newForm);
   };
+
   const getAddressFromCurrentLocation = () => {
     setLoadingLocation(true);
+
     Geolocation.getCurrentPosition(
       (position: GeolocationResponse) => {
         const params = {
           long: position.coords.longitude,
           lat: position.coords.latitude,
         };
+
         fetchAddressFromLocation(params).then((addr: Address) => {
-          const newForm = Object.assign({}, form);
+          const newForm = {...form};
           newForm.address = addr;
           setLoadingLocation(false);
           setForm(newForm);
@@ -114,10 +130,70 @@ export default function NewContact({
       },
     );
   };
+
+  interface UseLocationButtonProps {}
+
+  type UseLocationButtonState = {
+    isInternetReachable: boolean;
+  };
+
+  class UseLocationButton extends React.Component<
+    UseLocationButtonProps,
+    UseLocationButtonState
+  > {
+    constructor(props: UseLocationButtonProps) {
+      super(props);
+      this.state = {isInternetReachable: false};
+    }
+
+    _isMounted: boolean = false;
+
+    componentDidMount() {
+      this._isMounted = true;
+
+      if (this._isMounted) {
+        NetInfo.fetch().then((state) => {
+          if (state.isInternetReachable) {
+            this.setState({isInternetReachable: state.isInternetReachable});
+          }
+        });
+      }
+    }
+
+    componentWillUnmount() {
+      this.setState = () => {
+        return;
+      };
+      this._isMounted = false;
+    }
+
+    render() {
+      if (this.state.isInternetReachable) {
+        return (
+          <TouchableOpacity
+            onPress={getAddressFromCurrentLocation}
+            style={styles.rowLayout}>
+            <Icon
+              name={'navigate'}
+              color={themeStyle.textLightPurple}
+              size={16}
+            />
+            <AppText size={14} color={'textLightPurple'} font="anMedium">
+              &nbsp;Use my current location
+            </AppText>
+          </TouchableOpacity>
+        );
+      } else {
+        return null;
+      }
+    }
+  }
+
   const validateForm = () => {
     let valid = true;
     const newError = Object.assign({}, emptyContact);
     const newForm = Object.assign({}, form);
+
     if (!form.name_first) {
       newError.name_first = 'Required';
       valid = false;
@@ -202,17 +278,22 @@ export default function NewContact({
     } else {
       const newContacts = contacts.slice();
       const lastContact = contacts[0];
+
       const createdContact = formData;
       createdContact.agreements = [];
       createdContact.offlineAgreements = [];
       createdContact.id = lastContact.id + 1;
+
       newContacts.unshift(createdContact);
+
       setAction('contacts', {contacts: newContacts});
+
       const newMutations = offline_mutations.data;
       newMutations.push({
         type: 'CREATE_CONTACT',
         itemId: createdContact.id,
       });
+
       setAction('offline_mutations', {data: newMutations});
       navigation.pop();
     }
@@ -237,20 +318,7 @@ export default function NewContact({
         rightContent={null}
         pageTitle={'New contact'}
         toolbarCenterContent={null}
-        toolbarRightContent={
-          <TouchableOpacity
-            onPress={getAddressFromCurrentLocation}
-            style={styles.rowLayout}>
-            <Icon
-              name={'navigate'}
-              color={themeStyle.textLightPurple}
-              size={16}
-            />
-            <AppText size={14} color={'textLightPurple'} font="anMedium">
-              &nbsp;Use my current location
-            </AppText>
-          </TouchableOpacity>
-        }
+        toolbarRightContent={<UseLocationButton />}
       />
       <View style={styles.mainContent}>
         <View style={styles.row}>
