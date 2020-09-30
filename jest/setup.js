@@ -3,6 +3,9 @@ import {configure} from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import 'react-native-gesture-handler/jestSetup';
 import {NativeModules} from 'react-native';
+import mockRNCNetInfo from '@react-native-community/netinfo/jest/netinfo-mock.js';
+
+jest.mock('@react-native-community/netinfo', () => mockRNCNetInfo);
 
 jest.mock('react-native-device-info', () => {
   return {
