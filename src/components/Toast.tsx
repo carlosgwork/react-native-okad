@@ -15,7 +15,7 @@ export default function Toast() {
   const { text, type } = toast
   React.useEffect(() => {
     if (text != '') {
-      setTimeout(() => cleanAction('toast'), 5000)
+      setTimeout(() => cleanAction('toast'), 3000)
     }
   }, [text])
   if (text == '') {
